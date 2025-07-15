@@ -1,13 +1,17 @@
-import React from "react";
-import ListarProductos from "./modulos/productos/ListarProductos";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Layout from './modulos/Layout';
+import ListarProductos from './modulos/productos/ListarProductos';
 
 function App() {
-  return (
-    <div>
-      <h1>Sistema de Inventario</h1>
-      <ListarProductos />
-    </div>
-  );
+    return (
+        <Router>
+            <Layout>
+                <Routes>
+                    <Route path="/productos" element={<ListarProductos />} />
+                </Routes>
+            </Layout>
+        </Router>
+    );
 }
 
 export default App;
