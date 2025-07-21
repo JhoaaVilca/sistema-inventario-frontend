@@ -13,6 +13,9 @@ function Layout({ children }) {
                         <Link className="nav-link text-white" to="/productos">Productos</Link>
                     </li>
                     <li className="nav-item">
+                        <Link className="nav-link text-white" to="/proveedores">Proveedores</Link>
+                    </li>
+                    <li className="nav-item">
                         <Link className="nav-link text-white" to="/entradas">Entradas</Link>
                     </li>
                     <li className="nav-item">
