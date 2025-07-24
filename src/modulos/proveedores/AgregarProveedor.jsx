@@ -10,7 +10,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
         direccion: "",
         telefono: "",
         email: "",
-        estado: "", // nuevo campo solo para mostrar
+        estado: "",
     });
 
     const handleChange = (e) => {
@@ -18,24 +18,41 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
     };
 
     const buscarDocumento = async () => {
+        if (!proveedor.numeroDocumento || proveedor.numeroDocumento.trim() === "") {
+            alert("Por favor, ingrese un número de documento para buscar.");
+            return;
+        }
+
         try {
             const response = await axios.get(
                 `http://localhost:8080/api/proveedores/consultar?tipo=${proveedor.tipoDocumento}&numero=${proveedor.numeroDocumento}`
             );
-            console.log("Respuesta de la API:", response.data);
 
-            // Aquí está el cambio importante 👇
-            const data = response.data.data;
-
+            if (response.data && response.data.data) {
+                const data = response.data.data;
+                setProveedor((prev) => ({
+                    ...prev,
+                    nombre: data.nombre || "",
+                    direccion: data.direccion || "",
+                    estado: data.estado || "",
+                }));
+            } else {
+                alert("No se encontraron datos para el documento.");
+                setProveedor((prev) => ({
+                    ...prev,
+                    nombre: "",
+                    direccion: "",
+                    estado: "",
+                }));
+            }
+        } catch (error) {
+            alert("Ocurrió un error al consultar el documento.");
             setProveedor((prev) => ({
                 ...prev,
-                nombre: data.nombre || "",
-                direccion: data.direccion || "",
-                estado: data.estado || "",
+                nombre: "",
+                direccion: "",
+                estado: "",
             }));
-        } catch (error) {
-            console.error("Error al consultar documento:", error);
-            alert("No se pudo consultar el documento. Verifica el número.");
         }
     };
 
@@ -44,11 +61,25 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
         const { estado, ...proveedorSinEstado } = proveedor;
 
         try {
-            await axios.post("http://localhost:8080/api/proveedores", proveedorSinEstado);
-            onProveedorAdded();
-            handleClose();
+            const response = await axios.post("http://localhost:8080/api/proveedores", proveedorSinEstado);
+
+            if (response && response.data) {
+                onProveedorAdded(response.data);
+                handleClose();
+                setProveedor({
+                    nombre: "",
+                    tipoDocumento: "RUC",
+                    numeroDocumento: "",
+                    direccion: "",
+                    telefono: "",
+                    email: "",
+                    estado: "",
+                });
+            } else {
+                alert("Error al guardar proveedor.");
+            }
         } catch (error) {
-            console.error("Error al guardar proveedor:", error);
+            alert("Error al guardar proveedor. Verifique su conexión o intente nuevamente.");
         }
     };
 
@@ -59,7 +90,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Tipo Documento</Form.Label>
                         <Form.Select
                             name="tipoDocumento"
@@ -71,7 +102,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                         </Form.Select>
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Número Documento</Form.Label>
                         <div style={{ display: "flex", gap: "10px" }}>
                             <Form.Control
@@ -79,6 +110,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                                 name="numeroDocumento"
                                 value={proveedor.numeroDocumento}
                                 onChange={handleChange}
+                                required
                             />
                             <Button variant="secondary" onClick={buscarDocumento}>
                                 Buscar
@@ -86,17 +118,18 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                         </div>
                     </Form.Group>
 
-                    <Form.Group>
-                        <Form.Label>Nombre</Form.Label>
+                    <Form.Group className="mb-3">
+                        <Form.Label>Nombre / Razón Social</Form.Label>
                         <Form.Control
                             type="text"
                             name="nombre"
                             value={proveedor.nombre}
                             onChange={handleChange}
+                            required
                         />
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Dirección</Form.Label>
                         <Form.Control
                             type="text"
@@ -106,7 +139,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                         />
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Teléfono</Form.Label>
                         <Form.Control
                             type="text"
@@ -116,7 +149,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                         />
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Email</Form.Label>
                         <Form.Control
                             type="email"
@@ -127,14 +160,14 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                     </Form.Group>
 
                     {proveedor.estado && (
-                        <Form.Group>
-                            <Form.Label>Estado del RUC:</Form.Label>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Estado del Documento:</Form.Label>
                             <Form.Control type="text" readOnly value={proveedor.estado} />
                         </Form.Group>
                     )}
 
                     <Button variant="primary" type="submit" className="mt-3">
-                        Guardar
+                        Guardar Proveedor
                     </Button>
                 </Form>
             </Modal.Body>

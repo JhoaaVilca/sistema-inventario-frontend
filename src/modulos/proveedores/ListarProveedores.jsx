@@ -8,7 +8,6 @@ function ListarProveedores() {
     const [showEditModal, setShowEditModal] = useState(false);
     const [proveedorEditar, setProveedorEditar] = useState(null);
 
-    // Cargar proveedores al iniciar
     useEffect(() => {
         cargarProveedores();
     }, []);
@@ -17,7 +16,7 @@ function ListarProveedores() {
         fetch("http://localhost:8080/api/proveedores")
             .then((res) => res.json())
             .then((data) => setProveedores(data))
-            .catch((error) => console.error("Error al cargar proveedores:", error));
+            .catch(() => alert("Error al cargar proveedores."));
     };
 
     const handleOpenAddModal = () => setShowAddModal(true);
@@ -57,10 +56,10 @@ function ListarProveedores() {
                         prev.filter((p) => p.idProveedor !== idProveedor)
                     );
                 } else {
-                    console.error("Error al eliminar proveedor");
+                    alert("Error al eliminar proveedor.");
                 }
             })
-            .catch((error) => console.error("Error al eliminar proveedor:", error));
+            .catch(() => alert("Error de red al eliminar proveedor."));
     };
 
     return (
@@ -111,14 +110,12 @@ function ListarProveedores() {
                 </tbody>
             </table>
 
-            {/* Modal para agregar */}
             <AgregarProveedor
                 show={showAddModal}
                 handleClose={handleCloseAddModal}
-                onProveedorAgregado={handleProveedorAgregado}
+                onProveedorAdded={handleProveedorAgregado}
             />
 
-            {/* Modal para editar */}
             {proveedorEditar && (
                 <EditarProveedor
                     show={showEditModal}
