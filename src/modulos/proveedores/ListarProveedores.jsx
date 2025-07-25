@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AgregarProveedor from "./AgregarProveedor";
 import EditarProveedor from "./EditarProveedor";
-
+import { Edit, Trash2, Plus } from "lucide-react";
 function ListarProveedores() {
     const [proveedores, setProveedores] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -66,9 +66,16 @@ function ListarProveedores() {
         <div className="container mt-4">
             <h2 className="mb-4 text-center">Lista de Proveedores</h2>
 
-            <button className="btn btn-primary mb-3" onClick={handleOpenAddModal}>
-                Agregar Proveedor
-            </button>
+            <div className="d-flex justify-content-end mb-3">
+                <button
+                    className="btn btn-primary d-flex align-items-center gap-2"
+                    onClick={handleOpenAddModal}
+                >
+                    <Plus size={18} />
+                    <span>Agregar Proveedor</span>
+                </button>
+            </div>
+
 
             <table className="table table-striped table-bordered">
                 <thead className="table-dark">
@@ -92,18 +99,24 @@ function ListarProveedores() {
                             <td>{p.telefono}</td>
                             <td>{p.email}</td>
                             <td>
-                                <button
-                                    className="btn btn-success btn-sm me-2"
-                                    onClick={() => handleEditarClick(p)}
-                                >
-                                    Editar
-                                </button>
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => handleEliminarProveedor(p.idProveedor)}
-                                >
-                                    Eliminar
-                                </button>
+                                <div className="d-flex gap-2">
+                                    <button
+                                        className="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
+                                        onClick={() => handleEditarClick(p)}
+                                        title="Editar proveedor"
+                                    >
+                                        <Edit size={16} />
+                                        <span className="d-none d-md-inline">Editar</span>
+                                    </button>
+                                    <button
+                                        className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                                        onClick={() => handleEliminarProveedor(p.idProveedor)}
+                                        title="Eliminar proveedor"
+                                    >
+                                        <Trash2 size={16} />
+                                        <span className="d-none d-md-inline">Eliminar</span>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}

@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+// Íconos Lucide
+import { Box, Users, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
+
 function Layout({ children }) {
     return (
         <div className="d-flex flex-column flex-lg-row min-vh-100">
@@ -18,16 +21,24 @@ function Layout({ children }) {
                     <h5 className="text-white text-center d-none d-lg-block">Comercial Yoli</h5>
                     <ul className="nav flex-column w-100">
                         <li className="nav-item">
-                            <Link to="/productos" className="nav-link text-white">Productos</Link>
+                            <Link to="/productos" className="nav-link text-white">
+                                <Box size={18} className="me-2" /> Productos
+                            </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/proveedores" className="nav-link text-white">Proveedores</Link>
+                            <Link to="/proveedores" className="nav-link text-white">
+                                <Users size={18} className="me-2" /> Proveedores
+                            </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/entradas" className="nav-link text-white">Entradas</Link>
+                            <Link to="/entradas" className="nav-link text-white">
+                                <ArrowDownCircle size={18} className="me-2" /> Entradas
+                            </Link>
                         </li>
                         <li className="nav-item">
-                            <Link to="/salidas" className="nav-link text-white">Salidas</Link>
+                            <Link to="/salidas" className="nav-link text-white">
+                                <ArrowUpCircle size={18} className="me-2" /> Salidas
+                            </Link>
                         </li>
                     </ul>
                 </div>
