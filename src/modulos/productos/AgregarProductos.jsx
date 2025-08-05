@@ -37,6 +37,7 @@ function AgregarProducto({ show, handleClose, onProductoAdded }) {
                 setStock("");
                 setCategoria("");
                 setFechaIngreso("");
+                handleClose(); // Cerrar el modal
             })
             .catch((error) => console.error("Error al agregar producto:", error));
     };
