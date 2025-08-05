@@ -1,108 +1,133 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AgregarProveedor from "./AgregarProveedor";
 import EditarProveedor from "./EditarProveedor";
-import { Edit, Trash2, Plus } from "lucide-react";
+import { Edit, Trash2, Search, X } from "lucide-react";
+import {
+    Table,
+    Button,
+    InputGroup,
+    FormControl,
+} from "react-bootstrap";
+import axios from "axios";
+
 function ListarProveedores() {
     const [proveedores, setProveedores] = useState([]);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
     const [proveedorEditar, setProveedorEditar] = useState(null);
+    const [showAgregar, setShowAgregar] = useState(false);
+    const [showEditar, setShowEditar] = useState(false);
+    const [mostrarInput, setMostrarInput] = useState(false);
+    const [filtro, setFiltro] = useState("");
+
+    const inputRef = useRef(null);
 
     useEffect(() => {
-        cargarProveedores();
+        obtenerProveedores();
     }, []);
 
-    const cargarProveedores = () => {
-        fetch("http://localhost:8080/api/proveedores")
-            .then((res) => res.json())
-            .then((data) => setProveedores(data))
-            .catch(() => alert("Error al cargar proveedores."));
+    const obtenerProveedores = async () => {
+        try {
+            const response = await axios.get("http://localhost:8080/api/proveedores");
+            setProveedores(response.data);
+        } catch (error) {
+            console.error("Error al obtener proveedores:", error);
+        }
     };
 
-    const handleOpenAddModal = () => setShowAddModal(true);
-    const handleCloseAddModal = () => setShowAddModal(false);
-
-    const handleProveedorAgregado = (nuevoProveedor) => {
-        setProveedores((prev) => [...prev, nuevoProveedor]);
-        handleCloseAddModal();
+    const eliminarProveedor = async (id) => {
+        if (window.confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
+            try {
+                await axios.delete(`http://localhost:8080/api/proveedores/${id}`);
+                obtenerProveedores();
+            } catch (error) {
+                console.error("Error al eliminar proveedor:", error);
+            }
+        }
     };
 
-    const handleEditarClick = (proveedor) => {
-        setProveedorEditar(proveedor);
-        setShowEditModal(true);
+    const limpiarBuscador = () => {
+        setFiltro("");
+        setMostrarInput(false);
+        inputRef.current?.blur();
     };
 
-    const handleProveedorEditado = (proveedorActualizado) => {
-        setProveedores((prev) =>
-            prev.map((prov) =>
-                prov.idProveedor === proveedorActualizado.idProveedor
-                    ? proveedorActualizado
-                    : prov
-            )
-        );
-        setShowEditModal(false);
-    };
-
-    const handleEliminarProveedor = (idProveedor) => {
-        const confirmar = window.confirm("¿Estás segura de eliminar este proveedor?");
-        if (!confirmar) return;
-
-        fetch(`http://localhost:8080/api/proveedores/${idProveedor}`, {
-            method: "DELETE",
-        })
-            .then((res) => {
-                if (res.ok) {
-                    setProveedores((prev) =>
-                        prev.filter((p) => p.idProveedor !== idProveedor)
-                    );
-                } else {
-                    alert("Error al eliminar proveedor.");
-                }
-            })
-            .catch(() => alert("Error de red al eliminar proveedor."));
-    };
+    const proveedoresFiltrados = proveedores.filter((proveedor) =>
+        proveedor.nombre.toLowerCase().includes(filtro.toLowerCase())
+    );
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4 text-center">Lista de Proveedores</h2>
+            <h3 className="text-center mb-4">Lista de Proveedores</h3>
 
-            <div className="d-flex justify-content-end mb-3">
-                <button
-                    className="btn btn-primary d-flex align-items-center gap-2"
-                    onClick={handleOpenAddModal}
-                >
-                    <Plus size={18} />
-                    <span>Agregar Proveedor</span>
-                </button>
+            {/* Botón Agregar + Buscador */}
+            <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+                <Button variant="success" onClick={() => setShowAgregar(true)}>
+                    + Agregar Proveedor
+                </Button>
+
+                {!mostrarInput ? (
+                    <Button variant="outline-primary" onClick={() => setMostrarInput(true)}>
+                        <Search size={18} />
+                    </Button>
+                ) : (
+                    <InputGroup style={{ maxWidth: "250px" }}>
+                        <FormControl
+                            ref={inputRef}
+                            autoFocus
+                            placeholder="Buscar"
+                            value={filtro}
+                            onChange={(e) => setFiltro(e.target.value)}
+                        />
+                        {filtro ? (
+                            <Button variant="outline-secondary" onClick={limpiarBuscador}>
+                                <X size={18} />
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="outline-danger"
+                                onClick={() => {
+                                    setMostrarInput(false);
+                                    setFiltro("");
+                                }}
+                            >
+                                <X size={18} />
+                            </Button>
+                        )}
+                    </InputGroup>
+                )}
             </div>
 
-
-            <table className="table table-striped table-bordered">
-                <thead className="table-dark">
+            {/* Tabla */}
+            <Table striped bordered hover responsive>
+                <thead className="table-dark text-center">
                     <tr>
+                        <th>Id</th>
                         <th>Nombre</th>
-                        <th>Tipo Doc.</th>
-                        <th>N° Doc.</th>
+                        <th>Tipo Documento</th>
+                        <th>Número Documento</th>
                         <th>Dirección</th>
                         <th>Teléfono</th>
                         <th>Email</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {proveedores.map((p) => (
-                        <tr key={p.idProveedor}>
-                            <td>{p.nombre}</td>
-                            <td>{p.tipoDocumento}</td>
-                            <td>{p.numeroDocumento}</td>
-                            <td>{p.direccion}</td>
-                            <td>{p.telefono}</td>
-                            <td>{p.email}</td>
+                <tbody className="text-center align-middle">
+                    {proveedoresFiltrados.map((proveedor, index) => (
+                        <tr key={proveedor.idProveedor}>
+                            <td>{index + 1}</td>
+                            <td>{proveedor.nombre}</td>
+                            <td>{proveedor.tipoDocumento}</td>
+                            <td>{proveedor.numeroDocumento}</td>
+                            <td>{proveedor.direccion}</td>
+                            <td>{proveedor.telefono}</td>
+                            <td>{proveedor.email}</td>
                             <td>
-                                <div className="d-flex gap-2">
+                                <div className="d-flex justify-content-center gap-2">
                                     <button
                                         className="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
-                                        onClick={() => handleEditarClick(p)}
+                                        onClick={() => {
+                                            setProveedorEditar(proveedor);
+                                            setShowEditar(true);
+                                        }}
                                         title="Editar proveedor"
                                     >
                                         <Edit size={16} />
@@ -110,7 +135,7 @@ function ListarProveedores() {
                                     </button>
                                     <button
                                         className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
-                                        onClick={() => handleEliminarProveedor(p.idProveedor)}
+                                        onClick={() => eliminarProveedor(proveedor.idProveedor)}
                                         title="Eliminar proveedor"
                                     >
                                         <Trash2 size={16} />
@@ -121,22 +146,20 @@ function ListarProveedores() {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
 
+            {/* Modales */}
             <AgregarProveedor
-                show={showAddModal}
-                handleClose={handleCloseAddModal}
-                onProveedorAdded={handleProveedorAgregado}
+                show={showAgregar}
+                handleClose={() => setShowAgregar(false)}
+                onProveedorAdded={obtenerProveedores}
             />
-
-            {proveedorEditar && (
-                <EditarProveedor
-                    show={showEditModal}
-                    handleClose={() => setShowEditModal(false)}
-                    proveedor={proveedorEditar}
-                    onProveedorEditado={handleProveedorEditado}
-                />
-            )}
+            <EditarProveedor
+                show={showEditar}
+                handleClose={() => setShowEditar(false)}
+                proveedor={proveedorEditar}
+                onProveedorUpdated={obtenerProveedores}
+            />
         </div>
     );
 }
