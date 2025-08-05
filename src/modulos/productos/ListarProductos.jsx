@@ -106,8 +106,8 @@ function ListarProductos() {
                         <th>Id</th>
                         <th>Nombre</th>
                         <th>Precio</th>
-                        <th>Stock</th>
                         <th>Categoria</th>
+                        <th>Stock</th>
                         <th>Fecha Ingreso</th>
                         <th>Acciones</th>
                     </tr>
