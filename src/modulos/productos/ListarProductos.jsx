@@ -1,127 +1,167 @@
-import { useEffect, useState } from "react";
-import AgregarProducto from './AgregarProductos';
-import EditarProductos from "./EditarProductos";
+import { useEffect, useState, useRef } from "react";
+import AgregarProducto from "./AgregarProductos";
+import EditarProducto from "./EditarProductos";
+import { Edit, Trash2, Search, X } from "lucide-react";
+import {
+    Table,
+    Button,
+    InputGroup,
+    FormControl,
+} from "react-bootstrap";
+import axios from "axios";
 
 function ListarProductos() {
     const [productos, setProductos] = useState([]);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [productoEditar, setProductoSeleccionado] = useState(null);
+    const [productoEditar, setProductoEditar] = useState(null);
+    const [showAgregar, setShowAgregar] = useState(false);
+    const [showEditar, setShowEditar] = useState(false);
+    const [mostrarInput, setMostrarInput] = useState(false);
+    const [filtro, setFiltro] = useState("");
 
-    // 🟢 Cargar productos al iniciar
+    const inputRef = useRef(null);
+
     useEffect(() => {
-        fetch("http://localhost:8080/api/productos")
-            .then((response) => response.json())
-            .then((data) => setProductos(data))
-            .catch((error) => console.error("Error al obtener productos:", error));
+        obtenerProductos();
     }, []);
 
-    const handleOpenAddModal = () => setShowAddModal(true);
-    const handleCloseAddModal = () => setShowAddModal(false);
-
-    const handleProductoAgregado = (nuevoProducto) => {
-        setProductos((prev) => [...prev, nuevoProducto]);
-        handleCloseAddModal();
+    const obtenerProductos = async () => {
+        try {
+            const response = await axios.get("http://localhost:8080/api/productos");
+            setProductos(response.data);
+        } catch (error) {
+            console.error("Error al obtener productos:", error);
+        }
     };
 
-    // ✏️ Editar
-    const handleEditarClick = (producto) => {
-        setProductoSeleccionado(producto);
-        setShowEditModal(true);
+    const eliminarProducto = async (id) => {
+        if (window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
+            try {
+                await axios.delete(`http://localhost:8080/api/productos/${id}`);
+                obtenerProductos();
+            } catch (error) {
+                console.error("Error al eliminar producto:", error);
+            }
+        }
     };
 
-    const handleProductoEditado = (productoActualizado) => {
-        setProductos((prevProductos) =>
-            prevProductos.map((prod) =>
-                prod.idProducto === productoActualizado.idProducto ? productoActualizado : prod
-            )
-        );
-        setShowEditModal(false);
+    const limpiarBuscador = () => {
+        setFiltro("");
+        setMostrarInput(false);
+        inputRef.current?.blur();
     };
 
-    // ❌ Eliminar
-    const handleEliminarProducto = (idProducto) => {
-        const confirmacion = window.confirm("¿Estás segura de eliminar este producto?");
-        if (!confirmacion) return;
-
-        fetch(`http://localhost:8080/api/productos/${idProducto}`, {
-            method: "DELETE",
-        })
-            .then((response) => {
-                if (response.ok) {
-                    // Filtramos la lista para quitar el producto eliminado
-                    setProductos((prev) =>
-                        prev.filter((producto) => producto.idProducto !== idProducto)
-                    );
-                } else {
-                    console.error("Error al eliminar el producto.");
-                }
-            })
-            .catch((error) => console.error("Error de red al eliminar:", error));
-    };
+    const productosFiltrados = productos.filter((producto) =>
+        producto.nombreProducto.toLowerCase().includes(filtro.toLowerCase())
+    );
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4 text-center">Lista de Productos</h2>
+            <h3 className="text-center mb-4">Lista de Productos</h3>
 
-            <button className="btn btn-primary mb-3" onClick={handleOpenAddModal}>
-                Agregar Producto
-            </button>
+            {/* Botón Agregar + Buscador */}
+            <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+                <Button variant="success" onClick={() => setShowAgregar(true)}>
+                    + Agregar Producto
+                </Button>
 
-            <table className="table table-striped table-bordered">
-                <thead className="table-dark">
+                {!mostrarInput ? (
+                    <Button
+                        variant="outline-primary"
+                        onClick={() => setMostrarInput(true)}
+                    >
+                        <Search size={18} />
+                    </Button>
+                ) : (
+                    <InputGroup style={{ maxWidth: "250px" }}>
+                        <FormControl
+                            ref={inputRef}
+                            autoFocus
+                            placeholder="Buscar"
+                            value={filtro}
+                            onChange={(e) => setFiltro(e.target.value)}
+                        />
+                        {filtro ? (
+                            <Button variant="outline-secondary" onClick={limpiarBuscador}>
+                                <X size={18} />
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="outline-danger"
+                                onClick={() => {
+                                    setMostrarInput(false);
+                                    setFiltro("");
+                                }}
+                            >
+                                <X size={18} />
+                            </Button>
+                        )}
+                    </InputGroup>
+                )}
+            </div>
+
+            {/* Tabla */}
+            <Table striped bordered hover responsive>
+                <thead className="table-dark text-center">
                     <tr>
-                        <th>ID</th>
+                        <th>Id</th>
                         <th>Nombre</th>
                         <th>Precio</th>
                         <th>Stock</th>
-                        <th>Categoría</th>
+                        <th>Categoria</th>
                         <th>Fecha Ingreso</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {productos.map((producto) => (
+                <tbody className="text-center align-middle">
+                    {productosFiltrados.map((producto, index) => (
                         <tr key={producto.idProducto}>
-                            <td>{producto.idProducto}</td>
+                            <td>{index + 1}</td>
                             <td>{producto.nombreProducto}</td>
                             <td>S/. {producto.precio}</td>
-                            <td>{producto.stock}</td>
                             <td>{producto.categoria}</td>
-                            <td>{new Date(producto.fechaIngreso).toLocaleDateString()}</td>
+                            <td>{producto.stock}</td>
+                            <td>{producto.fechaIngreso?.split("T")[0]}</td>
                             <td>
-                                <button
-                                    className="btn btn-success btn-sm me-2"
-                                    onClick={() => handleEditarClick(producto)}
-                                >
-                                    Editar
-                                </button>
-                                <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() => handleEliminarProducto(producto.idProducto)}
-                                >
-                                    Eliminar
-                                </button>
+                                <div className="d-flex justify-content-center gap-2">
+                                    <button
+                                        className="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
+                                        onClick={() => {
+                                            setProductoEditar(producto);
+                                            setShowEditar(true);
+                                        }}
+                                        title="Editar producto"
+                                    >
+                                        <Edit size={16} />
+                                        <span className="d-none d-md-inline">Editar</span>
+                                    </button>
+                                    <button
+                                        className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                                        onClick={() => eliminarProducto(producto.idProducto)}
+                                        title="Eliminar producto"
+                                    >
+                                        <Trash2 size={16} />
+                                        <span className="d-none d-md-inline">Eliminar</span>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
 
+            {/* Modales */}
             <AgregarProducto
-                show={showAddModal}
-                handleClose={handleCloseAddModal}
-                onProductoAdded={handleProductoAgregado}
+                show={showAgregar}
+                handleClose={() => setShowAgregar(false)}
+                onProductoAdded={obtenerProductos}
+            />
+            <EditarProducto
+                show={showEditar}
+                handleClose={() => setShowEditar(false)}
+                producto={productoEditar}
+                onProductoEditado={obtenerProductos} // nombre correcto
             />
 
-            {productoEditar && (
-                <EditarProductos
-                    show={showEditModal}
-                    handleClose={() => setShowEditModal(false)}
-                    producto={productoEditar}
-                    onProductoEditado={handleProductoEditado}
-                />
-            )}
         </div>
     );
 }

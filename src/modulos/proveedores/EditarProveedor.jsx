@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
+import axios from "axios";
 
 function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
     const [formulario, setFormulario] = useState({
@@ -9,17 +10,51 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
         numeroDocumento: "",
         direccion: "",
         telefono: "",
-        email: ""
+        email: "",
+        estado: "",
     });
 
     useEffect(() => {
         if (proveedor) {
             setFormulario(proveedor);
+
+            // Buscar estado si es RUC
+            if (proveedor.tipoDocumento === "RUC") {
+                buscarEstado(proveedor.tipoDocumento, proveedor.numeroDocumento);
+            }
         }
     }, [proveedor]);
 
     const handleChange = (e) => {
-        setFormulario({ ...formulario, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        const actualizado = { ...formulario, [name]: value };
+        setFormulario(actualizado);
+
+        // Si se cambia número de documento y es RUC, actualiza el estado
+        if (
+            (name === "numeroDocumento" || name === "tipoDocumento") &&
+            actualizado.tipoDocumento === "RUC" &&
+            actualizado.numeroDocumento.trim().length === 11
+        ) {
+            buscarEstado(actualizado.tipoDocumento, actualizado.numeroDocumento);
+        }
+    };
+
+    const buscarEstado = async (tipo, numero) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8080/api/proveedores/consultar?tipo=${tipo}&numero=${numero}`
+            );
+
+            if (response.data?.data?.estado) {
+                setFormulario((prev) => ({ ...prev, estado: response.data.data.estado }));
+            } else {
+                setFormulario((prev) => ({ ...prev, estado: "" }));
+            }
+        } catch (error) {
+            console.error("Error consultando estado del RUC:", error);
+            setFormulario((prev) => ({ ...prev, estado: "" }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -70,6 +105,13 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
                         <Form.Label>Número de Documento</Form.Label>
                         <Form.Control type="text" name="numeroDocumento" value={formulario.numeroDocumento} onChange={handleChange} required />
                     </Form.Group>
+
+                    {formulario.tipoDocumento === "RUC" && formulario.estado && (
+                        <Form.Group className="mb-2">
+                            <Form.Label>Estado del Documento</Form.Label>
+                            <Form.Control type="text" value={formulario.estado} readOnly />
+                        </Form.Group>
+                    )}
 
                     <Form.Group className="mb-2">
                         <Form.Label>Dirección</Form.Label>
