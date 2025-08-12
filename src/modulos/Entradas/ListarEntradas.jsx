@@ -1,12 +1,14 @@
-// modulos/entradas/ListarEntradas.jsx
 import { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import AgregarEntrada from "./AgregarEntrada";
+import EditarEntrada from "./EditarEntrada";
 import { Plus } from "lucide-react";
 
 function ListarEntradas() {
     const [entradas, setEntradas] = useState([]);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [entradaSeleccionada, setEntradaSeleccionada] = useState(null);
 
     const obtenerEntradas = async () => {
         try {
@@ -26,13 +28,34 @@ function ListarEntradas() {
         setShowAddModal(true);
     };
 
-    const handleCerrarModal = () => {
+    const handleCerrarModalAgregar = () => {
         setShowAddModal(false);
+    };
+
+    const handleCerrarModalEditar = () => {
+        setShowEditModal(false);
+        setEntradaSeleccionada(null);
     };
 
     const handleEntradaAgregada = () => {
         obtenerEntradas();
-        handleCerrarModal();
+        handleCerrarModalAgregar();
+    };
+
+    const handleEditar = (entrada) => {
+        setEntradaSeleccionada(entrada);
+        setShowEditModal(true);
+    };
+
+    const handleEliminacion = async (idEntrada) => {
+        if (!window.confirm("¿Seguro que quieres eliminar esta entrada?")) return;
+
+        try {
+            await fetch(`http://localhost:8080/api/entradas/${idEntrada}`, { method: "DELETE" });
+            obtenerEntradas();
+        } catch (error) {
+            console.error("Error al eliminar entrada:", error);
+        }
     };
 
     return (
@@ -50,6 +73,7 @@ function ListarEntradas() {
                         <th>Fecha</th>
                         <th>Total</th>
                         <th>Detalles</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,7 +96,7 @@ function ListarEntradas() {
                                     <tbody>
                                         {entrada.detalles?.map((detalle, idx) => (
                                             <tr key={idx}>
-                                                <td>{detalle.producto?.nombreProducto || detalle.producto?.nombre || detalle.producto?.idProducto}</td>
+                                                <td>{detalle.producto?.nombreProducto}</td>
                                                 <td>{detalle.cantidad}</td>
                                                 <td>S/{detalle.precioUnitario}</td>
                                                 <td>S/{detalle.subtotal}</td>
@@ -81,16 +105,44 @@ function ListarEntradas() {
                                     </tbody>
                                 </Table>
                             </td>
+                            <td>
+                                <Button
+                                    variant="warning"
+                                    size="sm"
+                                    className="me-2"
+                                    onClick={() => handleEditar(entrada)}
+                                >
+                                    Editar
+                                </Button>
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() => handleEliminacion(entrada.idEntrada)}
+                                >
+                                    Eliminar
+                                </Button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </Table>
 
+            {/* Modal Agregar */}
             <AgregarEntrada
                 show={showAddModal}
-                handleClose={handleCerrarModal}
+                handleClose={handleCerrarModalAgregar}
                 onEntradaAgregada={handleEntradaAgregada}
             />
+
+            {/* Modal Editar */}
+            {entradaSeleccionada && (
+                <EditarEntrada
+                    show={showEditModal}
+                    handleClose={handleCerrarModalEditar}
+                    entrada={entradaSeleccionada}
+                    onEntradaEditada={obtenerEntradas}
+                />
+            )}
         </div>
     );
 }
