@@ -5,6 +5,7 @@ import ListarProductos from './modulos/productos/ListarProductos';
 import ListarCategorias from './modulos/categorias/ListarCategorias';
 import ListarProveedores from './modulos/proveedores/ListarProveedores';
 import ListarEntradas from './modulos/Entradas/ListarEntradas';
+import ListarSalidas from './modulos/Salidas/ListarSalidas';
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/categorias" element={<ListarCategorias />} />
                     <Route path='/proveedores' element={<ListarProveedores/>}/>
                     <Route path='/entradas' element={<ListarEntradas/>}/>
+                    <Route path='/salidas' element={<ListarSalidas/>}/>
                 </Routes>
             </Layout>
         </Router>
