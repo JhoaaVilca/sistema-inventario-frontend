@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 // Íconos Lucide
-import { Box, Users, ArrowDownCircle, ArrowUpCircle, Menu, LayoutDashboard } from 'lucide-react';
+import { Box, Users, ArrowDownCircle, ArrowUpCircle, Menu, LayoutDashboard, Grid3X3 } from 'lucide-react';
 
 function Layout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,6 +70,19 @@ function Layout({ children }) {
                                   onMouseLeave={(e) => e.target.classList.remove('bg-secondary')}>
                                 <Box size={20} className="me-3" /> 
                                 <span>Productos</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item mb-2">
+                            <Link to="/categorias" className="nav-link text-white d-flex align-items-center p-3 rounded" 
+                                  onClick={() => setSidebarOpen(false)}
+                                  style={{ 
+                                      transition: 'all 0.3s ease',
+                                      textDecoration: 'none'
+                                  }}
+                                  onMouseEnter={(e) => e.target.classList.add('bg-secondary')}
+                                  onMouseLeave={(e) => e.target.classList.remove('bg-secondary')}>
+                                <Grid3X3 size={20} className="me-3" /> 
+                                <span>Categorías</span>
                             </Link>
                         </li>
                         <li className="nav-item mb-2">

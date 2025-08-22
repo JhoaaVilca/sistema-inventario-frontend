@@ -1,19 +1,27 @@
 import { useEffect, useState, useRef } from "react";
-import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer } from "react-bootstrap";
-import { Edit, Trash2, Search, X, Package } from "lucide-react";
-import AgregarProducto from "./AgregarProductos";
-import EditarProducto from "./EditarProductos";
+import AgregarCategoria from "./AgregarCategoria";
+import EditarCategoria from "./EditarCategoria";
+import { Edit, Trash2, Search, X, Grid3X3 } from "lucide-react";
+import {
+    Table,
+    Button,
+    InputGroup,
+    FormControl,
+    Alert,
+    Toast,
+    ToastContainer
+} from "react-bootstrap";
 import axios from "axios";
 
-const ListarProductos = () => {
-    const [productos, setProductos] = useState([]);
-    const [productoEditar, setProductoEditar] = useState(null);
+function ListarCategorias() {
+    const [categorias, setCategorias] = useState([]);
+    const [categoriaEditar, setCategoriaEditar] = useState(null);
     const [showAgregar, setShowAgregar] = useState(false);
     const [showEditar, setShowEditar] = useState(false);
+    const [mostrarInput, setMostrarInput] = useState(false);
+    const [filtro, setFiltro] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [filtro, setFiltro] = useState("");
-    const [mostrarInput, setMostrarInput] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
@@ -21,32 +29,32 @@ const ListarProductos = () => {
     const inputRef = useRef(null);
 
     useEffect(() => {
-        cargarProductos();
+        obtenerCategorias();
     }, []);
 
-    const cargarProductos = async () => {
+    const obtenerCategorias = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/productos");
-            setProductos(response.data);
+            const response = await axios.get("http://localhost:8080/api/categorias");
+            setCategorias(response.data);
             setError("");
-        } catch (err) {
-            console.error("Error al cargar productos:", err);
-            setError("Error al cargar los productos. Intente nuevamente.");
+        } catch (error) {
+            console.error("Error al obtener categorías:", error);
+            setError("Error al cargar las categorías. Intente nuevamente.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleEliminar = async (id) => {
-        if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
+    const eliminarCategoria = async (id) => {
+        if (window.confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
             try {
-                await axios.delete(`http://localhost:8080/api/productos/${id}`);
-                mostrarNotificacion("Producto eliminado exitosamente", "success");
-                cargarProductos();
-            } catch (err) {
-                console.error("Error al eliminar producto:", err);
-                mostrarNotificacion("Error al eliminar el producto", "danger");
+                await axios.delete(`http://localhost:8080/api/categorias/${id}`);
+                mostrarNotificacion("Categoría eliminada exitosamente", "success");
+                obtenerCategorias();
+            } catch (error) {
+                console.error("Error al eliminar categoría:", error);
+                mostrarNotificacion("Error al eliminar la categoría", "danger");
             }
         }
     };
@@ -63,21 +71,21 @@ const ListarProductos = () => {
         inputRef.current?.blur();
     };
 
-    const productosFiltrados = productos.filter((p) =>
-        p.nombreProducto.toLowerCase().includes(filtro.toLowerCase())
+    const categoriasFiltradas = categorias.filter((categoria) =>
+        categoria.nombre.toLowerCase().includes(filtro.toLowerCase())
     );
 
     return (
         <div className="container mt-4">
             <div className="d-flex align-items-center gap-3 mb-4">
-                <Package size={32} className="text-primary" />
-                <h3 className="mb-0">Gestión de Productos</h3>
+                <Grid3X3 size={32} className="text-primary" />
+                <h3 className="mb-0">Gestión de Categorías</h3>
             </div>
 
-            {/* Botón + buscador */}
+            {/* Botón Agregar + Buscador */}
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <Button variant="success" onClick={() => setShowAgregar(true)}>
-                    + Agregar Producto
+                    + Agregar Categoría
                 </Button>
 
                 {!mostrarInput ? (
@@ -92,7 +100,7 @@ const ListarProductos = () => {
                         <FormControl
                             ref={inputRef}
                             autoFocus
-                            placeholder="Buscar productos..."
+                            placeholder="Buscar categorías..."
                             value={filtro}
                             onChange={(e) => setFiltro(e.target.value)}
                         />
@@ -115,7 +123,7 @@ const ListarProductos = () => {
                 )}
             </div>
 
-            {/* Error */}
+            {/* Mensaje de error */}
             {error && (
                 <Alert variant="danger" dismissible onClose={() => setError("")}>
                     {error}
@@ -128,48 +136,41 @@ const ListarProductos = () => {
                     <Table striped bordered hover responsive className="mb-0">
                         <thead className="table-dark text-center">
                             <tr>
-                                <th>ID</th>
+                                <th style={{ width: '80px' }}>ID</th>
                                 <th>Nombre</th>
-                                <th>Precio</th>
-                                <th>Categoría</th>
-                                <th>Stock</th>
-                                <th>Fecha Ingreso</th>
-                                <th style={{ width: "180px" }}>Acciones</th>
+                                <th style={{ width: '150px' }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="text-center align-middle">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="7" className="text-center py-4">
+                                    <td colSpan="3" className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">
                                             <span className="visually-hidden">Cargando...</span>
                                         </div>
                                     </td>
                                 </tr>
-                            ) : productosFiltrados.length === 0 ? (
+                            ) : categoriasFiltradas.length === 0 ? (
                                 <tr>
-                                    <td colSpan="7" className="text-center py-4 text-muted">
-                                        {filtro ? "No se encontraron productos" : "No hay productos registrados"}
+                                    <td colSpan="3" className="text-center py-4 text-muted">
+                                        {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
                                     </td>
                                 </tr>
                             ) : (
-                                productosFiltrados.map((producto) => (
-                                    <tr key={producto.idProducto}>
-                                        <td>{producto.idProducto}</td>
-                                        <td className="fw-medium">{producto.nombreProducto}</td>
-                                        <td>S/. {producto.precio}</td>
-                                        <td>{producto.nombreCategoria || "Sin categoría"}</td>
-                                        <td>{producto.stock}</td>
-                                        <td>{producto.fechaIngreso}</td>
+                                categoriasFiltradas.map((categoria) => (
+                                    <tr key={categoria.idCategoria}>
+                                        <td>{categoria.idCategoria}</td>
+                                        <td className="fw-medium">{categoria.nombre}</td>
                                         <td>
                                             <div className="d-flex justify-content-center gap-2">
                                                 <Button
                                                     variant="outline-warning"
                                                     size="sm"
                                                     onClick={() => {
-                                                        setProductoEditar(producto);
+                                                        setCategoriaEditar(categoria);
                                                         setShowEditar(true);
                                                     }}
+                                                    title="Editar categoría"
                                                 >
                                                     <Edit size={16} />
                                                     <span className="d-none d-md-inline ms-1">Editar</span>
@@ -177,7 +178,8 @@ const ListarProductos = () => {
                                                 <Button
                                                     variant="outline-danger"
                                                     size="sm"
-                                                    onClick={() => handleEliminar(producto.idProducto)}
+                                                    onClick={() => eliminarCategoria(categoria.idCategoria)}
+                                                    title="Eliminar categoría"
                                                 >
                                                     <Trash2 size={16} />
                                                     <span className="d-none d-md-inline ms-1">Eliminar</span>
@@ -193,30 +195,30 @@ const ListarProductos = () => {
             </div>
 
             {/* Modales */}
-            <AgregarProducto
+            <AgregarCategoria
                 show={showAgregar}
                 handleClose={() => setShowAgregar(false)}
-                onProductoAdded={() => {
-                    cargarProductos();
-                    mostrarNotificacion("Producto agregado exitosamente", "success");
+                onCategoriaAdded={() => {
+                    obtenerCategorias();
+                    mostrarNotificacion("Categoría agregada exitosamente", "success");
                 }}
             />
-            <EditarProducto
+            <EditarCategoria
                 show={showEditar}
                 handleClose={() => setShowEditar(false)}
-                producto={productoEditar}
-                onProductoUpdated={() => {
-                    cargarProductos();
-                    mostrarNotificacion("Producto actualizado exitosamente", "success");
+                categoria={categoriaEditar}
+                onCategoriaEditada={() => {
+                    obtenerCategorias();
+                    mostrarNotificacion("Categoría actualizada exitosamente", "success");
                 }}
             />
 
-            {/* Toasts */}
+            {/* Toast de notificaciones */}
             <ToastContainer position="top-end" className="p-3">
-                <Toast
-                    show={showToast}
-                    onClose={() => setShowToast(false)}
-                    delay={3000}
+                <Toast 
+                    show={showToast} 
+                    onClose={() => setShowToast(false)} 
+                    delay={3000} 
                     autohide
                     bg={toastVariant}
                 >
@@ -232,6 +234,6 @@ const ListarProductos = () => {
             </ToastContainer>
         </div>
     );
-};
+}
 
-export default ListarProductos;
+export default ListarCategorias;
