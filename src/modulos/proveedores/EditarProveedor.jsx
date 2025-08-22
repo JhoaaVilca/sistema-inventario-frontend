@@ -87,25 +87,48 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
+                    {/* Nombre */}
                     <Form.Group className="mb-2">
-                        <Form.Label>Nombre</Form.Label>
-                        <Form.Control type="text" name="nombre" value={formulario.nombre} onChange={handleChange} required />
+                        <Form.Label>Nombre / Razón Social</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="nombre"
+                            value={formulario.nombre}
+                            onChange={handleChange}
+                            placeholder="Ingrese nombre o razón social"
+                            required
+                        />
                     </Form.Group>
 
+                    {/* Tipo de Documento */}
                     <Form.Group className="mb-2">
                         <Form.Label>Tipo de Documento</Form.Label>
-                        <Form.Select name="tipoDocumento" value={formulario.tipoDocumento} onChange={handleChange} required>
-                            <option value="">Seleccionar</option>
+                        <Form.Select
+                            name="tipoDocumento"
+                            value={formulario.tipoDocumento}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Seleccione un tipo de documento</option>
                             <option value="DNI">DNI</option>
                             <option value="RUC">RUC</option>
                         </Form.Select>
                     </Form.Group>
 
+                    {/* Número de Documento */}
                     <Form.Group className="mb-2">
                         <Form.Label>Número de Documento</Form.Label>
-                        <Form.Control type="text" name="numeroDocumento" value={formulario.numeroDocumento} onChange={handleChange} required />
+                        <Form.Control
+                            type="text"
+                            name="numeroDocumento"
+                            value={formulario.numeroDocumento}
+                            onChange={handleChange}
+                            placeholder="Ingrese número de documento"
+                            required
+                        />
                     </Form.Group>
 
+                    {/* Estado (solo si es RUC) */}
                     {formulario.tipoDocumento === "RUC" && formulario.estado && (
                         <Form.Group className="mb-2">
                             <Form.Label>Estado del Documento</Form.Label>
@@ -113,21 +136,45 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
                         </Form.Group>
                     )}
 
+                    {/* Dirección */}
                     <Form.Group className="mb-2">
                         <Form.Label>Dirección</Form.Label>
-                        <Form.Control type="text" name="direccion" value={formulario.direccion} onChange={handleChange} required />
+                        <Form.Control
+                            type="text"
+                            name="direccion"
+                            value={formulario.direccion}
+                            onChange={handleChange}
+                            placeholder="Ingrese dirección"
+                            required
+                        />
                     </Form.Group>
 
+                    {/* Teléfono */}
                     <Form.Group className="mb-2">
                         <Form.Label>Teléfono</Form.Label>
-                        <Form.Control type="text" name="telefono" value={formulario.telefono} onChange={handleChange} required />
+                        <Form.Control
+                            type="text"
+                            name="telefono"
+                            value={formulario.telefono}
+                            onChange={handleChange}
+                            placeholder="Ingrese teléfono"
+                            required
+                        />
                     </Form.Group>
 
+                    {/* Email */}
                     <Form.Group className="mb-2">
                         <Form.Label>Email</Form.Label>
-                        <Form.Control type="email" name="email" value={formulario.email} onChange={handleChange} />
+                        <Form.Control
+                            type="email"
+                            name="email"
+                            value={formulario.email}
+                            onChange={handleChange}
+                            placeholder="Ingrese correo electrónico"
+                        />
                     </Form.Group>
 
+                    {/* Botones */}
                     <div className="text-end mt-3">
                         <Button variant="secondary" onClick={handleClose} className="me-2">
                             Cancelar

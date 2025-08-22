@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, InputGroup, Toast, ToastContainer } from "react-bootstrap";
 import axios from "axios";
 
 const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
     const [proveedor, setProveedor] = useState({
         nombre: "",
-        tipoDocumento: "RUC",
+        tipoDocumento: "",
         numeroDocumento: "",
         direccion: "",
         telefono: "",
@@ -13,13 +13,23 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
         estado: "",
     });
 
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastVariant, setToastVariant] = useState("success");
+
+    const mostrarNotificacion = (mensaje, variante) => {
+        setToastMessage(mensaje);
+        setToastVariant(variante);
+        setShowToast(true);
+    };
+
     const handleChange = (e) => {
         setProveedor({ ...proveedor, [e.target.name]: e.target.value });
     };
 
     const buscarDocumento = async () => {
-        if (!proveedor.numeroDocumento || proveedor.numeroDocumento.trim() === "") {
-            alert("Por favor, ingrese un número de documento para buscar.");
+        if (!proveedor.numeroDocumento.trim()) {
+            mostrarNotificacion("Por favor, ingrese un número de documento.", "danger");
             return;
         }
 
@@ -36,23 +46,14 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                     direccion: data.direccion || "",
                     estado: data.estado || "",
                 }));
+                mostrarNotificacion("Datos obtenidos exitosamente", "success");
             } else {
-                alert("No se encontraron datos para el documento.");
-                setProveedor((prev) => ({
-                    ...prev,
-                    nombre: "",
-                    direccion: "",
-                    estado: "",
-                }));
+                mostrarNotificacion("No se encontraron datos para el documento.", "warning");
+                setProveedor((prev) => ({ ...prev, nombre: "", direccion: "", estado: "" }));
             }
         } catch (error) {
-            alert("Ocurrió un error al consultar el documento.");
-            setProveedor((prev) => ({
-                ...prev,
-                nombre: "",
-                direccion: "",
-                estado: "",
-            }));
+            mostrarNotificacion("Error al consultar el documento.", "danger");
+            setProveedor((prev) => ({ ...prev, nombre: "", direccion: "", estado: "" }));
         }
     };
 
@@ -65,113 +66,148 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
 
             if (response && response.data) {
                 onProveedorAdded(response.data);
+                mostrarNotificacion("Proveedor agregado exitosamente", "success");
                 handleClose();
                 setProveedor({
                     nombre: "",
-                    tipoDocumento: "RUC",
+                    tipoDocumento: "",
                     numeroDocumento: "",
                     direccion: "",
                     telefono: "",
                     email: "",
                     estado: "",
                 });
-            } else {
-                alert("Error al guardar proveedor.");
             }
         } catch (error) {
-            alert("Error al guardar proveedor. Verifique su conexión o intente nuevamente.");
+            mostrarNotificacion("Error al guardar proveedor. Verifique la conexión.", "danger");
         }
     };
 
     return (
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Agregar Proveedor</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Tipo Documento</Form.Label>
-                        <Form.Select
-                            name="tipoDocumento"
-                            value={proveedor.tipoDocumento}
-                            onChange={handleChange}
-                        >
-                            <option value="RUC">RUC</option>
-                            <option value="DNI">DNI</option>
-                        </Form.Select>
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Número Documento</Form.Label>
-                        <div style={{ display: "flex", gap: "10px" }}>
-                            <Form.Control
-                                type="text"
-                                name="numeroDocumento"
-                                value={proveedor.numeroDocumento}
+        <>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Agregar Proveedor</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={handleSubmit}>
+                        {/* Tipo Documento */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Tipo Documento</Form.Label>
+                            <Form.Select
+                                name="tipoDocumento"
+                                value={proveedor.tipoDocumento}
                                 onChange={handleChange}
                                 required
-                            />
-                            <Button variant="secondary" onClick={buscarDocumento}>
-                                Buscar
-                            </Button>
-                        </div>
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Nombre / Razón Social</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="nombre"
-                            value={proveedor.nombre}
-                            onChange={handleChange}
-                            required
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Dirección</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="direccion"
-                            value={proveedor.direccion}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Teléfono</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="telefono"
-                            value={proveedor.telefono}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Email</Form.Label>
-                        <Form.Control
-                            type="email"
-                            name="email"
-                            value={proveedor.email}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-
-                    {proveedor.estado && (
-                        <Form.Group className="mb-3">
-                            <Form.Label>Estado del Documento:</Form.Label>
-                            <Form.Control type="text" readOnly value={proveedor.estado} />
+                            >
+                                <option value="">Seleccione un tipo de documento</option>
+                                <option value="RUC">RUC</option>
+                                <option value="DNI">DNI</option>
+                            </Form.Select>
                         </Form.Group>
-                    )}
 
-                    <Button variant="primary" type="submit" className="mt-3">
-                        Guardar Proveedor
-                    </Button>
-                </Form>
-            </Modal.Body>
-        </Modal>
+                        {/* Número Documento */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Número Documento</Form.Label>
+                            <InputGroup>
+                                <Form.Control
+                                    type="text"
+                                    name="numeroDocumento"
+                                    value={proveedor.numeroDocumento}
+                                    onChange={handleChange}
+                                    placeholder="Ingrese el número de documento"
+                                    required
+                                />
+                                <Button variant="secondary" onClick={buscarDocumento}>
+                                    Buscar
+                                </Button>
+                            </InputGroup>
+                        </Form.Group>
+
+                        {/* Nombre */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Nombre / Razón Social</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="nombre"
+                                value={proveedor.nombre}
+                                onChange={handleChange}
+                                placeholder="Ingrese nombre o razón social"
+                                required
+                            />
+                        </Form.Group>
+
+                        {/* Dirección */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Dirección</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="direccion"
+                                value={proveedor.direccion}
+                                onChange={handleChange}
+                                placeholder="Ingrese dirección"
+                            />
+                        </Form.Group>
+
+                        {/* Teléfono */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Teléfono</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="telefono"
+                                value={proveedor.telefono}
+                                onChange={handleChange}
+                                placeholder="Ingrese teléfono"
+                            />
+                        </Form.Group>
+
+                        {/* Email */}
+                        <Form.Group className="mb-3">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control
+                                type="email"
+                                name="email"
+                                value={proveedor.email}
+                                onChange={handleChange}
+                                placeholder="Ingrese correo electrónico"
+                            />
+                        </Form.Group>
+
+                        {/* Estado Documento */}
+                        {proveedor.estado && (
+                            <Form.Group className="mb-3">
+                                <Form.Label>Estado del Documento:</Form.Label>
+                                <Form.Control type="text" readOnly value={proveedor.estado} />
+                            </Form.Group>
+                        )}
+
+                        <Button variant="primary" type="submit" className="mt-3 w-100">
+                            Guardar Proveedor
+                        </Button>
+                    </Form>
+                </Modal.Body>
+            </Modal>
+
+            {/* Toast de notificaciones */}
+            <ToastContainer position="top-end" className="p-3">
+                <Toast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    delay={3000}
+                    autohide
+                    bg={toastVariant}
+                >
+                    <Toast.Header closeButton>
+                        <strong className="me-auto">
+                            {toastVariant === "success" ? "Éxito" : "Aviso"}
+                        </strong>
+                    </Toast.Header>
+                    <Toast.Body className={toastVariant === "success" ? "text-white" : ""}>
+                        {toastMessage}
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
+        </>
     );
 };
 
