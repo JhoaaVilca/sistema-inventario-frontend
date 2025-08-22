@@ -1,4 +1,4 @@
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TablaProductosEntrada from "./TablaProductosEntrada";
@@ -8,6 +8,8 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
     const [idProveedor, setIdProveedor] = useState("");
     const [productosEntrada, setProductosEntrada] = useState([]);
     const [fechaEntrada, setFechaEntrada] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [guardando, setGuardando] = useState(false);
 
     useEffect(() => {
         const obtenerProveedores = async () => {
@@ -28,7 +30,10 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
     }, [show, entrada]);
 
     const handleGuardarCambios = async () => {
-        if (!idProveedor || productosEntrada.length === 0 || !fechaEntrada) return;
+        if (!idProveedor || productosEntrada.length === 0 || !fechaEntrada) {
+            setErrorMsg("Complete proveedor, fecha y al menos un producto.");
+            return;
+        }
 
         const totalEntrada = productosEntrada.reduce(
             (acc, detalle) => acc + (detalle.subtotal || 0),
@@ -36,6 +41,7 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
         );
 
         try {
+            setGuardando(true);
             await axios.put(`http://localhost:8080/api/entradas/${entrada.idEntrada}`, {
                 proveedor: { idProveedor: parseInt(idProveedor) },
                 fechaEntrada,
@@ -46,6 +52,9 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
             handleClose();
         } catch (error) {
             console.error("Error al editar entrada:", error);
+            setErrorMsg("No se pudo guardar los cambios.");
+        } finally {
+            setGuardando(false);
         }
     };
 
@@ -55,11 +64,15 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
                 <Modal.Title>Editar Entrada</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {errorMsg && (
+                    <Alert variant="danger" className="mb-3">{errorMsg}</Alert>
+                )}
                 <Form.Group className="mb-3">
                     <Form.Label>Proveedor</Form.Label>
                     <Form.Select
                         value={idProveedor}
                         onChange={(e) => setIdProveedor(e.target.value)}
+                        disabled={guardando}
                     >
                         <option value="">Seleccione un proveedor</option>
                         {proveedores.map((p) => (
@@ -76,6 +89,7 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
                         type="date"
                         value={fechaEntrada}
                         onChange={(e) => setFechaEntrada(e.target.value)}
+                        disabled={guardando}
                     />
                 </Form.Group>
 
@@ -92,10 +106,10 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose} disabled={guardando}>
                     Cancelar
                 </Button>
-                <Button variant="primary" onClick={handleGuardarCambios}>
+                <Button variant="primary" onClick={handleGuardarCambios} disabled={guardando}>
                     Guardar Cambios
                 </Button>
             </Modal.Footer>

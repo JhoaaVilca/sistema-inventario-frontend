@@ -1,7 +1,7 @@
 // src/modulos/Entradas/TablaProductosEntrada.jsx
 
 import { useEffect, useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Table } from "react-bootstrap";
 import axios from "axios";
 
 function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
@@ -9,6 +9,7 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
     const [productoSeleccionado, setProductoSeleccionado] = useState("");
     const [cantidad, setCantidad] = useState("");
     const [precioUnitario, setPrecioUnitario] = useState("");
+    const [errorInline, setErrorInline] = useState("");
 
     useEffect(() => {
         const obtenerProductos = async () => {
@@ -23,11 +24,23 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
     }, []);
 
     const agregarProducto = () => {
-        if (!productoSeleccionado || !cantidad || !precioUnitario) return;
+        setErrorInline("");
+        if (!productoSeleccionado || cantidad === "" || precioUnitario === "") {
+            setErrorInline("Complete producto, cantidad y precio.");
+            return;
+        }
 
         const producto = productos.find((p) => p.idProducto === parseInt(productoSeleccionado));
         const cantidadNum = parseInt(cantidad);
         const precioNum = parseFloat(precioUnitario);
+        if (!(cantidadNum > 0)) {
+            setErrorInline("La cantidad debe ser mayor a 0.");
+            return;
+        }
+        if (!(precioNum >= 0)) {
+            setErrorInline("El precio no puede ser negativo.");
+            return;
+        }
         const subtotal = cantidadNum * precioNum;
         const nuevoDetalle = {
             producto: { idProducto: producto.idProducto },
@@ -36,16 +49,25 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
             subtotal: subtotal
         };
 
-        setProductosEntrada([...productosEntrada, nuevoDetalle]);
+        setProductosEntrada([...(productosEntrada || []), nuevoDetalle]);
         setProductoSeleccionado("");
         setCantidad("");
         setPrecioUnitario("");
     };
 
+    const eliminarDetalle = (index) => {
+        const copia = [...productosEntrada];
+        copia.splice(index, 1);
+        setProductosEntrada(copia);
+    };
+
     return (
         <div className="mt-3">
             <h5>Productos de la Entrada</h5>
-            <div className="d-flex gap-2">
+            {errorInline && (
+                <div className="text-danger mb-2">{errorInline}</div>
+            )}
+            <div className="d-flex gap-2 flex-wrap align-items-end">
                 <Form.Select
                     value={productoSeleccionado}
                     onChange={(e) => setProductoSeleccionado(e.target.value)}
@@ -62,23 +84,43 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
                     placeholder="Cantidad"
                     value={cantidad}
                     onChange={(e) => setCantidad(e.target.value)}
+                    min="1"
                 />
                 <Form.Control
                     type="number"
                     placeholder="Precio unitario"
                     value={precioUnitario}
                     onChange={(e) => setPrecioUnitario(e.target.value)}
+                    min="0"
+                    step="0.01"
                 />
                 <Button variant="primary" onClick={agregarProducto}>Agregar</Button>
             </div>
 
-            <ul className="mt-3">
-                {productosEntrada.map((detalle, index) => (
-                    <li key={index}>
-                        Producto: {detalle.producto.idProducto} - Cantidad: {detalle.cantidad} - Precio unitario: S/{detalle.precioUnitario} - Subtotal: S/{detalle.subtotal}
-                    </li>
-                ))}
-            </ul>
+            <Table bordered size="sm" className="mt-3">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {productosEntrada.map((detalle, index) => (
+                        <tr key={index}>
+                            <td>{detalle.producto.idProducto}</td>
+                            <td>{detalle.cantidad}</td>
+                            <td>S/{detalle.precioUnitario}</td>
+                            <td>S/{detalle.subtotal}</td>
+                            <td>
+                                <Button variant="outline-danger" size="sm" onClick={() => eliminarDetalle(index)}>Eliminar</Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
         </div>
     );
 }

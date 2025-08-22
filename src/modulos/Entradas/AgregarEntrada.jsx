@@ -1,6 +1,6 @@
 // src/modulos/Entradas/AgregarEntrada.jsx
 
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TablaProductosEntrada from "./TablaProductosEntrada";
@@ -10,6 +10,8 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
     const [idProveedor, setIdProveedor] = useState("");
     const [productosEntrada, setProductosEntrada] = useState([]);
     const [fechaEntrada, setFechaEntrada] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [guardando, setGuardando] = useState(false);
 
     useEffect(() => {
         const obtenerProveedores = async () => {
@@ -27,16 +29,21 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
             setIdProveedor("");
             setProductosEntrada([]);
             setFechaEntrada("");
+            setErrorMsg("");
         }
     }, [show]);
 
     const handleGuardar = async () => {
-        if (!idProveedor || productosEntrada.length === 0 || !fechaEntrada) return;
+        if (!idProveedor || productosEntrada.length === 0 || !fechaEntrada) {
+            setErrorMsg("Complete proveedor, fecha y al menos un producto.");
+            return;
+        }
 
         // Calcular el total sumando los subtotales
         const totalEntrada = productosEntrada.reduce((acc, detalle) => acc + (detalle.subtotal || 0), 0);
 
         try {
+            setGuardando(true);
             await axios.post("http://localhost:8080/api/entradas", {
                 proveedor: { idProveedor: parseInt(idProveedor) },
                 fechaEntrada,
@@ -47,6 +54,9 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
             handleClose();
         } catch (error) {
             console.error("Error al guardar entrada:", error);
+            setErrorMsg("No se pudo guardar la entrada.");
+        } finally {
+            setGuardando(false);
         }
     };
 
@@ -56,11 +66,15 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                 <Modal.Title>Agregar Entrada</Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {errorMsg && (
+                    <Alert variant="danger" className="mb-3">{errorMsg}</Alert>
+                )}
                 <Form.Group className="mb-3">
                     <Form.Label>Proveedor</Form.Label>
                     <Form.Select
                         value={idProveedor}
                         onChange={(e) => setIdProveedor(e.target.value)}
+                        disabled={guardando}
                     >
                         <option value="">Seleccione un proveedor</option>
                         {proveedores.map((p) => (
@@ -77,6 +91,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                         type="date"
                         value={fechaEntrada}
                         onChange={(e) => setFechaEntrada(e.target.value)}
+                        disabled={guardando}
                     />
                 </Form.Group>
 
@@ -89,10 +104,10 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose} disabled={guardando}>
                     Cancelar
                 </Button>
-                <Button variant="primary" onClick={handleGuardar}>
+                <Button variant="primary" onClick={handleGuardar} disabled={guardando}>
                     Guardar Entrada
                 </Button>
             </Modal.Footer>
