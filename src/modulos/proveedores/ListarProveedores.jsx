@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import AgregarProveedor from "./AgregarProveedor";
 import EditarProveedor from "./EditarProveedor";
-import { Edit, Trash2, Search, X, Building2 } from "lucide-react";
+import { Edit, Power, PowerOff, Search, X, Building2 } from "lucide-react";
 import {
     Table,
     Button,
@@ -46,16 +46,29 @@ function ListarProveedores() {
         }
     };
 
-    const eliminarProveedor = async (id) => {
-        if (window.confirm("¿Estás seguro de que deseas eliminar este proveedor?")) {
+    // 🔴 Desactivar proveedor
+    const desactivarProveedor = async (id) => {
+        if (window.confirm("¿Seguro que deseas desactivar este proveedor?")) {
             try {
-                await axios.delete(`http://localhost:8080/api/proveedores/${id}`);
-                mostrarNotificacion("Proveedor eliminado exitosamente", "success");
+                await axios.put(`http://localhost:8080/api/proveedores/${id}/desactivar`);
+                mostrarNotificacion("Proveedor desactivado exitosamente", "success");
                 obtenerProveedores();
             } catch (error) {
-                console.error("Error al eliminar proveedor:", error);
-                mostrarNotificacion("Error al eliminar el proveedor", "danger");
+                console.error("Error al desactivar proveedor:", error);
+                mostrarNotificacion("Error al desactivar el proveedor", "danger");
             }
+        }
+    };
+
+    // 🟢 Activar proveedor
+    const activarProveedor = async (id) => {
+        try {
+            await axios.put(`http://localhost:8080/api/proveedores/${id}/activar`);
+            mostrarNotificacion("Proveedor activado exitosamente", "success");
+            obtenerProveedores();
+        } catch (error) {
+            console.error("Error al activar proveedor:", error);
+            mostrarNotificacion("Error al activar el proveedor", "danger");
         }
     };
 
@@ -144,13 +157,14 @@ function ListarProveedores() {
                                 <th>Dirección</th>
                                 <th>Teléfono</th>
                                 <th>Email</th>
-                                <th style={{ width: '180px' }}>Acciones</th>
+                                <th>Estado</th>
+                                <th style={{ width: '220px' }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="text-center align-middle">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="8" className="text-center py-4">
+                                    <td colSpan="9" className="text-center py-4">
                                         <div className="spinner-border text-success" role="status">
                                             <span className="visually-hidden">Cargando...</span>
                                         </div>
@@ -158,7 +172,7 @@ function ListarProveedores() {
                                 </tr>
                             ) : proveedoresFiltrados.length === 0 ? (
                                 <tr>
-                                    <td colSpan="8" className="text-center py-4 text-muted">
+                                    <td colSpan="9" className="text-center py-4 text-muted">
                                         {filtro ? "No se encontraron proveedores" : "No hay proveedores registrados"}
                                     </td>
                                 </tr>
@@ -173,6 +187,13 @@ function ListarProveedores() {
                                         <td>{proveedor.telefono}</td>
                                         <td>{proveedor.email}</td>
                                         <td>
+                                            {proveedor.activo ? (
+                                                <span className="badge bg-success">Activo</span>
+                                            ) : (
+                                                <span className="badge bg-secondary">Inactivo</span>
+                                            )}
+                                        </td>
+                                        <td>
                                             <div className="d-flex justify-content-center gap-2">
                                                 <Button
                                                     variant="outline-warning"
@@ -186,15 +207,27 @@ function ListarProveedores() {
                                                     <Edit size={16} />
                                                     <span className="d-none d-md-inline ms-1">Editar</span>
                                                 </Button>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => eliminarProveedor(proveedor.idProveedor)}
-                                                    title="Eliminar proveedor"
-                                                >
-                                                    <Trash2 size={16} />
-                                                    <span className="d-none d-md-inline ms-1">Eliminar</span>
-                                                </Button>
+                                                {proveedor.activo ? (
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        onClick={() => desactivarProveedor(proveedor.idProveedor)}
+                                                        title="Desactivar proveedor"
+                                                    >
+                                                        <PowerOff size={16} />
+                                                        <span className="d-none d-md-inline ms-1">Desactivar</span>
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        variant="outline-success"
+                                                        size="sm"
+                                                        onClick={() => activarProveedor(proveedor.idProveedor)}
+                                                        title="Activar proveedor"
+                                                    >
+                                                        <Power size={16} />
+                                                        <span className="d-none d-md-inline ms-1">Activar</span>
+                                                    </Button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

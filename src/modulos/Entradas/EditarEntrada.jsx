@@ -14,7 +14,7 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
     useEffect(() => {
         const obtenerProveedores = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/api/proveedores");
+                const response = await axios.get("http://localhost:8080/api/proveedores/activos");
                 setProveedores(response.data);
             } catch (error) {
                 console.error("Error al obtener proveedores:", error);
