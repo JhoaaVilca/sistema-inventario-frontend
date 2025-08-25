@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
 
-function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
+function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
     const [formulario, setFormulario] = useState({
         idProveedor: "",
         nombre: "",
@@ -18,7 +18,6 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
         if (proveedor) {
             setFormulario(proveedor);
 
-            // Buscar estado si es RUC
             if (proveedor.tipoDocumento === "RUC") {
                 buscarEstado(proveedor.tipoDocumento, proveedor.numeroDocumento);
             }
@@ -30,7 +29,6 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
         const actualizado = { ...formulario, [name]: value };
         setFormulario(actualizado);
 
-        // Si se cambia número de documento y es RUC, actualiza el estado
         if (
             (name === "numeroDocumento" || name === "tipoDocumento") &&
             actualizado.tipoDocumento === "RUC" &&
@@ -71,7 +69,8 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
 
             if (respuesta.ok) {
                 const actualizado = await respuesta.json();
-                onProveedorEditado(actualizado);
+                onProveedorUpdated(actualizado); // ✅ nombre correcto
+                handleClose(); // ✅ cerrar modal al guardar
             } else {
                 console.error("Error al actualizar proveedor");
             }
@@ -128,7 +127,7 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
                         />
                     </Form.Group>
 
-                    {/* Estado (solo si es RUC) */}
+                    {/* Estado */}
                     {formulario.tipoDocumento === "RUC" && formulario.estado && (
                         <Form.Group className="mb-2">
                             <Form.Label>Estado del Documento</Form.Label>
@@ -174,7 +173,6 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorEditado }) {
                         />
                     </Form.Group>
 
-                    {/* Botones */}
                     <div className="text-end mt-3">
                         <Button variant="secondary" onClick={handleClose} className="me-2">
                             Cancelar
