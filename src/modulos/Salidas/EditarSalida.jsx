@@ -12,7 +12,10 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
         if (show && salida) {
             setProductosSalida(
                 (salida.detalles || []).map(d => ({
-                    producto: { idProducto: d.producto?.idProducto ?? d.productoId ?? d.idProducto },
+                    producto: {
+                        idProducto: d.producto?.idProducto ?? d.idProducto ?? d.idProducto,
+                        nombreProducto: d.nombreProducto ?? d.producto?.nombreProducto ?? ""
+                    },
                     cantidad: d.cantidad,
                     precioUnitario: d.precioUnitario
                 }))

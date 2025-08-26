@@ -214,7 +214,7 @@ function ListarSalidas() {
                                     <tbody>
                                         {salida.detalles?.map((detalle, idx) => (
                                             <tr key={idx}>
-                                                <td>{detalle.producto?.nombreProducto}</td>
+                                                <td>{detalle.nombreProducto}</td>
                                                 <td>{detalle.cantidad}</td>
                                                 <td>S/{detalle.precioUnitario}</td>
                                                 <td>S/{detalle.subtotal}</td>
