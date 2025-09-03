@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { User, Search, CheckCircle, AlertCircle } from "lucide-react";
 import axios from "axios";
@@ -31,7 +31,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
                 setTimeout(() => validarDni(), 100);
             }
         }
-    }, [clienteInicial, show]);
+    }, [clienteInicial, show, validarDni]);
 
     // Limpiar cuando se cierre el modal
     useEffect(() => {
@@ -58,7 +58,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
         }));
     };
 
-    const validarDni = async () => {
+    const validarDni = useCallback(async () => {
         if (!formData.dni || formData.dni.length !== 8) {
             setDniValidation('invalid');
             setClienteEncontrado(null);
@@ -104,7 +104,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
         } finally {
             setValidatingDni(false);
         }
-    };
+    }, [formData.dni]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

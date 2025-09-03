@@ -66,10 +66,10 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
         try {
             await axios.put(`http://localhost:8080/api/salidas/${salida.idSalida}`, {
                 fechaSalida,
-                idCliente: clienteSeleccionado.idCliente,
+                cliente: { idCliente: clienteSeleccionado.idCliente },
                 tipoVenta,
                 detalles: productosSalida.map(d => ({
-                    idProducto: d.producto.idProducto,
+                    producto: { idProducto: d.producto.idProducto },
                     cantidad: d.cantidad,
                     precioUnitario: d.precioUnitario
                 }))
