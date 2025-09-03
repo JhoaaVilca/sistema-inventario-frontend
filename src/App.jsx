@@ -4,6 +4,7 @@ import Dashboard from './modulos/Dashboard';
 import ListarProductos from './modulos/productos/ListarProductos';
 import ListarCategorias from './modulos/categorias/ListarCategorias';
 import ListarProveedores from './modulos/proveedores/ListarProveedores';
+import ListarClientes from './modulos/clientes/ListarClientes';
 import ListarEntradas from './modulos/Entradas/ListarEntradas';
 import ListarSalidas from './modulos/Salidas/ListarSalidas';
 
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/productos" element={<ListarProductos />} />
                     <Route path="/categorias" element={<ListarCategorias />} />
                     <Route path='/proveedores' element={<ListarProveedores/>}/>
+                    <Route path='/clientes' element={<ListarClientes/>}/>
                     <Route path='/entradas' element={<ListarEntradas/>}/>
                     <Route path='/salidas' element={<ListarSalidas/>}/>
                 </Routes>

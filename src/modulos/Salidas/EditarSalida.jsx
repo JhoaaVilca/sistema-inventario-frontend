@@ -1,11 +1,14 @@
-import { Modal, Button, Form, Alert } from "react-bootstrap";
+import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TablaProductosSalida from "./TablaProductosSalida";
+import BusquedaCliente from "../clientes/BusquedaCliente";
 
 function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
     const [productosSalida, setProductosSalida] = useState([]);
     const [fechaSalida, setFechaSalida] = useState("");
+    const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+    const [tipoVenta, setTipoVenta] = useState("CONTADO");
     const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
@@ -21,6 +24,21 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
                 }))
             );
             setFechaSalida(salida.fechaSalida || "");
+            
+            // Configurar cliente si existe
+            if (salida.cliente) {
+                setClienteSeleccionado({
+                    idCliente: salida.cliente.idCliente,
+                    dni: salida.cliente.dni,
+                    nombres: salida.cliente.nombres,
+                    apellidos: salida.cliente.apellidos,
+                    direccion: salida.cliente.direccion,
+                    telefono: salida.cliente.telefono,
+                    email: salida.cliente.email
+                });
+            }
+            
+            setTipoVenta(salida.tipoVenta || "CONTADO");
             setErrorMsg("");
         }
     }, [show, salida]);
@@ -29,6 +47,7 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
         const hoy = new Date().toISOString().slice(0, 10);
         if (!fechaSalida) return "La fecha es requerida.";
         if (fechaSalida > hoy) return "La fecha no puede ser futura.";
+        if (!clienteSeleccionado) return "Debe seleccionar un cliente.";
         if (productosSalida.length === 0) return "Agregue al menos un detalle.";
         for (const d of productosSalida) {
             if (d.cantidad <= 0) return "La cantidad debe ser mayor a 0.";
@@ -47,8 +66,10 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
         try {
             await axios.put(`http://localhost:8080/api/salidas/${salida.idSalida}`, {
                 fechaSalida,
+                cliente: { idCliente: clienteSeleccionado.idCliente },
+                tipoVenta,
                 detalles: productosSalida.map(d => ({
-                    idProducto: d.producto.idProducto,
+                    producto: { idProducto: d.producto.idProducto },
                     cantidad: d.cantidad,
                     precioUnitario: d.precioUnitario
                 }))
@@ -76,14 +97,38 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
                 {errorMsg && (
                     <Alert variant="danger" className="mb-3">{errorMsg}</Alert>
                 )}
-                <Form.Group className="mb-3">
-                    <Form.Label>Fecha</Form.Label>
-                    <Form.Control
-                        type="date"
-                        value={fechaSalida}
-                        onChange={(e) => setFechaSalida(e.target.value)}
-                    />
-                </Form.Group>
+                <Row>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Fecha</Form.Label>
+                            <Form.Control
+                                type="date"
+                                value={fechaSalida}
+                                onChange={(e) => setFechaSalida(e.target.value)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Tipo de Venta</Form.Label>
+                            <Form.Select
+                                value={tipoVenta}
+                                onChange={(e) => setTipoVenta(e.target.value)}
+                            >
+                                <option value="CONTADO">Contado</option>
+                                <option value="CREDITO">Crédito</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
+                </Row>
+
+                {/* Búsqueda de Cliente */}
+                <BusquedaCliente
+                    onClienteSeleccionado={setClienteSeleccionado}
+                    clienteSeleccionado={clienteSeleccionado}
+                    required={true}
+                    showAgregarCliente={true}
+                />
 
                 <TablaProductosSalida
                     productosSalida={productosSalida}

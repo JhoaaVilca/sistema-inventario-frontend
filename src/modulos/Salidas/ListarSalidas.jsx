@@ -85,6 +85,15 @@ function ListarSalidas() {
         }
     };
 
+    const handleAsignarCliente = (idSalida) => {
+        // Por ahora, redirigir a editar la salida para asignar cliente
+        const salida = salidas.find(s => s.idSalida === idSalida);
+        if (salida) {
+            setSalidaSeleccionada(salida);
+            setShowEditModal(true);
+        }
+    };
+
     return (
         <div className="container mt-4">
             <h2 className="mb-4">Lista de Salidas</h2>
@@ -190,6 +199,8 @@ function ListarSalidas() {
                     <tr>
                         <th>ID</th>
                         <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Tipo Venta</th>
                         <th>Total</th>
                         <th>Detalles</th>
                         <th>Acciones</th>
@@ -200,6 +211,33 @@ function ListarSalidas() {
                         <tr key={salida.idSalida}>
                             <td>{salida.idSalida}</td>
                             <td>{salida.fechaSalida}</td>
+                            <td>
+                                {salida.nombreCliente ? (
+                                    <div>
+                                        <strong>{salida.dniCliente}</strong>
+                                        <br />
+                                        <small>{salida.nombreCliente}</small>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <span className="text-muted">Sin cliente</span>
+                                        <br />
+                                        <Button 
+                                            variant="outline-primary" 
+                                            size="sm" 
+                                            className="mt-1"
+                                            onClick={() => handleAsignarCliente(salida.idSalida)}
+                                        >
+                                            Asignar Cliente
+                                        </Button>
+                                    </div>
+                                )}
+                            </td>
+                            <td>
+                                <Badge bg={salida.tipoVenta === 'CONTADO' ? 'success' : 'warning'}>
+                                    {salida.tipoVenta || 'CONTADO'}
+                                </Badge>
+                            </td>
                             <td>S/{salida.totalSalida?.toFixed(2)}</td>
                             <td>
                                 <Table size="sm" bordered>
