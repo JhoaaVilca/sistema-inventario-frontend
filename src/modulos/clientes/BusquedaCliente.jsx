@@ -7,8 +7,7 @@ const BusquedaCliente = ({
     onClienteSeleccionado, 
     clienteSeleccionado, 
     required = false,
-    showAgregarCliente = false,
-    onAgregarCliente = null 
+    showAgregarCliente = false
 }) => {
     const [dni, setDni] = useState("");
     const [clientes, setClientes] = useState([]);

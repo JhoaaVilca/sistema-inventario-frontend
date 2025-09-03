@@ -47,10 +47,10 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
         try {
             const dataToSend = {
                 fechaSalida,
-                cliente: { idCliente: clienteSeleccionado.idCliente },
+                idCliente: clienteSeleccionado.idCliente,
                 tipoVenta,
                 detalles: productosSalida.map(d => ({
-                    producto: { idProducto: d.producto.idProducto },
+                    idProducto: d.producto.idProducto,
                     cantidad: d.cantidad,
                     precioUnitario: d.precioUnitario
                 }))
