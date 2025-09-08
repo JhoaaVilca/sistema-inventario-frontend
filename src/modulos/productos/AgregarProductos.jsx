@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal, Button, Form, Alert } from "react-bootstrap";
+import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { useCategorias } from "./useCategorias";
 
@@ -80,7 +80,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
     };
 
     return (
-        <Modal show={show} onHide={handleCloseModal} backdrop={loading ? "static" : true}>
+        <Modal show={show} onHide={handleCloseModal} backdrop={loading ? "static" : true} size="lg" centered>
             <Modal.Header closeButton={!loading}>
                 <Modal.Title>Agregar Producto</Modal.Title>
             </Modal.Header>
@@ -91,66 +91,83 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                     </Alert>
                 )}
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group controlId="formNombreProducto" className="mb-3">
-                        <Form.Label>Nombre del Producto</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={nombreProducto}
-                            onChange={(e) => setNombreProducto(e.target.value)}
-                            placeholder="Ingresa el nombre del producto"
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formPrecio" className="mb-3">
-                        <Form.Label>Precio</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={precio}
-                            onChange={(e) => setPrecio(e.target.value)}
-                            placeholder="Ingresa el precio del producto"
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formStock" className="mb-3">
-                        <Form.Label>Stock</Form.Label>
-                        <Form.Control
-                            type="number"
-                            value={stock}
-                            onChange={(e) => setStock(e.target.value)}
-                            placeholder="Ingresa la cantidad disponible"
-                            required
-                        />
-                    </Form.Group>
-                    <Form.Group controlId="formCategoria" className="mb-3">
-                        <Form.Label>Categoría <span className="text-danger">*</span></Form.Label>
-                        <Form.Select
-                            value={categoria}
-                            onChange={(e) => setCategoria(e.target.value)}
-                            required
-                        >
-                            <option value="">Selecciona una categoría</option>
-                            {categorias.map((cat) => (
-                                <option key={cat.idCategoria} value={cat.idCategoria}>
-                                    {cat.nombre}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                    <Form.Group controlId="formFechaIngreso" className="mb-3">
-                        <Form.Label>Fecha de Ingreso</Form.Label>
-                        <Form.Control
-                            type="date"
-                            value={fechaIngreso}
-                            onChange={(e) => setFechaIngreso(e.target.value)}
-                            required
-                        />
-                    </Form.Group>
+                    <Row>
+                        <Col md={12}>
+                            <Form.Group controlId="formNombreProducto" className="mb-3">
+                                <Form.Label>Nombre del Producto</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={nombreProducto}
+                                    onChange={(e) => setNombreProducto(e.target.value)}
+                                    placeholder="Ingresa el nombre del producto"
+                                    required
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group controlId="formPrecio" className="mb-3">
+                                <Form.Label>Precio</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={precio}
+                                    onChange={(e) => setPrecio(e.target.value)}
+                                    placeholder="Ingresa el precio del producto"
+                                    required
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group controlId="formStock" className="mb-3">
+                                <Form.Label>Stock</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    value={stock}
+                                    onChange={(e) => setStock(e.target.value)}
+                                    placeholder="Ingresa la cantidad disponible"
+                                    required
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group controlId="formCategoria" className="mb-3">
+                                <Form.Label>Categoría <span className="text-danger">*</span></Form.Label>
+                                <Form.Select
+                                    value={categoria}
+                                    onChange={(e) => setCategoria(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Selecciona una categoría</option>
+                                    {categorias.map((cat) => (
+                                        <option key={cat.idCategoria} value={cat.idCategoria}>
+                                            {cat.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group controlId="formFechaIngreso" className="mb-3">
+                                <Form.Label>Fecha de Ingreso</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    value={fechaIngreso}
+                                    onChange={(e) => setFechaIngreso(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                    <div className="d-flex justify-content-end gap-2 mt-4">
+                    <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
                         <Button
                             variant="secondary"
                             onClick={handleCloseModal}
                             disabled={loading}
+                            className="w-100 w-sm-auto"
                         >
                             Cancelar
                         </Button>
@@ -158,6 +175,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                             variant="success"
                             type="submit"
                             disabled={loading}
+                            className="w-100 w-sm-auto"
                         >
                             {loading ? (
                                 <>

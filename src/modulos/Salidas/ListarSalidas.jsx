@@ -64,9 +64,14 @@ function ListarSalidas() {
         setSalidaSeleccionada(null);
     };
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleSalidaAgregada = () => {
         obtenerSalidas();
         handleCerrarModalAgregar();
+        scrollToTop();
     };
 
     const handleEditar = (salida) => {
@@ -96,7 +101,15 @@ function ListarSalidas() {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4">Lista de Salidas</h2>
+            <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
+                <div className="p-2 bg-danger bg-opacity-10 rounded-3">
+                    <Calendar size={24} className="text-danger" />
+                </div>
+                <div>
+                    <h3 className="mb-0 text-dark fw-bold">Gestión de Salidas</h3>
+                    <small className="text-muted">Administra las salidas de productos del inventario</small>
+                </div>
+            </div>
 
             {errorListado && (
                 <Alert variant="danger" className="mb-3">{errorListado}</Alert>
@@ -144,7 +157,7 @@ function ListarSalidas() {
                 <Collapse in={filtrosAbiertos}>
                     <Card.Body>
                         <div className="row g-3">
-                            <div className="col-md-5">
+                            <div className="col-lg-5 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
                                         <Calendar size={16} className="me-2" />
@@ -154,11 +167,11 @@ function ListarSalidas() {
                                         type="date"
                                         value={fechaInicio}
                                         onChange={e => setFechaInicio(e.target.value)}
-                                        className="form-control-lg"
+                                        size="sm"
                                     />
                                 </Form.Group>
                             </div>
-                            <div className="col-md-5">
+                            <div className="col-lg-5 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
                                         <Calendar size={16} className="me-2" />
@@ -168,18 +181,19 @@ function ListarSalidas() {
                                         type="date"
                                         value={fechaFin}
                                         onChange={e => setFechaFin(e.target.value)}
-                                        className="form-control-lg"
+                                        size="sm"
                                     />
                                 </Form.Group>
                             </div>
-                            <div className="col-md-2 d-flex align-items-end">
+                            <div className="col-lg-2 col-md-12 d-flex align-items-end">
                                 <Button
                                     variant="primary"
                                     onClick={filtrarSalidas}
+                                    size="sm"
                                     className="d-flex align-items-center justify-content-center w-100"
                                     disabled={!fechaInicio || !fechaFin}
                                 >
-                                    <Search size={16} className="me-2" />
+                                    <Search size={14} className="me-1" />
                                     Buscar
                                 </Button>
                             </div>
@@ -194,18 +208,29 @@ function ListarSalidas() {
                 </Button>
             </div>
 
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Tipo Venta</th>
-                        <th>Total</th>
-                        <th>Detalles</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div className="card shadow-sm border-0">
+                <div className="card-header bg-white border-0 py-3">
+                    <h5 className="mb-0 text-dark fw-semibold">
+                        Lista de Salidas
+                        {salidas.length > 0 && (
+                            <span className="badge bg-primary ms-2">{salidas.length}</span>
+                        )}
+                    </h5>
+                </div>
+                <div className="card-body p-0">
+                    <div className="table-responsive">
+                        <Table hover className="mb-0">
+                            <thead className="table-light text-center">
+                                <tr>
+                                    <th className="fw-semibold py-3">ID</th>
+                                    <th className="fw-semibold py-3">Fecha</th>
+                                    <th className="fw-semibold py-3">Cliente</th>
+                                    <th className="fw-semibold py-3">Tipo Venta</th>
+                                    <th className="fw-semibold py-3">Total</th>
+                                    <th className="fw-semibold py-3">Detalles</th>
+                                    <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
+                                </tr>
+                            </thead>
                 <tbody>
                     {salidas?.map((salida) => (
                         <tr key={salida.idSalida}>
@@ -262,29 +287,38 @@ function ListarSalidas() {
                                 </Table>
                             </td>
                             <td>
-                                <div className="d-flex justify-content-center gap-2">
-                                    <button
-                                        className="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
+                                <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                    <Button
+                                        variant="outline-warning"
+                                        size="sm"
                                         onClick={() => handleEditar(salida)}
                                         title="Ver/Editar salida"
+                                        className="btn-sm shadow-sm"
+                                        style={{ minWidth: '32px' }}
                                     >
-                                        <Edit size={16} />
-                                        <span className="d-none d-md-inline">Ver/Editar</span>
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                                        <Edit size={12} />
+                                        <span className="d-none d-xl-inline ms-1">Ver/Editar</span>
+                                    </Button>
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
                                         onClick={() => handleEliminacion(salida.idSalida)}
                                         title="Eliminar salida"
+                                        className="btn-sm shadow-sm"
+                                        style={{ minWidth: '32px' }}
                                     >
-                                        <Trash2 size={16} />
-                                        <span className="d-none d-md-inline">Eliminar</span>
-                                    </button>
+                                        <Trash2 size={12} />
+                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
+                                    </Button>
                                 </div>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </Table>
+                        </Table>
+                    </div>
+                </div>
+            </div>
 
             <AgregarSalida
                 show={showAddModal}

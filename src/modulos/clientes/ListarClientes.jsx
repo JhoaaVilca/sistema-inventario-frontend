@@ -59,6 +59,10 @@ const ListarClientes = () => {
         setShowToast(true);
     };
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const limpiarBuscador = () => {
         setFiltro("");
         setMostrarInput(false);
@@ -78,45 +82,21 @@ const ListarClientes = () => {
 
     return (
         <div className="container mt-4">
-            <div className="d-flex align-items-center gap-3 mb-4">
-                <User size={32} className="text-primary" />
-                <h3 className="mb-0">Gestión de Clientes</h3>
+            <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
+                <div className="p-2 bg-primary bg-opacity-10 rounded-3">
+                    <User size={24} className="text-primary" />
+                </div>
+                <div>
+                    <h3 className="mb-0 text-dark fw-bold">Gestión de Clientes</h3>
+                    <small className="text-muted">Administra tu base de clientes</small>
+                </div>
             </div>
 
-            {/* Botón + buscador */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <Button variant="success" onClick={() => setShowAgregar(true)}>
-                    <Plus size={18} className="me-2" />
-                    Agregar Cliente
+            {/* Botón Agregar */}
+            <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+                <Button variant="success" onClick={() => setShowAgregar(true)} className="mb-3">
+                    <Plus size={16} /> Agregar Cliente
                 </Button>
-
-                {!mostrarInput ? (
-                    <Button
-                        variant="outline-primary"
-                        onClick={() => setMostrarInput(true)}
-                    >
-                        <Search size={18} />
-                    </Button>
-                ) : (
-                    <InputGroup style={{ maxWidth: "250px" }}>
-                        <FormControl
-                            ref={inputRef}
-                            autoFocus
-                            placeholder="Buscar clientes..."
-                            value={filtro}
-                            onChange={(e) => setFiltro(e.target.value)}
-                        />
-                        {filtro ? (
-                            <Button variant="outline-secondary" onClick={limpiarBuscador}>
-                                <X size={18} />
-                            </Button>
-                        ) : (
-                            <Button variant="outline-secondary" onClick={limpiarBuscador}>
-                                <X size={18} />
-                            </Button>
-                        )}
-                    </InputGroup>
-                )}
             </div>
 
             {/* Mensaje de error */}
@@ -127,21 +107,69 @@ const ListarClientes = () => {
             )}
 
             {/* Tabla de clientes */}
-            <div className="table-responsive">
-                <Table striped bordered hover>
-                    <thead className="table-dark">
-                        <tr>
-                            <th>DNI</th>
-                            <th>Nombres</th>
-                            <th>Apellidos</th>
-                            <th>Dirección</th>
-                            <th>Teléfono</th>
-                            <th>Email</th>
-                            <th>Fecha Registro</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
+            <div className="card shadow-sm border-0">
+                <div className="card-header bg-white border-0 py-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0 text-dark fw-semibold">
+                            Lista de Clientes
+                            {clientesFiltrados.length > 0 && (
+                                <span className="badge bg-primary ms-2">{clientesFiltrados.length}</span>
+                            )}
+                        </h5>
+                        <div className="d-flex align-items-center gap-2">
+                            {!mostrarInput ? (
+                                <Button
+                                    variant="outline-primary"
+                                    size="sm"
+                                    onClick={() => setMostrarInput(true)}
+                                >
+                                    <Search size={16} />
+                                </Button>
+                            ) : (
+                                <InputGroup size="sm" style={{ width: "250px" }}>
+                                    <FormControl
+                                        ref={inputRef}
+                                        autoFocus
+                                        placeholder="Buscar clientes..."
+                                        value={filtro}
+                                        onChange={(e) => setFiltro(e.target.value)}
+                                    />
+                                    {filtro ? (
+                                        <Button variant="outline-secondary" onClick={limpiarBuscador}>
+                                            <X size={16} />
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={() => {
+                                                setMostrarInput(false);
+                                                setFiltro("");
+                                            }}
+                                        >
+                                            <X size={16} />
+                                        </Button>
+                                    )}
+                                </InputGroup>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className="card-body p-0">
+                    <div className="table-responsive">
+                        <Table hover className="mb-0">
+                            <thead className="table-light text-center">
+                                <tr>
+                                    <th className="fw-semibold py-3">DNI</th>
+                                    <th className="fw-semibold py-3">Nombres</th>
+                                    <th className="fw-semibold py-3">Apellidos</th>
+                                    <th className="fw-semibold py-3">Dirección</th>
+                                    <th className="fw-semibold py-3">Teléfono</th>
+                                    <th className="fw-semibold py-3">Email</th>
+                                    <th className="fw-semibold py-3">Fecha Registro</th>
+                                    <th className="fw-semibold py-3">Estado</th>
+                                    <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
+                                </tr>
+                            </thead>
                     <tbody>
                         {loading ? (
                             <tr>
@@ -177,7 +205,7 @@ const ListarClientes = () => {
                                         </Badge>
                                     </td>
                                     <td>
-                                        <div className="d-flex gap-1">
+                                        <div className="d-flex gap-1 flex-wrap justify-content-center">
                                             <Button
                                                 variant="outline-primary"
                                                 size="sm"
@@ -185,15 +213,23 @@ const ListarClientes = () => {
                                                     setClienteEditar(cliente);
                                                     setShowEditar(true);
                                                 }}
+                                                className="btn-sm shadow-sm"
+                                                style={{ minWidth: '32px' }}
+                                                title="Editar cliente"
                                             >
-                                                <Edit size={16} />
+                                                <Edit size={12} />
+                                                <span className="d-none d-xl-inline ms-1">Editar</span>
                                             </Button>
                                             <Button
                                                 variant="outline-danger"
                                                 size="sm"
                                                 onClick={() => handleEliminar(cliente.idCliente)}
+                                                className="btn-sm shadow-sm"
+                                                style={{ minWidth: '32px' }}
+                                                title="Eliminar cliente"
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={12} />
+                                                <span className="d-none d-xl-inline ms-1">Eliminar</span>
                                             </Button>
                                         </div>
                                     </td>
@@ -201,7 +237,9 @@ const ListarClientes = () => {
                             ))
                         )}
                     </tbody>
-                </Table>
+                        </Table>
+                    </div>
+                </div>
             </div>
 
             {/* Modal Agregar Cliente */}
@@ -213,6 +251,7 @@ const ListarClientes = () => {
                         setShowAgregar(false);
                         cargarClientes();
                         mostrarNotificacion("Cliente agregado exitosamente", "success");
+                        scrollToTop();
                     }}
                 />
             )}
@@ -228,6 +267,7 @@ const ListarClientes = () => {
                         setClienteEditar(null);
                         cargarClientes();
                         mostrarNotificacion("Cliente actualizado exitosamente", "success");
+                        scrollToTop();
                     }}
                 />
             )}

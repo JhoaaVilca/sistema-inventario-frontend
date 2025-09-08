@@ -41,9 +41,6 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
             return;
         }
 
-        console.log("Cliente seleccionado:", clienteSeleccionado);
-        console.log("ID del cliente:", clienteSeleccionado?.idCliente);
-
         try {
             const dataToSend = {
                 fechaSalida,
@@ -55,9 +52,6 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                     precioUnitario: d.precioUnitario
                 }))
             };
-            
-            console.log("Datos a enviar:", dataToSend);
-            console.log("JSON stringificado:", JSON.stringify(dataToSend, null, 2));
             
             await axios.post("http://localhost:8080/api/salidas", dataToSend);
             onSalidaAgregada();

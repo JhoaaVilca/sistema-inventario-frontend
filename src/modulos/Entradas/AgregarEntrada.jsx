@@ -1,6 +1,6 @@
 // src/modulos/Entradas/AgregarEntrada.jsx
 
-import { Modal, Button, Form, Alert } from "react-bootstrap";
+import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TablaProductosEntrada from "./TablaProductosEntrada";
@@ -61,7 +61,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
     };
 
     return (
-        <Modal show={show} onHide={handleClose} size="lg">
+        <Modal show={show} onHide={handleClose} size="xl" centered>
             <Modal.Header closeButton>
                 <Modal.Title>Agregar Entrada</Modal.Title>
             </Modal.Header>
@@ -69,31 +69,36 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                 {errorMsg && (
                     <Alert variant="danger" className="mb-3">{errorMsg}</Alert>
                 )}
-                <Form.Group className="mb-3">
-                    <Form.Label>Proveedor</Form.Label>
-                    <Form.Select
-                        value={idProveedor}
-                        onChange={(e) => setIdProveedor(e.target.value)}
-                        disabled={guardando}
-                    >
-                        <option value="">Seleccione un proveedor</option>
-                        {proveedores.map((p) => (
-                            <option key={p.idProveedor} value={p.idProveedor}>
-                                {p.nombre}
-                            </option>
-                        ))}
-                    </Form.Select>
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                    <Form.Label>Fecha de Entrada</Form.Label>
-                    <Form.Control
-                        type="date"
-                        value={fechaEntrada}
-                        onChange={(e) => setFechaEntrada(e.target.value)}
-                        disabled={guardando}
-                    />
-                </Form.Group>
+                <Row>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Proveedor</Form.Label>
+                            <Form.Select
+                                value={idProveedor}
+                                onChange={(e) => setIdProveedor(e.target.value)}
+                                disabled={guardando}
+                            >
+                                <option value="">Seleccione un proveedor</option>
+                                {proveedores.map((p) => (
+                                    <option key={p.idProveedor} value={p.idProveedor}>
+                                        {p.nombre}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
+                    <Col md={6}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Fecha de Entrada</Form.Label>
+                            <Form.Control
+                                type="date"
+                                value={fechaEntrada}
+                                onChange={(e) => setFechaEntrada(e.target.value)}
+                                disabled={guardando}
+                            />
+                        </Form.Group>
+                    </Col>
+                </Row>
 
                 <TablaProductosEntrada
                     productosEntrada={productosEntrada}
@@ -104,12 +109,14 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose} disabled={guardando}>
-                    Cancelar
-                </Button>
-                <Button variant="primary" onClick={handleGuardar} disabled={guardando}>
-                    Guardar Entrada
-                </Button>
+                <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 w-100">
+                    <Button variant="secondary" onClick={handleClose} disabled={guardando} className="w-100 w-sm-auto">
+                        Cancelar
+                    </Button>
+                    <Button variant="primary" onClick={handleGuardar} disabled={guardando} className="w-100 w-sm-auto">
+                        Guardar Entrada
+                    </Button>
+                </div>
             </Modal.Footer>
         </Modal>
     );

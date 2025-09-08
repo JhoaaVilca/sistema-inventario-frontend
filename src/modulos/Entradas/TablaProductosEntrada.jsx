@@ -1,7 +1,7 @@
 // src/modulos/Entradas/TablaProductosEntrada.jsx
 
 import { useEffect, useState } from "react";
-import { Button, Form, Table } from "react-bootstrap";
+import { Button, Form, Table, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
 function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
@@ -67,37 +67,48 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
             {errorInline && (
                 <div className="text-danger mb-2">{errorInline}</div>
             )}
-            <div className="d-flex gap-2 flex-wrap align-items-end">
-                <Form.Select
-                    value={productoSeleccionado}
-                    onChange={(e) => setProductoSeleccionado(e.target.value)}
-                >
-                    <option value="">Seleccione un producto</option>
-                    {productos.map((p) => (
-                        <option key={p.idProducto} value={p.idProducto}>
-                            {p.nombreProducto}
-                        </option>
-                    ))}
-                </Form.Select>
-                <Form.Control
-                    type="number"
-                    placeholder="Cantidad"
-                    value={cantidad}
-                    onChange={(e) => setCantidad(e.target.value)}
-                    min="1"
-                />
-                <Form.Control
-                    type="number"
-                    placeholder="Precio unitario"
-                    value={precioUnitario}
-                    onChange={(e) => setPrecioUnitario(e.target.value)}
-                    min="0"
-                    step="0.01"
-                />
-                <Button variant="primary" onClick={agregarProducto}>Agregar</Button>
-            </div>
+            <Row className="g-2 mb-3">
+                <Col md={4} sm={6}>
+                    <Form.Select
+                        value={productoSeleccionado}
+                        onChange={(e) => setProductoSeleccionado(e.target.value)}
+                    >
+                        <option value="">Seleccione un producto</option>
+                        {productos.map((p) => (
+                            <option key={p.idProducto} value={p.idProducto}>
+                                {p.nombreProducto}
+                            </option>
+                        ))}
+                    </Form.Select>
+                </Col>
+                <Col md={2} sm={3}>
+                    <Form.Control
+                        type="number"
+                        placeholder="Cantidad"
+                        value={cantidad}
+                        onChange={(e) => setCantidad(e.target.value)}
+                        min="1"
+                    />
+                </Col>
+                <Col md={3} sm={6}>
+                    <Form.Control
+                        type="number"
+                        placeholder="Precio unitario"
+                        value={precioUnitario}
+                        onChange={(e) => setPrecioUnitario(e.target.value)}
+                        min="0"
+                        step="0.01"
+                    />
+                </Col>
+                <Col md={3} sm={3}>
+                    <Button variant="primary" onClick={agregarProducto} className="w-100">
+                        Agregar
+                    </Button>
+                </Col>
+            </Row>
 
-            <Table bordered size="sm" className="mt-3">
+            <div className="table-responsive">
+                <Table bordered size="sm" className="mt-3">
                 <thead>
                     <tr>
                         <th>Producto</th>
@@ -120,7 +131,8 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
                         </tr>
                     ))}
                 </tbody>
-            </Table>
+                </Table>
+            </div>
         </div>
     );
 }

@@ -90,9 +90,14 @@ function ListarEntradas() {
         setEntradaSeleccionada(null);
     };
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleEntradaAgregada = () => {
         obtenerEntradas();
         handleCerrarModalAgregar();
+        scrollToTop();
     };
 
     const handleEditar = (entrada) => {
@@ -113,7 +118,16 @@ function ListarEntradas() {
 
     return (
         <div className="container mt-4">
-            <h2 className="mb-4 d-flex align-items-center gap-2">Lista de Entradas {cargando && <Spinner animation="border" size="sm" />} </h2>
+            <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
+                <div className="p-2 bg-warning bg-opacity-10 rounded-3">
+                    <Calendar size={24} className="text-warning" />
+                </div>
+                <div>
+                    <h3 className="mb-0 text-dark fw-bold">Gestión de Entradas</h3>
+                    <small className="text-muted">Administra las entradas de productos al inventario</small>
+                </div>
+                {cargando && <Spinner animation="border" size="sm" />}
+            </div>
 
             {errorListado && (
                 <Alert variant="danger" className="mb-3">{errorListado}</Alert>
@@ -162,7 +176,7 @@ function ListarEntradas() {
                 <Collapse in={filtrosAbiertos}>
                     <Card.Body>
                         <div className="row g-3">
-                            <div className="col-md-4">
+                            <div className="col-lg-4 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
                                         <Building size={16} className="me-2" />
@@ -171,7 +185,7 @@ function ListarEntradas() {
                                     <Form.Select
                                         value={idProveedor}
                                         onChange={e => setIdProveedor(e.target.value)}
-                                        className="form-select-lg"
+                                        size="sm"
                                     >
                                         <option value="">Seleccione un proveedor</option>
                                         {proveedores.map(prov => (
@@ -182,7 +196,7 @@ function ListarEntradas() {
                                     </Form.Select>
                                 </Form.Group>
                             </div>
-                            <div className="col-md-3">
+                            <div className="col-lg-3 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
                                         <Calendar size={16} className="me-2" />
@@ -192,11 +206,11 @@ function ListarEntradas() {
                                         type="date"
                                         value={fechaInicio}
                                         onChange={e => setFechaInicio(e.target.value)}
-                                        className="form-control-lg"
+                                        size="sm"
                                     />
                                 </Form.Group>
                             </div>
-                            <div className="col-md-3">
+                            <div className="col-lg-3 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
                                         <Calendar size={16} className="me-2" />
@@ -206,18 +220,19 @@ function ListarEntradas() {
                                         type="date"
                                         value={fechaFin}
                                         onChange={e => setFechaFin(e.target.value)}
-                                        className="form-control-lg"
+                                        size="sm"
                                     />
                                 </Form.Group>
                             </div>
-                            <div className="col-md-2 d-flex align-items-end">
+                            <div className="col-lg-2 col-md-12 d-flex align-items-end">
                                 <Button
                                     variant="primary"
                                     onClick={filtrarEntradas}
+                                    size="sm"
                                     className="d-flex align-items-center justify-content-center w-100"
                                     disabled={!idProveedor || !fechaInicio || !fechaFin || cargando}
                                 >
-                                    <Search size={16} className="me-2" />
+                                    <Search size={14} className="me-1" />
                                     Buscar
                                 </Button>
                             </div>
@@ -237,17 +252,28 @@ function ListarEntradas() {
                     <Card.Body className="text-center text-muted">No hay entradas para mostrar.</Card.Body>
                 </Card>
             ) : (
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Proveedor</th>
-                        <th>Fecha</th>
-                        <th>Total</th>
-                        <th>Detalles</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
+            <div className="card shadow-sm border-0">
+                <div className="card-header bg-white border-0 py-3">
+                    <h5 className="mb-0 text-dark fw-semibold">
+                        Lista de Entradas
+                        {entradas.length > 0 && (
+                            <span className="badge bg-primary ms-2">{entradas.length}</span>
+                        )}
+                    </h5>
+                </div>
+                <div className="card-body p-0">
+                    <div className="table-responsive">
+                        <Table hover className="mb-0">
+                            <thead className="table-light text-center">
+                                <tr>
+                                    <th className="fw-semibold py-3">ID</th>
+                                    <th className="fw-semibold py-3">Proveedor</th>
+                                    <th className="fw-semibold py-3">Fecha</th>
+                                    <th className="fw-semibold py-3">Total</th>
+                                    <th className="fw-semibold py-3">Detalles</th>
+                                    <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
+                                </tr>
+                            </thead>
                 <tbody>
                     {entradas?.map((entrada) => (
                         <tr key={entrada.idEntrada}>
@@ -278,33 +304,42 @@ function ListarEntradas() {
                                 </Table>
                             </td>
                             <td>
-                                <div className="d-flex justify-content-center gap-2">
-                                    <button
-                                        className="btn btn-sm btn-outline-success d-flex align-items-center gap-1"
+                                <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                    <Button
+                                        variant="outline-warning"
+                                        size="sm"
                                         onClick={() => handleEditar(entrada)}
                                         title="Editar entrada"
                                         disabled={cargando}
+                                        className="btn-sm shadow-sm"
+                                        style={{ minWidth: '32px' }}
                                     >
-                                        <Edit size={16} />
-                                        <span className="d-none d-md-inline">Editar</span>
-                                    </button>
+                                        <Edit size={12} />
+                                        <span className="d-none d-xl-inline ms-1">Editar</span>
+                                    </Button>
 
-                                    <button
-                                        className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
                                         onClick={() => handleEliminacion(entrada.idEntrada)}
                                         title="Eliminar entrada"
                                         disabled={cargando}
+                                        className="btn-sm shadow-sm"
+                                        style={{ minWidth: '32px' }}
                                     >
-                                        <Trash2 size={16} />
-                                        <span className="d-none d-md-inline">Eliminar</span>
-                                    </button>
+                                        <Trash2 size={12} />
+                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
+                                    </Button>
                                 </div>
                             </td>
 
                         </tr>
                     ))}
                 </tbody>
-            </Table>
+                        </Table>
+                    </div>
+                </div>
+            </div>
             )}
 
             {/* Modal Agregar */}

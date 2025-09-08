@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import AgregarCategoria from "./AgregarCategoria";
 import EditarCategoria from "./EditarCategoria";
-import { Edit, Trash2, Search, X, Grid3X3 } from "lucide-react";
+import { Edit, Trash2, Search, X, Grid3X3, Eye, Plus } from "lucide-react";
 import {
     Table,
     Button,
@@ -14,6 +15,7 @@ import {
 import axios from "axios";
 
 function ListarCategorias() {
+    const navigate = useNavigate();
     const [categorias, setCategorias] = useState([]);
     const [categoriaEditar, setCategoriaEditar] = useState(null);
     const [showAgregar, setShowAgregar] = useState(false);
@@ -65,6 +67,10 @@ function ListarCategorias() {
         setShowToast(true);
     };
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const limpiarBuscador = () => {
         setFiltro("");
         setMostrarInput(false);
@@ -77,50 +83,21 @@ function ListarCategorias() {
 
     return (
         <div className="container mt-4">
-            <div className="d-flex align-items-center gap-3 mb-4">
-                <Grid3X3 size={32} className="text-primary" />
-                <h3 className="mb-0">Gestión de Categorías</h3>
+            <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
+                <div className="p-2 bg-primary bg-opacity-10 rounded-3">
+                    <Grid3X3 size={24} className="text-primary" />
+                </div>
+                <div>
+                    <h3 className="mb-0 text-dark fw-bold">Gestión de Categorías</h3>
+                    <small className="text-muted">Organiza tus productos por categorías</small>
+                </div>
             </div>
 
-            {/* Botón Agregar + Buscador */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <Button variant="success" onClick={() => setShowAgregar(true)}>
-                    + Agregar Categoría
+            {/* Botón Agregar */}
+            <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+                <Button variant="success" onClick={() => setShowAgregar(true)} className="mb-3">
+                    <Plus size={16} /> Agregar Categoría
                 </Button>
-
-                {!mostrarInput ? (
-                    <Button
-                        variant="outline-primary"
-                        onClick={() => setMostrarInput(true)}
-                    >
-                        <Search size={18} />
-                    </Button>
-                ) : (
-                    <InputGroup style={{ maxWidth: "250px" }}>
-                        <FormControl
-                            ref={inputRef}
-                            autoFocus
-                            placeholder="Buscar categorías..."
-                            value={filtro}
-                            onChange={(e) => setFiltro(e.target.value)}
-                        />
-                        {filtro ? (
-                            <Button variant="outline-secondary" onClick={limpiarBuscador}>
-                                <X size={18} />
-                            </Button>
-                        ) : (
-                            <Button
-                                variant="outline-danger"
-                                onClick={() => {
-                                    setMostrarInput(false);
-                                    setFiltro("");
-                                }}
-                            >
-                                <X size={18} />
-                            </Button>
-                        )}
-                    </InputGroup>
-                )}
             </div>
 
             {/* Mensaje de error */}
@@ -131,14 +108,61 @@ function ListarCategorias() {
             )}
 
             {/* Tabla */}
-            <div className="card shadow-sm">
+            <div className="card shadow-sm border-0">
+                <div className="card-header bg-white border-0 py-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0 text-dark fw-semibold">
+                            Lista de Categorías
+                            {categoriasFiltradas.length > 0 && (
+                                <span className="badge bg-primary ms-2">{categoriasFiltradas.length}</span>
+                            )}
+                        </h5>
+                        <div className="d-flex align-items-center gap-2">
+                            {!mostrarInput ? (
+                                <Button
+                                    variant="outline-primary"
+                                    size="sm"
+                                    onClick={() => setMostrarInput(true)}
+                                >
+                                    <Search size={16} />
+                                </Button>
+                            ) : (
+                                <InputGroup size="sm" style={{ width: "250px" }}>
+                                    <FormControl
+                                        ref={inputRef}
+                                        autoFocus
+                                        placeholder="Buscar categorías..."
+                                        value={filtro}
+                                        onChange={(e) => setFiltro(e.target.value)}
+                                    />
+                                    {filtro ? (
+                                        <Button variant="outline-secondary" onClick={limpiarBuscador}>
+                                            <X size={16} />
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={() => {
+                                                setMostrarInput(false);
+                                                setFiltro("");
+                                            }}
+                                        >
+                                            <X size={16} />
+                                        </Button>
+                                    )}
+                                </InputGroup>
+                            )}
+                        </div>
+                    </div>
+                </div>
                 <div className="card-body p-0">
-                    <Table striped bordered hover responsive className="mb-0">
-                        <thead className="table-dark text-center">
+                    <div className="table-responsive">
+                        <Table hover className="mb-0">
+                        <thead className="table-light text-center">
                             <tr>
-                                <th style={{ width: '80px' }}>ID</th>
-                                <th>Nombre</th>
-                                <th style={{ width: '150px' }}>Acciones</th>
+                                <th className="fw-semibold py-3" style={{ width: '80px' }}>ID</th>
+                                <th className="fw-semibold py-3">Nombre</th>
+                                <th className="fw-semibold py-3" style={{ width: '180px' }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="text-center align-middle">
@@ -162,7 +186,18 @@ function ListarCategorias() {
                                         <td>{categoria.idCategoria}</td>
                                         <td className="fw-medium">{categoria.nombre}</td>
                                         <td>
-                                            <div className="d-flex justify-content-center gap-2">
+                                            <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={() => navigate(`/categoria/${categoria.idCategoria}`)}
+                                                    title="Ver productos de esta categoría"
+                                                    className="btn-sm shadow-sm"
+                                                    style={{ minWidth: '32px' }}
+                                                >
+                                                    <Eye size={12} />
+                                                    <span className="d-none d-xl-inline ms-1">Ver</span>
+                                                </Button>
                                                 <Button
                                                     variant="outline-warning"
                                                     size="sm"
@@ -171,18 +206,22 @@ function ListarCategorias() {
                                                         setShowEditar(true);
                                                     }}
                                                     title="Editar categoría"
+                                                    className="btn-sm shadow-sm"
+                                                    style={{ minWidth: '32px' }}
                                                 >
-                                                    <Edit size={16} />
-                                                    <span className="d-none d-md-inline ms-1">Editar</span>
+                                                    <Edit size={12} />
+                                                    <span className="d-none d-xl-inline ms-1">Editar</span>
                                                 </Button>
                                                 <Button
                                                     variant="outline-danger"
                                                     size="sm"
                                                     onClick={() => eliminarCategoria(categoria.idCategoria)}
                                                     title="Eliminar categoría"
+                                                    className="btn-sm shadow-sm"
+                                                    style={{ minWidth: '32px' }}
                                                 >
-                                                    <Trash2 size={16} />
-                                                    <span className="d-none d-md-inline ms-1">Eliminar</span>
+                                                    <Trash2 size={12} />
+                                                    <span className="d-none d-xl-inline ms-1">Eliminar</span>
                                                 </Button>
                                             </div>
                                         </td>
@@ -190,7 +229,8 @@ function ListarCategorias() {
                                 ))
                             )}
                         </tbody>
-                    </Table>
+                        </Table>
+                    </div>
                 </div>
             </div>
 
@@ -201,6 +241,7 @@ function ListarCategorias() {
                 onCategoriaAdded={() => {
                     obtenerCategorias();
                     mostrarNotificacion("Categoría agregada exitosamente", "success");
+                    scrollToTop();
                 }}
             />
             <EditarCategoria
@@ -210,6 +251,7 @@ function ListarCategorias() {
                 onCategoriaEditada={() => {
                     obtenerCategorias();
                     mostrarNotificacion("Categoría actualizada exitosamente", "success");
+                    scrollToTop();
                 }}
             />
 

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import AgregarProveedor from "./AgregarProveedor";
 import EditarProveedor from "./EditarProveedor";
-import { Edit, Power, PowerOff, Search, X, Building2 } from "lucide-react";
+import { Edit, Power, PowerOff, Search, X, Building2, Plus } from "lucide-react";
 import {
     Table,
     Button,
@@ -78,6 +78,10 @@ function ListarProveedores() {
         setShowToast(true);
     };
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const limpiarBuscador = () => {
         setFiltro("");
         setMostrarInput(false);
@@ -91,50 +95,74 @@ function ListarProveedores() {
     return (
         <div className="container mt-4">
             {/* HEADER CON ICONO */}
-            <div className="d-flex align-items-center gap-3 mb-4">
-                <Building2 size={32} className="text-success" />
-                <h3 className="mb-0">Gestión de Proveedores</h3>
+            <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
+                <div className="p-2 bg-success bg-opacity-10 rounded-3">
+                    <Building2 size={24} className="text-success" />
+                </div>
+                <div>
+                    <h3 className="mb-0 text-dark fw-bold">Gestión de Proveedores</h3>
+                    <small className="text-muted">Administra tus proveedores y contactos</small>
+                </div>
             </div>
 
             {/* Botón Agregar + Buscador */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <Button variant="success" onClick={() => setShowAgregar(true)}>
-                    + Agregar Proveedor
+            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
+                <Button 
+                    variant="success" 
+                    onClick={() => setShowAgregar(true)} 
+                    size="sm"
+                    className="w-100 w-sm-auto shadow-sm"
+                    style={{ minWidth: '140px' }}
+                >
+                    <Plus size={14} className="me-1" />
+                    Agregar Proveedor
                 </Button>
 
-                {!mostrarInput ? (
-                    <Button
-                        variant="outline-primary"
-                        onClick={() => setMostrarInput(true)}
-                    >
-                        <Search size={18} />
-                    </Button>
-                ) : (
-                    <InputGroup style={{ maxWidth: "250px" }}>
-                        <FormControl
-                            ref={inputRef}
-                            autoFocus
-                            placeholder="Buscar proveedores..."
-                            value={filtro}
-                            onChange={(e) => setFiltro(e.target.value)}
-                        />
-                        {filtro ? (
-                            <Button variant="outline-secondary" onClick={limpiarBuscador}>
-                                <X size={18} />
-                            </Button>
-                        ) : (
-                            <Button
-                                variant="outline-danger"
-                                onClick={() => {
-                                    setMostrarInput(false);
-                                    setFiltro("");
-                                }}
-                            >
-                                <X size={18} />
-                            </Button>
-                        )}
-                    </InputGroup>
-                )}
+                <div className="w-100 w-sm-auto" style={{ maxWidth: '300px' }}>
+                    {!mostrarInput ? (
+                        <Button
+                            variant="outline-primary"
+                            onClick={() => setMostrarInput(true)}
+                            size="sm"
+                            className="w-100 w-sm-auto shadow-sm"
+                            style={{ minWidth: '100px' }}
+                        >
+                            <Search size={14} className="me-1" />
+                            Buscar
+                        </Button>
+                    ) : (
+                        <InputGroup size="sm" className="shadow-sm">
+                            <FormControl
+                                ref={inputRef}
+                                autoFocus
+                                placeholder="Buscar proveedores..."
+                                value={filtro}
+                                onChange={(e) => setFiltro(e.target.value)}
+                                className="border-end-0"
+                            />
+                            {filtro ? (
+                                <Button 
+                                    variant="outline-secondary" 
+                                    onClick={limpiarBuscador}
+                                    className="border-start-0"
+                                >
+                                    <X size={14} />
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="outline-danger"
+                                    onClick={() => {
+                                        setMostrarInput(false);
+                                        setFiltro("");
+                                    }}
+                                    className="border-start-0"
+                                >
+                                    <X size={14} />
+                                </Button>
+                            )}
+                        </InputGroup>
+                    )}
+                </div>
             </div>
 
             {/* Mensaje de error */}
@@ -145,20 +173,67 @@ function ListarProveedores() {
             )}
 
             {/* TABLA */}
-            <div className="card shadow-sm">
+            <div className="card shadow-sm border-0">
+                <div className="card-header bg-white border-0 py-3">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0 text-dark fw-semibold">
+                            Lista de Proveedores
+                            {proveedoresFiltrados.length > 0 && (
+                                <span className="badge bg-primary ms-2">{proveedoresFiltrados.length}</span>
+                            )}
+                        </h5>
+                        <div className="d-flex align-items-center gap-2">
+                            {!mostrarInput ? (
+                                <Button
+                                    variant="outline-primary"
+                                    size="sm"
+                                    onClick={() => setMostrarInput(true)}
+                                >
+                                    <Search size={16} />
+                                </Button>
+                            ) : (
+                                <InputGroup size="sm" style={{ width: "250px" }}>
+                                    <FormControl
+                                        ref={inputRef}
+                                        autoFocus
+                                        placeholder="Buscar proveedores..."
+                                        value={filtro}
+                                        onChange={(e) => setFiltro(e.target.value)}
+                                    />
+                                    {filtro ? (
+                                        <Button variant="outline-secondary" onClick={limpiarBuscador}>
+                                            <X size={16} />
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="outline-danger"
+                                            onClick={() => {
+                                                setMostrarInput(false);
+                                                setFiltro("");
+                                            }}
+                                        >
+                                            <X size={16} />
+                                        </Button>
+                                    )}
+                                </InputGroup>
+                            )}
+                        </div>
+                    </div>
+                </div>
                 <div className="card-body p-0">
-                    <Table striped bordered hover responsive className="mb-0">
-                        <thead className="table-dark text-center">
+                    <div className="table-responsive">
+                        <Table hover className="mb-0">
+                        <thead className="table-light text-center">
                             <tr>
-                                <th>#</th>
-                                <th>Nombre</th>
-                                <th>Tipo Documento</th>
-                                <th>Número Documento</th>
-                                <th>Dirección</th>
-                                <th>Teléfono</th>
-                                <th>Email</th>
-                                <th>Estado</th>
-                                <th style={{ width: '220px' }}>Acciones</th>
+                                <th className="fw-semibold py-3">#</th>
+                                <th className="fw-semibold py-3">Nombre</th>
+                                <th className="fw-semibold py-3">Tipo Documento</th>
+                                <th className="fw-semibold py-3">Número Documento</th>
+                                <th className="fw-semibold py-3">Dirección</th>
+                                <th className="fw-semibold py-3">Teléfono</th>
+                                <th className="fw-semibold py-3">Email</th>
+                                <th className="fw-semibold py-3">Estado</th>
+                                <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="text-center align-middle">
@@ -194,7 +269,7 @@ function ListarProveedores() {
                                             )}
                                         </td>
                                         <td>
-                                            <div className="d-flex justify-content-center gap-2">
+                                            <div className="d-flex justify-content-center gap-1 flex-wrap">
                                                 <Button
                                                     variant="outline-warning"
                                                     size="sm"
@@ -203,9 +278,11 @@ function ListarProveedores() {
                                                         setShowEditar(true);
                                                     }}
                                                     title="Editar proveedor"
+                                                    className="btn-sm shadow-sm"
+                                                    style={{ minWidth: '32px' }}
                                                 >
-                                                    <Edit size={16} />
-                                                    <span className="d-none d-md-inline ms-1">Editar</span>
+                                                    <Edit size={12} />
+                                                    <span className="d-none d-xl-inline ms-1">Editar</span>
                                                 </Button>
                                                 {proveedor.activo ? (
                                                     <Button
@@ -213,9 +290,11 @@ function ListarProveedores() {
                                                         size="sm"
                                                         onClick={() => desactivarProveedor(proveedor.idProveedor)}
                                                         title="Desactivar proveedor"
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
                                                     >
-                                                        <PowerOff size={16} />
-                                                        <span className="d-none d-md-inline ms-1">Desactivar</span>
+                                                        <PowerOff size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Desactivar</span>
                                                     </Button>
                                                 ) : (
                                                     <Button
@@ -223,9 +302,11 @@ function ListarProveedores() {
                                                         size="sm"
                                                         onClick={() => activarProveedor(proveedor.idProveedor)}
                                                         title="Activar proveedor"
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
                                                     >
-                                                        <Power size={16} />
-                                                        <span className="d-none d-md-inline ms-1">Activar</span>
+                                                        <Power size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Activar</span>
                                                     </Button>
                                                 )}
                                             </div>
@@ -234,7 +315,8 @@ function ListarProveedores() {
                                 ))
                             )}
                         </tbody>
-                    </Table>
+                        </Table>
+                    </div>
                 </div>
             </div>
 
@@ -245,6 +327,7 @@ function ListarProveedores() {
                 onProveedorAdded={() => {
                     obtenerProveedores();
                     mostrarNotificacion("Proveedor agregado exitosamente", "success");
+                    scrollToTop();
                 }}
             />
             <EditarProveedor
@@ -254,6 +337,7 @@ function ListarProveedores() {
                 onProveedorUpdated={() => {
                     obtenerProveedores();
                     mostrarNotificacion("Proveedor actualizado exitosamente", "success");
+                    scrollToTop();
                 }}
             />
 
