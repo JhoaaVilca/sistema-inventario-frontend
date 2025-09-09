@@ -1,137 +1,257 @@
 import { useEffect, useState } from "react";
-import { Modal, Button, Form, Spinner, Alert } from "react-bootstrap";
+import { Modal, Button, Form, Spinner, Alert, Row, Col } from "react-bootstrap";
+import axios from "axios";
+import { useCategorias } from "./useCategorias";
 
 const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
     const [nombreProducto, setNombreProducto] = useState("");
-    const [precio, setPrecio] = useState("");
+    const [precio, setPrecio] = useState(""); // Precio de venta
+    const [precioCompra, setPrecioCompra] = useState(""); // Precio de compra
     const [stock, setStock] = useState("");
+    const [stockMinimo, setStockMinimo] = useState("");
+    const [unidadMedida, setUnidadMedida] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
+    const [esPerecible, setEsPerecible] = useState(false);
+    const [fechaVencimiento, setFechaVencimiento] = useState("");
+    const [descripcionCorta, setDescripcionCorta] = useState("");
     const [categoria, setCategoria] = useState("");
-    const [categorias, setCategorias] = useState([]);
+    const [proveedorPrincipal, setProveedorPrincipal] = useState("");
+    const [proveedores, setProveedores] = useState([]);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const { categorias } = useCategorias();
 
-    // ✅ Cargar categorías
-    const cargarCategorias = async () => {
+    // Cargar proveedores al montar el componente
+    useEffect(() => {
+        const cargarProveedores = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/categorias");
-            const data = await response.json();
-            setCategorias(data);
+                const response = await axios.get("http://localhost:8080/api/proveedores");
+                setProveedores(response.data);
         } catch (error) {
-            console.error("Error al cargar categorías:", error);
+                console.error("Error al cargar proveedores:", error);
         }
     };
-
-    useEffect(() => {
-        cargarCategorias();
+        cargarProveedores();
     }, []);
 
     useEffect(() => {
         if (producto) {
-            setNombreProducto(producto.nombreProducto);
-            setPrecio(producto.precio);
-            setStock(producto.stock);
-            setFechaIngreso(producto.fechaIngreso);
+            setNombreProducto(producto.nombreProducto || "");
+            setPrecio(producto.precio || ""); // Precio de venta
+            setPrecioCompra(producto.precioCompra || ""); // Precio de compra
+            setStock(producto.stock || "");
+            setStockMinimo(producto.stockMinimo || "");
+            setUnidadMedida(producto.unidadMedida || "");
+            setFechaIngreso(producto.fechaIngreso || "");
+            setEsPerecible(producto.esPerecible || false);
+            setFechaVencimiento(producto.fechaVencimiento || "");
+            setDescripcionCorta(producto.descripcionCorta || "");
             setCategoria(producto.idCategoria || "");
+            setProveedorPrincipal(producto.idProveedorPrincipal || "");
             setError("");
         }
     }, [producto]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!categoria) {
+            setError("Por favor selecciona una categoría");
+            return;
+        }
+
+        if (!unidadMedida) {
+            setError("Por favor ingresa la unidad de medida");
+            return;
+        }
+
+        if (esPerecible && !fechaVencimiento) {
+            setError("La fecha de vencimiento es obligatoria para productos perecibles");
+            return;
+        }
+
         setLoading(true);
+        setError("");
 
         const productoActualizado = {
-            idProducto: producto.idProducto,
             nombreProducto,
-            precio: parseFloat(precio),
-            stock: parseInt(stock),
+            precio: parseFloat(precio), // Precio de venta
+            precioCompra: parseFloat(precioCompra), // Precio de compra
+            stock: parseInt(stock, 10),
+            stockMinimo: parseInt(stockMinimo, 10),
+            unidadMedida,
             fechaIngreso,
-            idCategoria: parseInt(categoria),
+            esPerecible,
+            fechaVencimiento: esPerecible ? fechaVencimiento : null,
+            descripcionCorta: descripcionCorta || null,
+            idCategoria: parseInt(categoria, 10),
+            idProveedorPrincipal: proveedorPrincipal ? parseInt(proveedorPrincipal, 10) : null,
         };
 
         try {
-            const response = await fetch(
+            const response = await axios.put(
                 `http://localhost:8080/api/productos/${producto.idProducto}`,
-                {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(productoActualizado),
-                }
+                productoActualizado
             );
 
-            if (response.ok) {
+            if (response.status === 200) {
                 onProductoUpdated();
                 handleClose();
-            } else {
-                setError("⚠️ No se pudo actualizar el producto. Intente nuevamente.");
             }
         } catch (error) {
-            console.error("Error en la petición:", error);
-            setError("⚠️ Error de conexión con el servidor.");
+            console.error("Error al actualizar producto:", error);
+            
+            if (error.response?.data?.error) {
+                setError(error.response.data.error);
+            } else if (error.response?.data?.message) {
+                setError(error.response.data.message);
+            } else {
+                setError("Error al actualizar el producto. Intente nuevamente.");
+            }
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <Modal show={show} onHide={handleClose} centered>
-            <Modal.Header closeButton>
+        <Modal show={show} onHide={handleClose} backdrop={loading ? "static" : true} size="xl" centered scrollable>
+            <Modal.Header closeButton={!loading}>
                 <Modal.Title>Editar Producto</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {error && <Alert variant="danger">{error}</Alert>}
+                {error && (
+                    <Alert variant="danger" dismissible onClose={() => setError("")}>
+                        {error}
+                    </Alert>
+                )}
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Nombre</Form.Label>
+                    {/* Información Básica */}
+                    <Row>
+                        <Col md={12}>
+                            <Form.Group controlId="formNombreProducto" className="mb-3">
+                                <Form.Label>Nombre del Producto <span className="text-danger">*</span></Form.Label>
                         <Form.Control
                             type="text"
                             value={nombreProducto}
                             onChange={(e) => setNombreProducto(e.target.value)}
+                                    placeholder="Ingresa el nombre del producto"
                             required
                         />
                     </Form.Group>
+                        </Col>
+                    </Row>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Precio</Form.Label>
+                    <Row>
+                        <Col md={12}>
+                            <Form.Group controlId="formDescripcion" className="mb-3">
+                                <Form.Label>Descripción Corta</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={2}
+                                    value={descripcionCorta}
+                                    onChange={(e) => setDescripcionCorta(e.target.value)}
+                                    placeholder="Descripción breve del producto (opcional)"
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    {/* Precios */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group controlId="formPrecioCompra" className="mb-3">
+                                <Form.Label>Precio de Compra <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={precioCompra}
+                                    onChange={(e) => setPrecioCompra(e.target.value)}
+                                    placeholder="0.00"
+                                    required
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group controlId="formPrecio" className="mb-3">
+                                <Form.Label>Precio de Venta <span className="text-danger">*</span></Form.Label>
                         <Form.Control
                             type="number"
+                                    step="0.01"
+                                    min="0"
                             value={precio}
                             onChange={(e) => setPrecio(e.target.value)}
-                            step="0.01"
+                                    placeholder="0.00"
                             required
                         />
                     </Form.Group>
+                        </Col>
+                    </Row>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Stock</Form.Label>
+                    {/* Stock e Inventario */}
+                    <Row>
+                        <Col md={4}>
+                            <Form.Group controlId="formStock" className="mb-3">
+                                <Form.Label>Stock Actual <span className="text-danger">*</span></Form.Label>
                         <Form.Control
                             type="number"
+                                    min="0"
                             value={stock}
                             onChange={(e) => setStock(e.target.value)}
+                                    placeholder="0"
                             required
                         />
                     </Form.Group>
-
-                    <Form.Group className="mb-3">
-                        <Form.Label>Fecha Ingreso</Form.Label>
+                        </Col>
+                        <Col md={4}>
+                            <Form.Group controlId="formStockMinimo" className="mb-3">
+                                <Form.Label>Stock Mínimo <span className="text-danger">*</span></Form.Label>
                         <Form.Control
-                            type="date"
-                            value={fechaIngreso}
-                            onChange={(e) => setFechaIngreso(e.target.value)}
+                                    type="number"
+                                    min="0"
+                                    value={stockMinimo}
+                                    onChange={(e) => setStockMinimo(e.target.value)}
+                                    placeholder="0"
                             required
                         />
                     </Form.Group>
+                        </Col>
+                        <Col md={4}>
+                            <Form.Group controlId="formUnidadMedida" className="mb-3">
+                                <Form.Label>Unidad de Medida <span className="text-danger">*</span></Form.Label>
+                                <Form.Select
+                                    value={unidadMedida}
+                                    onChange={(e) => setUnidadMedida(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Selecciona unidad</option>
+                                    <option value="unidad">Unidad</option>
+                                    <option value="kg">Kilogramo (kg)</option>
+                                    <option value="g">Gramo (g)</option>
+                                    <option value="litro">Litro (L)</option>
+                                    <option value="ml">Mililitro (ml)</option>
+                                    <option value="caja">Caja</option>
+                                    <option value="paquete">Paquete</option>
+                                    <option value="bolsa">Bolsa</option>
+                                    <option value="botella">Botella</option>
+                                    <option value="lata">Lata</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                    <Form.Group className="mb-3">
-                        <Form.Label>Categoría</Form.Label>
+                    {/* Categoría y Proveedor */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group controlId="formCategoria" className="mb-3">
+                                <Form.Label>Categoría <span className="text-danger">*</span></Form.Label>
                         <Form.Select
                             value={categoria}
                             onChange={(e) => setCategoria(e.target.value)}
                             required
                         >
-                            <option value="">Seleccione una categoría</option>
+                                    <option value="">Selecciona una categoría</option>
                             {categorias.map((cat) => (
                                 <option key={cat.idCategoria} value={cat.idCategoria}>
                                     {cat.nombre}
@@ -139,12 +259,84 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                             ))}
                         </Form.Select>
                     </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group controlId="formProveedor" className="mb-3">
+                                <Form.Label>Proveedor Principal</Form.Label>
+                                <Form.Select
+                                    value={proveedorPrincipal}
+                                    onChange={(e) => setProveedorPrincipal(e.target.value)}
+                                >
+                                    <option value="">Selecciona un proveedor (opcional)</option>
+                                    {proveedores.map((prov) => (
+                                        <option key={prov.idProveedor} value={prov.idProveedor}>
+                                            {prov.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                    <div className="d-flex justify-content-end gap-2">
-                        <Button variant="secondary" onClick={handleClose}>
+                    {/* Fechas */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group controlId="formFechaIngreso" className="mb-3">
+                                <Form.Label>Fecha de Ingreso <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    value={fechaIngreso}
+                                    onChange={(e) => setFechaIngreso(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group controlId="formEsPerecible" className="mb-3">
+                                <Form.Label>¿El producto vence?</Form.Label>
+                                <Form.Select
+                                    value={esPerecible}
+                                    onChange={(e) => setEsPerecible(e.target.value === "true")}
+                                >
+                                    <option value={false}>No vence</option>
+                                    <option value={true}>Sí vence</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    {/* Fecha de Vencimiento (condicional) */}
+                    {esPerecible && (
+                        <Row>
+                            <Col md={6}>
+                                <Form.Group controlId="formFechaVencimiento" className="mb-3">
+                                    <Form.Label>Fecha de Vencimiento <span className="text-danger">*</span></Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        value={fechaVencimiento}
+                                        onChange={(e) => setFechaVencimiento(e.target.value)}
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                    )}
+
+                    <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
+                        <Button
+                            variant="secondary"
+                            onClick={handleClose}
+                            disabled={loading}
+                            className="w-100 w-sm-auto"
+                        >
                             Cancelar
                         </Button>
-                        <Button type="submit" variant="primary" disabled={loading}>
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            disabled={loading}
+                            className="w-100 w-sm-auto"
+                        >
                             {loading ? (
                                 <>
                                     <Spinner
@@ -156,7 +348,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                     /> Guardando...
                                 </>
                             ) : (
-                                "Guardar cambios"
+                                "Guardar Cambios"
                             )}
                         </Button>
                     </div>
