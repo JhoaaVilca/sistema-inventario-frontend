@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Form, Card, Badge, Collapse, Alert, Spinner } from "react-bootstrap";
+import { Table, Button, Form, Card, Badge, Collapse, Alert, Spinner, Modal } from "react-bootstrap";
 import AgregarEntrada from "./AgregarEntrada";
 import EditarEntrada from "./EditarEntrada";
-import { Plus, Search, X, Filter, Calendar, Building, ChevronDown, ChevronUp, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, X, Filter, Calendar, Building, ChevronDown, ChevronUp, Edit, Trash2, Upload, FileText, Eye } from "lucide-react";
+import axios from "axios";
 
 function ListarEntradas() {
     const [entradas, setEntradas] = useState([]);
@@ -10,6 +11,7 @@ function ListarEntradas() {
     const [idProveedor, setIdProveedor] = useState("");
     const [fechaInicio, setFechaInicio] = useState("");
     const [fechaFin, setFechaFin] = useState("");
+    const [numeroFactura, setNumeroFactura] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [entradaSeleccionada, setEntradaSeleccionada] = useState(null);
@@ -17,6 +19,8 @@ function ListarEntradas() {
     const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
     const [cargando, setCargando] = useState(false);
     const [errorListado, setErrorListado] = useState("");
+    const [subiendoFactura, setSubiendoFactura] = useState(false);
+    const [entradaFactura, setEntradaFactura] = useState(null);
 
     const obtenerEntradas = async () => {
         try {
@@ -50,14 +54,22 @@ function ListarEntradas() {
             setErrorListado("");
             setCargando(true);
             let url = `http://localhost:8080/api/entradas`;
-            if (idProveedor && fechaInicio && fechaFin) {
-                url += `/filtrar?idProveedor=${idProveedor}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+            const params = new URLSearchParams();
+            
+            if (idProveedor) params.append('idProveedor', idProveedor);
+            if (numeroFactura) params.append('numeroFactura', numeroFactura);
+            if (fechaInicio) params.append('fechaInicio', fechaInicio);
+            if (fechaFin) params.append('fechaFin', fechaFin);
+            
+            if (params.toString()) {
+                url += `/filtrar?${params.toString()}`;
             }
+            
             const response = await fetch(url);
             if (!response.ok) throw new Error();
             const data = await response.json();
             setEntradas(data);
-            setFiltrosActivos(Boolean(idProveedor && fechaInicio && fechaFin));
+            setFiltrosActivos(Boolean(idProveedor || numeroFactura || (fechaInicio && fechaFin)));
         } catch (error) {
             console.error("Error al filtrar entradas:", error);
             setErrorListado("No se pudo aplicar el filtro.");
@@ -68,6 +80,7 @@ function ListarEntradas() {
 
     const limpiarFiltros = () => {
         setIdProveedor("");
+        setNumeroFactura("");
         setFechaInicio("");
         setFechaFin("");
         setFiltrosActivos(false);
@@ -113,6 +126,62 @@ function ListarEntradas() {
             obtenerEntradas();
         } catch (error) {
             console.error("Error al eliminar entrada:", error);
+        }
+    };
+
+    // Funciones para manejar facturas
+    const handleSubirFactura = (entrada) => {
+        setEntradaFactura(entrada);
+        setSubiendoFactura(true);
+    };
+
+    const handleFileChange = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Validar tipo de archivo
+        const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+        if (!validTypes.includes(file.type)) {
+            alert('Solo se permiten archivos PDF o imágenes (JPG, PNG)');
+            return;
+        }
+
+        // Validar tamaño (máximo 100MB)
+        if (file.size > 100 * 1024 * 1024) {
+            alert('El archivo no puede ser mayor a 100MB');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post(
+                `http://localhost:8080/api/entradas/${entradaFactura.idEntrada}/factura`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            
+            alert('Factura subida exitosamente');
+            obtenerEntradas();
+            setSubiendoFactura(false);
+            setEntradaFactura(null);
+        } catch (error) {
+            console.error('Error al subir factura:', error);
+            alert('Error al subir la factura');
+        }
+    };
+
+    const handleVerFactura = (entrada) => {
+        if (entrada.facturaUrl) {
+            const url = `http://localhost:8080${entrada.facturaUrl}`;
+            window.open(url, '_blank');
+        } else {
+            alert('Esta entrada no tiene factura asociada');
         }
     };
 
@@ -175,8 +244,17 @@ function ListarEntradas() {
                 </Card.Header>
                 <Collapse in={filtrosAbiertos}>
                     <Card.Body>
+                        <div className="alert alert-info mb-3">
+                            <small>
+                                <strong>💡 Tip:</strong> Puedes combinar los filtros para búsquedas más específicas:
+                                <br />• <strong>Proveedor + N° Factura:</strong> Entradas de ese proveedor con ese número
+                                <br />• <strong>Proveedor + Fechas:</strong> Entradas de ese proveedor en ese rango
+                                <br />• <strong>N° Factura + Fechas:</strong> Entradas con ese número en ese rango
+                                <br />• <strong>Todos juntos:</strong> Máxima precisión en la búsqueda
+                            </small>
+                        </div>
                         <div className="row g-3">
-                            <div className="col-lg-4 col-md-6">
+                            <div className="col-lg-3 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
                                         <Building size={16} className="me-2" />
@@ -199,6 +277,21 @@ function ListarEntradas() {
                             <div className="col-lg-3 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
+                                        <FileText size={16} className="me-2" />
+                                        N° Factura
+                                    </Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={numeroFactura}
+                                        onChange={e => setNumeroFactura(e.target.value)}
+                                        placeholder="Ej: F001-00012345"
+                                        size="sm"
+                                    />
+                                </Form.Group>
+                            </div>
+                            <div className="col-lg-2 col-md-6">
+                                <Form.Group>
+                                    <Form.Label className="d-flex align-items-center">
                                         <Calendar size={16} className="me-2" />
                                         Fecha Inicio
                                     </Form.Label>
@@ -210,7 +303,7 @@ function ListarEntradas() {
                                     />
                                 </Form.Group>
                             </div>
-                            <div className="col-lg-3 col-md-6">
+                            <div className="col-lg-2 col-md-6">
                                 <Form.Group>
                                     <Form.Label className="d-flex align-items-center">
                                         <Calendar size={16} className="me-2" />
@@ -230,7 +323,7 @@ function ListarEntradas() {
                                     onClick={filtrarEntradas}
                                     size="sm"
                                     className="d-flex align-items-center justify-content-center w-100"
-                                    disabled={!idProveedor || !fechaInicio || !fechaFin || cargando}
+                                    disabled={(!idProveedor && !numeroFactura && !fechaInicio && !fechaFin) || cargando}
                                 >
                                     <Search size={14} className="me-1" />
                                     Buscar
@@ -269,9 +362,12 @@ function ListarEntradas() {
                                     <th className="fw-semibold py-3">ID</th>
                                     <th className="fw-semibold py-3">Proveedor</th>
                                     <th className="fw-semibold py-3">Fecha</th>
+                                    <th className="fw-semibold py-3">N° Factura</th>
+                                    <th className="fw-semibold py-3">Estado</th>
                                     <th className="fw-semibold py-3">Total</th>
+                                    <th className="fw-semibold py-3">Factura</th>
                                     <th className="fw-semibold py-3">Detalles</th>
-                                    <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
+                                    <th className="fw-semibold py-3" style={{ width: '160px' }}>Acciones</th>
                                 </tr>
                             </thead>
                 <tbody>
@@ -280,7 +376,51 @@ function ListarEntradas() {
                             <td>{entrada.idEntrada}</td>
                             <td>{entrada.proveedor?.nombre}</td>
                             <td>{entrada.fechaEntrada}</td>
+                            <td>
+                                <span className="fw-medium text-primary">
+                                    {entrada.numeroFactura || 'Sin número'}
+                                </span>
+                            </td>
+                            <td>
+                                <Badge 
+                                    bg={
+                                        entrada.estado === 'Registrada' ? 'success' : 
+                                        entrada.estado === 'Pendiente de pago' ? 'warning' : 
+                                        'danger'
+                                    }
+                                    className="px-2 py-1"
+                                >
+                                    {entrada.estado || 'Registrada'}
+                                </Badge>
+                            </td>
                             <td>S/{entrada.totalEntrada?.toFixed(2)}</td>
+                            <td>
+                                <div className="d-flex justify-content-center gap-1">
+                                    {entrada.facturaUrl ? (
+                                        <Button
+                                            variant="success"
+                                            size="sm"
+                                            onClick={() => handleVerFactura(entrada)}
+                                            title="Ver factura"
+                                            className="d-flex align-items-center"
+                                        >
+                                            <Eye size={14} className="me-1" />
+                                            <span className="d-none d-md-inline">Ver</span>
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="outline-primary"
+                                            size="sm"
+                                            onClick={() => handleSubirFactura(entrada)}
+                                            title="Subir factura"
+                                            className="d-flex align-items-center"
+                                        >
+                                            <Upload size={14} className="me-1" />
+                                            <span className="d-none d-md-inline">Subir</span>
+                                        </Button>
+                                    )}
+                                </div>
+                            </td>
                             <td>
                                 <Table size="sm" bordered>
                                     <thead>
@@ -358,6 +498,52 @@ function ListarEntradas() {
                     onEntradaEditada={obtenerEntradas}
                 />
             )}
+
+            {/* Modal para subir factura */}
+            <Modal show={subiendoFactura} onHide={() => setSubiendoFactura(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Subir Factura</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p><strong>Entrada ID:</strong> {entradaFactura?.idEntrada}</p>
+                    <p><strong>Proveedor:</strong> {entradaFactura?.proveedor?.nombre}</p>
+                    <p><strong>Fecha:</strong> {entradaFactura?.fechaEntrada}</p>
+                    <p><strong>N° Factura:</strong> {entradaFactura?.numeroFactura || 'Sin número'}</p>
+                    <p><strong>Estado:</strong> 
+                        <Badge 
+                            bg={
+                                entradaFactura?.estado === 'Registrada' ? 'success' : 
+                                entradaFactura?.estado === 'Pendiente de pago' ? 'warning' : 
+                                'danger'
+                            }
+                            className="ms-2"
+                        >
+                            {entradaFactura?.estado || 'Registrada'}
+                        </Badge>
+                    </p>
+                    {entradaFactura?.observaciones && (
+                        <p><strong>Observaciones:</strong> {entradaFactura.observaciones}</p>
+                    )}
+                    <hr />
+                    <Form.Group>
+                        <Form.Label>Seleccionar archivo (PDF o imagen)</Form.Label>
+                        <Form.Control
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={handleFileChange}
+                        />
+                        <Form.Text className="text-muted">
+                            Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 10MB
+                        </Form.Text>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setSubiendoFactura(false)}>
+                        Cancelar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
         </div>
     );
 }

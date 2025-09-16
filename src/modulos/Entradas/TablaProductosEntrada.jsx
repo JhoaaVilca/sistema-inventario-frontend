@@ -1,27 +1,18 @@
 // src/modulos/Entradas/TablaProductosEntrada.jsx
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Form, Table, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import BuscadorProductos from "./BuscadorProductos";
+import SelectProductos from "./SelectProductos";
+import { X } from "lucide-react";
 
-function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
-    const [productos, setProductos] = useState([]);
-    const [productoSeleccionado, setProductoSeleccionado] = useState("");
+function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProductoAgregado }) {
+    const [productoSeleccionado, setProductoSeleccionado] = useState(null);
     const [cantidad, setCantidad] = useState("");
     const [precioUnitario, setPrecioUnitario] = useState("");
     const [errorInline, setErrorInline] = useState("");
-
-    useEffect(() => {
-        const obtenerProductos = async () => {
-            try {
-                const response = await axios.get("http://localhost:8080/api/productos");
-                setProductos(response.data);
-            } catch (error) {
-                console.error("Error al obtener productos:", error);
-            }
-        };
-        obtenerProductos();
-    }, []);
+    const [limpiarBuscador, setLimpiarBuscador] = useState(false);
+    const [productoRecienAgregado, setProductoRecienAgregado] = useState(null);
 
     const agregarProducto = () => {
         setErrorInline("");
@@ -30,7 +21,6 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
             return;
         }
 
-        const producto = productos.find((p) => p.idProducto === parseInt(productoSeleccionado));
         const cantidadNum = parseInt(cantidad);
         const precioNum = parseFloat(precioUnitario);
         if (!(cantidadNum > 0)) {
@@ -43,16 +33,36 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
         }
         const subtotal = cantidadNum * precioNum;
         const nuevoDetalle = {
-            producto: { idProducto: producto.idProducto },
+            producto: { 
+                idProducto: productoSeleccionado.idProducto,
+                nombreProducto: productoSeleccionado.nombreProducto 
+            },
             cantidad: cantidadNum,
             precioUnitario: precioNum,
             subtotal: subtotal
         };
 
         setProductosEntrada([...(productosEntrada || []), nuevoDetalle]);
-        setProductoSeleccionado("");
+        
+        // Efecto de resaltado
+        setProductoRecienAgregado(productoSeleccionado.nombreProducto);
+        setTimeout(() => setProductoRecienAgregado(null), 2000);
+        
+        // Notificar que se agregó el producto
+        if (onProductoAgregado) {
+            onProductoAgregado(`${productoSeleccionado.nombreProducto} agregado correctamente (${cantidadNum} unidades)`);
+        }
+        
+        // Limpiar campos después de agregar
+        setProductoSeleccionado(null);
         setCantidad("");
         setPrecioUnitario("");
+        setLimpiarBuscador(true);
+        
+        // Resetear el flag de limpiar después de un momento
+        setTimeout(() => {
+            setLimpiarBuscador(false);
+        }, 100);
     };
 
     const eliminarDetalle = (index) => {
@@ -69,17 +79,11 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
             )}
             <Row className="g-2 mb-3">
                 <Col md={4} sm={6}>
-                    <Form.Select
-                        value={productoSeleccionado}
-                        onChange={(e) => setProductoSeleccionado(e.target.value)}
-                    >
-                        <option value="">Seleccione un producto</option>
-                        {productos.map((p) => (
-                            <option key={p.idProducto} value={p.idProducto}>
-                                {p.nombreProducto}
-                            </option>
-                        ))}
-                    </Form.Select>
+                    <SelectProductos
+                        onProductoSeleccionado={setProductoSeleccionado}
+                        placeholder="Escribe para buscar productos..."
+                        limpiar={limpiarBuscador}
+                    />
                 </Col>
                 <Col md={2} sm={3}>
                     <Form.Control
@@ -120,13 +124,32 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada }) {
                 </thead>
                 <tbody>
                     {productosEntrada.map((detalle, index) => (
-                        <tr key={index}>
-                            <td>{detalle.producto.idProducto}</td>
+                        <tr 
+                            key={index} 
+                            className={`animate__animated animate__fadeIn ${
+                                productoRecienAgregado === detalle.producto.nombreProducto ? 'table-success' : ''
+                            }`}
+                            style={{
+                                transition: 'background-color 0.3s ease',
+                                backgroundColor: productoRecienAgregado === detalle.producto.nombreProducto ? '#d1edff' : 'transparent'
+                            }}
+                        >
+                            <td>
+                                <div className="fw-medium">{detalle.producto.nombreProducto}</div>
+                            </td>
                             <td>{detalle.cantidad}</td>
                             <td>S/{detalle.precioUnitario}</td>
                             <td>S/{detalle.subtotal}</td>
                             <td>
-                                <Button variant="outline-danger" size="sm" onClick={() => eliminarDetalle(index)}>Eliminar</Button>
+                                <Button 
+                                    variant="outline-danger" 
+                                    size="sm" 
+                                    onClick={() => eliminarDetalle(index)}
+                                    title="Eliminar producto de la entrada"
+                                >
+                                    <X size={14} className="me-1" />
+                                    Eliminar
+                                </Button>
                             </td>
                         </tr>
                     ))}
