@@ -4,6 +4,8 @@ import axios from "axios";
 
 function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
     const [nombre, setNombre] = useState("");
+    const [descripcion, setDescripcion] = useState("");
+    const [activo, setActivo] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [validated, setValidated] = useState(false);
@@ -11,6 +13,8 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
     useEffect(() => {
         if (show) {
             setNombre("");
+            setDescripcion("");
+            setActivo(true);
             setError("");
             setValidated(false);
         }
@@ -31,13 +35,17 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
 
         try {
             const nuevaCategoria = {
-                nombre: nombre.trim()
+                nombre: nombre.trim(),
+                descripcion: descripcion.trim(),
+                activo: activo
             };
 
             await axios.post("http://localhost:8080/api/categorias", nuevaCategoria);
             
             // Limpiar formulario y cerrar modal
             setNombre("");
+            setDescripcion("");
+            setActivo(true);
             setValidated(false);
             handleClose();
             
@@ -60,6 +68,8 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
     const handleCloseModal = () => {
         if (!loading) {
             setNombre("");
+            setDescripcion("");
+            setActivo(true);
             setError("");
             setValidated(false);
             handleClose();
@@ -90,8 +100,8 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
                             placeholder="Ej: Bebidas, Alimentos, Limpieza..."
                             required
                             minLength={2}
-                            maxLength={50}
-                            isInvalid={validated && (!nombre.trim() || nombre.trim().length < 2 || nombre.trim().length > 50)}
+                            maxLength={100}
+                            isInvalid={validated && (!nombre.trim() || nombre.trim().length < 2 || nombre.trim().length > 100)}
                             disabled={loading}
                         />
                         <Form.Control.Feedback type="invalid">
@@ -99,11 +109,42 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
                                 ? "El nombre es obligatorio" 
                                 : nombre.trim().length < 2 
                                     ? "El nombre debe tener al menos 2 caracteres" 
-                                    : "El nombre no puede exceder 50 caracteres"
+                                    : "El nombre no puede exceder 100 caracteres"
                             }
                         </Form.Control.Feedback>
                         <Form.Text className="text-muted">
-                            El nombre debe tener entre 2 y 50 caracteres.
+                            El nombre debe tener entre 2 y 100 caracteres.
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group controlId="formDescripcion" className="mb-3">
+                        <Form.Label>Descripción</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            value={descripcion}
+                            onChange={(e) => setDescripcion(e.target.value)}
+                            placeholder="Descripción opcional de la categoría..."
+                            maxLength={255}
+                            disabled={loading}
+                        />
+                        <Form.Text className="text-muted">
+                            Descripción opcional (máximo 255 caracteres).
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group controlId="formActivo" className="mb-3">
+                        <Form.Label>Estado</Form.Label>
+                        <Form.Select
+                            value={activo}
+                            onChange={(e) => setActivo(e.target.value === "true")}
+                            disabled={loading}
+                        >
+                            <option value={true}>🟢 Activo</option>
+                            <option value={false}>⚪ Inactivo</option>
+                        </Form.Select>
+                        <Form.Text className="text-muted">
+                            Solo las categorías activas aparecerán en el selector de productos.
                         </Form.Text>
                     </Form.Group>
 

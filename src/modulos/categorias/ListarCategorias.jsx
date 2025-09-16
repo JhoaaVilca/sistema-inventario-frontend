@@ -10,7 +10,8 @@ import {
     FormControl,
     Alert,
     Toast,
-    ToastContainer
+    ToastContainer,
+    Badge
 } from "react-bootstrap";
 import axios from "axios";
 
@@ -78,7 +79,8 @@ function ListarCategorias() {
     };
 
     const categoriasFiltradas = categorias.filter((categoria) =>
-        categoria.nombre.toLowerCase().includes(filtro.toLowerCase())
+        (categoria.nombre || "").toLowerCase().includes(filtro.toLowerCase()) ||
+        (categoria.descripcion || "").toLowerCase().includes(filtro.toLowerCase())
     );
 
     return (
@@ -131,7 +133,7 @@ function ListarCategorias() {
                                     <FormControl
                                         ref={inputRef}
                                         autoFocus
-                                        placeholder="Buscar categorías..."
+                                        placeholder="Buscar categorías o descripción..."
                                         value={filtro}
                                         onChange={(e) => setFiltro(e.target.value)}
                                     />
@@ -158,17 +160,19 @@ function ListarCategorias() {
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <Table hover className="mb-0">
-                        <thead className="table-light text-center">
-                            <tr>
-                                <th className="fw-semibold py-3" style={{ width: '80px' }}>ID</th>
-                                <th className="fw-semibold py-3">Nombre</th>
-                                <th className="fw-semibold py-3" style={{ width: '180px' }}>Acciones</th>
-                            </tr>
-                        </thead>
+                         <thead className="table-light text-center">
+                             <tr>
+                                 <th className="fw-semibold py-3" style={{ width: '80px' }}>ID</th>
+                                 <th className="fw-semibold py-3">Nombre</th>
+                                 <th className="fw-semibold py-3">Descripción</th>
+                                 <th className="fw-semibold py-3" style={{ width: '120px' }}>Estado</th>
+                                 <th className="fw-semibold py-3" style={{ width: '180px' }}>Acciones</th>
+                             </tr>
+                         </thead>
                         <tbody className="text-center align-middle">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="3" className="text-center py-4">
+                                    <td colSpan="5" className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">
                                             <span className="visually-hidden">Cargando...</span>
                                         </div>
@@ -176,7 +180,7 @@ function ListarCategorias() {
                                 </tr>
                             ) : categoriasFiltradas.length === 0 ? (
                                 <tr>
-                                    <td colSpan="3" className="text-center py-4 text-muted">
+                                    <td colSpan="5" className="text-center py-4 text-muted">
                                         {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
                                     </td>
                                 </tr>
@@ -185,6 +189,14 @@ function ListarCategorias() {
                                     <tr key={categoria.idCategoria}>
                                         <td>{categoria.idCategoria}</td>
                                         <td className="fw-medium">{categoria.nombre}</td>
+                                        <td className="text-start">{categoria.descripcion || "-"}</td>
+                                        <td>
+                                            {categoria.activo ? (
+                                                <Badge bg="success">🟢 Activo</Badge>
+                                            ) : (
+                                                <Badge bg="secondary">⚪ Inactivo</Badge>
+                                            )}
+                                        </td>
                                         <td>
                                             <div className="d-flex justify-content-center gap-1 flex-wrap">
                                                 <Button

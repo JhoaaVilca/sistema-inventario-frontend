@@ -9,12 +9,13 @@ export const useCategorias = () => {
     const obtenerCategorias = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/categorias");
+            // Usar el endpoint de categorías activas para productos
+            const response = await axios.get("http://localhost:8080/api/categorias/activas");
             setCategorias(response.data);
             setError("");
         } catch (error) {
-            console.error("Error al obtener categorías:", error);
-            setError("Error al cargar las categorías");
+            console.error("Error al obtener categorías activas:", error);
+            setError("Error al cargar las categorías activas");
         } finally {
             setLoading(false);
         }
