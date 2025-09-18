@@ -15,25 +15,11 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
     const [fechaVencimiento, setFechaVencimiento] = useState("");
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [categoria, setCategoria] = useState("");
-    const [proveedorPrincipal, setProveedorPrincipal] = useState("");
-    const [proveedores, setProveedores] = useState([]);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const { categorias } = useCategorias();
 
-    // Cargar proveedores al montar el componente
-    useEffect(() => {
-        const cargarProveedores = async () => {
-        try {
-                const response = await axios.get("http://localhost:8080/api/proveedores");
-                setProveedores(response.data);
-        } catch (error) {
-                console.error("Error al cargar proveedores:", error);
-        }
-    };
-        cargarProveedores();
-    }, []);
 
     useEffect(() => {
         if (producto) {
@@ -48,7 +34,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             setFechaVencimiento(producto.fechaVencimiento || "");
             setDescripcionCorta(producto.descripcionCorta || "");
             setCategoria(producto.idCategoria || "");
-            setProveedorPrincipal(producto.idProveedorPrincipal || "");
             setError("");
         }
     }, [producto]);
@@ -86,7 +71,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             fechaVencimiento: esPerecible ? fechaVencimiento : null,
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
-            idProveedorPrincipal: proveedorPrincipal ? parseInt(proveedorPrincipal, 10) : null,
         };
 
         try {
@@ -259,22 +243,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                             ))}
                         </Form.Select>
                     </Form.Group>
-                        </Col>
-                        <Col md={6}>
-                            <Form.Group controlId="formProveedor" className="mb-3">
-                                <Form.Label>Proveedor Principal</Form.Label>
-                                <Form.Select
-                                    value={proveedorPrincipal}
-                                    onChange={(e) => setProveedorPrincipal(e.target.value)}
-                                >
-                                    <option value="">Selecciona un proveedor (opcional)</option>
-                                    {proveedores.map((prov) => (
-                                        <option key={prov.idProveedor} value={prov.idProveedor}>
-                                            {prov.nombre}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
                         </Col>
                     </Row>
 

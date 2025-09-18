@@ -255,7 +255,6 @@ const ListarProductos = () => {
                                 <th className="fw-semibold py-3">Stock Mín.</th>
                                 <th className="fw-semibold py-3">Unidad</th>
                                 <th className="fw-semibold py-3">Categoría</th>
-                                <th className="fw-semibold py-3">Proveedor</th>
                                 <th className="fw-semibold py-3">Vence</th>
                                 <th className="fw-semibold py-3">Alertas</th>
                                 <th className="fw-semibold py-3" style={{ width: "160px" }}>Acciones</th>
@@ -264,7 +263,7 @@ const ListarProductos = () => {
                         <tbody className="text-center align-middle">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="12" className="text-center py-4">
+                                    <td colSpan="11" className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">
                                             <span className="visually-hidden">Cargando...</span>
                                         </div>
@@ -272,7 +271,7 @@ const ListarProductos = () => {
                                 </tr>
                             ) : productosFiltrados.length === 0 ? (
                                 <tr>
-                                    <td colSpan="12" className="text-center py-4 text-muted">
+                                    <td colSpan="11" className="text-center py-4 text-muted">
                                         {filtro ? "No se encontraron productos" : "No hay productos registrados"}
                                     </td>
                                 </tr>
@@ -331,11 +330,6 @@ const ListarProductos = () => {
                                                 <span className="badge bg-primary">
                                                     {producto.nombreCategoria || "Sin categoría"}
                                                 </span>
-                                            </td>
-                                            <td>
-                                                <div className="text-muted small">
-                                                    {producto.nombreProveedorPrincipal || "Sin proveedor"}
-                                                </div>
                                             </td>
                                             <td>
                                                 {producto.esPerecible ? (

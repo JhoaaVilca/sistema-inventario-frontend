@@ -11,28 +11,14 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
     const [stockMinimo, setStockMinimo] = useState("");
     const [unidadMedida, setUnidadMedida] = useState("");
     const [categoria, setCategoria] = useState("");
-    const [proveedorPrincipal, setProveedorPrincipal] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
     const [esPerecible, setEsPerecible] = useState(false);
     const [fechaVencimiento, setFechaVencimiento] = useState("");
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [proveedores, setProveedores] = useState([]);
     const { categorias } = useCategorias();
 
-    // Cargar proveedores al montar el componente
-    useEffect(() => {
-        const cargarProveedores = async () => {
-            try {
-                const response = await axios.get("http://localhost:8080/api/proveedores");
-                setProveedores(response.data);
-            } catch (error) {
-                console.error("Error al cargar proveedores:", error);
-            }
-        };
-        cargarProveedores();
-    }, []);
 
     // Resetear formulario cada vez que se abre el modal
     useEffect(() => {
@@ -44,7 +30,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setStockMinimo("");
             setUnidadMedida("");
             setCategoria("");
-            setProveedorPrincipal("");
             setFechaIngreso("");
             setEsPerecible(false);
             setFechaVencimiento("");
@@ -83,7 +68,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             fechaVencimiento: esPerecible ? fechaVencimiento : null,
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
-            idProveedorPrincipal: proveedorPrincipal ? parseInt(proveedorPrincipal, 10) : null,
         };
 
         setLoading(true);
@@ -100,7 +84,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setStockMinimo("");
             setUnidadMedida("");
             setCategoria("");
-            setProveedorPrincipal("");
             setFechaIngreso("");
             setEsPerecible(false);
             setFechaVencimiento("");
@@ -272,22 +255,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                     {categorias.map((cat) => (
                                         <option key={cat.idCategoria} value={cat.idCategoria}>
                                             {cat.nombre}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-                        <Col md={6}>
-                            <Form.Group controlId="formProveedor" className="mb-3">
-                                <Form.Label>Proveedor Principal</Form.Label>
-                                <Form.Select
-                                    value={proveedorPrincipal}
-                                    onChange={(e) => setProveedorPrincipal(e.target.value)}
-                                >
-                                    <option value="">Selecciona un proveedor (opcional)</option>
-                                    {proveedores.map((prov) => (
-                                        <option key={prov.idProveedor} value={prov.idProveedor}>
-                                            {prov.nombre}
                                         </option>
                                     ))}
                                 </Form.Select>
