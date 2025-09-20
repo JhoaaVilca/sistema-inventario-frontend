@@ -13,7 +13,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
     const [categoria, setCategoria] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
     const [esPerecible, setEsPerecible] = useState(false);
-    const [fechaVencimiento, setFechaVencimiento] = useState("");
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -51,10 +50,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             return;
         }
 
-        if (esPerecible && !fechaVencimiento) {
-            setError("La fecha de vencimiento es obligatoria para productos perecibles");
-            return;
-        }
 
         const nuevoProducto = {
             nombreProducto,
@@ -65,7 +60,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             unidadMedida,
             fechaIngreso,
             esPerecible,
-            fechaVencimiento: esPerecible ? fechaVencimiento : null,
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
         };
@@ -290,21 +284,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                     </Row>
 
                     {/* Fecha de Vencimiento (condicional) */}
-                    {esPerecible && (
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group controlId="formFechaVencimiento" className="mb-3">
-                                    <Form.Label>Fecha de Vencimiento <span className="text-danger">*</span></Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        value={fechaVencimiento}
-                                        onChange={(e) => setFechaVencimiento(e.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    )}
 
                     <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
                         <Button

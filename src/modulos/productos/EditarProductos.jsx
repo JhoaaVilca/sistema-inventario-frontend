@@ -12,7 +12,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
     const [unidadMedida, setUnidadMedida] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
     const [esPerecible, setEsPerecible] = useState(false);
-    const [fechaVencimiento, setFechaVencimiento] = useState("");
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [categoria, setCategoria] = useState("");
 
@@ -31,7 +30,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             setUnidadMedida(producto.unidadMedida || "");
             setFechaIngreso(producto.fechaIngreso || "");
             setEsPerecible(producto.esPerecible || false);
-            setFechaVencimiento(producto.fechaVencimiento || "");
             setDescripcionCorta(producto.descripcionCorta || "");
             setCategoria(producto.idCategoria || "");
             setError("");
@@ -51,10 +49,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             return;
         }
 
-        if (esPerecible && !fechaVencimiento) {
-            setError("La fecha de vencimiento es obligatoria para productos perecibles");
-            return;
-        }
 
         setLoading(true);
         setError("");
@@ -68,7 +62,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             unidadMedida,
             fechaIngreso,
             esPerecible,
-            fechaVencimiento: esPerecible ? fechaVencimiento : null,
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
         };
@@ -274,21 +267,6 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                     </Row>
 
                     {/* Fecha de Vencimiento (condicional) */}
-                    {esPerecible && (
-                        <Row>
-                            <Col md={6}>
-                                <Form.Group controlId="formFechaVencimiento" className="mb-3">
-                                    <Form.Label>Fecha de Vencimiento <span className="text-danger">*</span></Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        value={fechaVencimiento}
-                                        onChange={(e) => setFechaVencimiento(e.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    )}
 
                     <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
                         <Button
