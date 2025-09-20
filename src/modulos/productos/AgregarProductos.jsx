@@ -31,7 +31,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setCategoria("");
             setFechaIngreso("");
             setEsPerecible(false);
-            setFechaVencimiento("");
             setDescripcionCorta("");
             setError("");
         }
@@ -80,7 +79,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setCategoria("");
             setFechaIngreso("");
             setEsPerecible(false);
-            setFechaVencimiento("");
             setDescripcionCorta("");
             setError("");
 

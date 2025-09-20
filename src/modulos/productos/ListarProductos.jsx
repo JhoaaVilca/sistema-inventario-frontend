@@ -578,7 +578,7 @@ const ListarProductos = () => {
                                     </thead>
                                     <tbody>
                                         {lotesProducto.map((lote, index) => {
-                                            const fechaEntrada = lote.detalleEntrada?.entrada?.fechaEntrada;
+                                            const fechaEntrada = lote.fechaEntrada; // ✅ CORREGIDO: Usar el campo directo del lote
                                             const cantidad = lote.detalleEntrada?.cantidad;
                                             
                                             return (
