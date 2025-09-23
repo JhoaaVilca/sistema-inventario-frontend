@@ -8,7 +8,7 @@ import EditarProducto from './EditarProductos';
 const ProductosPorCategoria = () => {
     const { categoriaId } = useParams();
     const navigate = useNavigate();
-    
+
     const [productos, setProductos] = useState([]);
     const [categoria, setCategoria] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -109,8 +109,8 @@ const ProductosPorCategoria = () => {
         <div className="container mt-4">
             {/* Header */}
             <div className="d-flex align-items-center gap-3 mb-4">
-                <Button 
-                    variant="outline-secondary" 
+                <Button
+                    variant="outline-secondary"
                     onClick={() => navigate(-1)}
                     className="d-flex align-items-center"
                 >

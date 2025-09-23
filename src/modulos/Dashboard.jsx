@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Card, Row, Col, Badge } from 'react-bootstrap';
-import { 
-    Package, 
-    ShoppingCart, 
-    TrendingUp, 
+import {
+    Package,
+    ShoppingCart,
+    TrendingUp,
     AlertTriangle,
     Users,
     DollarSign,
@@ -157,7 +157,7 @@ function Dashboard() {
                                     </div>
                                     <Badge bg="success">{stats.totalProductos - stats.productosSinStock}</Badge>
                                 </div>
-                                
+
                                 <div className="d-flex align-items-center justify-content-between p-3 rounded bg-light">
                                     <div className="d-flex align-items-center">
                                         <Activity size={20} className="me-3 text-primary" />
@@ -170,7 +170,7 @@ function Dashboard() {
                                     </div>
                                     <Badge bg="primary">{stats.totalProveedores}</Badge>
                                 </div>
-                                
+
                                 <div className="d-flex align-items-center justify-content-between p-3 rounded bg-light">
                                     <div className="d-flex align-items-center">
                                         <DollarSign size={20} className="me-3 text-warning" />

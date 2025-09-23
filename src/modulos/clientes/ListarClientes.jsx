@@ -170,73 +170,73 @@ const ListarClientes = () => {
                                     <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
                                 </tr>
                             </thead>
-                    <tbody>
-                        {loading ? (
-                            <tr>
-                                <td colSpan="9" className="text-center py-4">
-                                    <div className="spinner-border text-primary" role="status">
-                                        <span className="visually-hidden">Cargando...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        ) : clientesFiltrados.length === 0 ? (
-                            <tr>
-                                <td colSpan="9" className="text-center py-4 text-muted">
-                                    {filtro ? "No se encontraron clientes con ese filtro" : "No hay clientes registrados"}
-                                </td>
-                            </tr>
-                        ) : (
-                            clientesFiltrados.map((cliente) => (
-                                <tr key={cliente.idCliente}>
-                                    <td>
-                                        <code className="bg-light px-2 py-1 rounded">
-                                            {cliente.dni}
-                                        </code>
-                                    </td>
-                                    <td>{cliente.nombres}</td>
-                                    <td>{cliente.apellidos || "-"}</td>
-                                    <td>{cliente.direccion || "-"}</td>
-                                    <td>{cliente.telefono || "-"}</td>
-                                    <td>{cliente.email || "-"}</td>
-                                    <td>{formatearFecha(cliente.fechaRegistro)}</td>
-                                    <td>
-                                        <Badge bg={cliente.activo ? "success" : "danger"}>
-                                            {cliente.activo ? "Activo" : "Inactivo"}
-                                        </Badge>
-                                    </td>
-                                    <td>
-                                        <div className="d-flex gap-1 flex-wrap justify-content-center">
-                                            <Button
-                                                variant="outline-primary"
-                                                size="sm"
-                                                onClick={() => {
-                                                    setClienteEditar(cliente);
-                                                    setShowEditar(true);
-                                                }}
-                                                className="btn-sm shadow-sm"
-                                                style={{ minWidth: '32px' }}
-                                                title="Editar cliente"
-                                            >
-                                                <Edit size={12} />
-                                                <span className="d-none d-xl-inline ms-1">Editar</span>
-                                            </Button>
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                onClick={() => handleEliminar(cliente.idCliente)}
-                                                className="btn-sm shadow-sm"
-                                                style={{ minWidth: '32px' }}
-                                                title="Eliminar cliente"
-                                            >
-                                                <Trash2 size={12} />
-                                                <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
+                            <tbody>
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="9" className="text-center py-4">
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : clientesFiltrados.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="9" className="text-center py-4 text-muted">
+                                            {filtro ? "No se encontraron clientes con ese filtro" : "No hay clientes registrados"}
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    clientesFiltrados.map((cliente) => (
+                                        <tr key={cliente.idCliente}>
+                                            <td>
+                                                <code className="bg-light px-2 py-1 rounded">
+                                                    {cliente.dni}
+                                                </code>
+                                            </td>
+                                            <td>{cliente.nombres}</td>
+                                            <td>{cliente.apellidos || "-"}</td>
+                                            <td>{cliente.direccion || "-"}</td>
+                                            <td>{cliente.telefono || "-"}</td>
+                                            <td>{cliente.email || "-"}</td>
+                                            <td>{formatearFecha(cliente.fechaRegistro)}</td>
+                                            <td>
+                                                <Badge bg={cliente.activo ? "success" : "danger"}>
+                                                    {cliente.activo ? "Activo" : "Inactivo"}
+                                                </Badge>
+                                            </td>
+                                            <td>
+                                                <div className="d-flex gap-1 flex-wrap justify-content-center">
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setClienteEditar(cliente);
+                                                            setShowEditar(true);
+                                                        }}
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                        title="Editar cliente"
+                                                    >
+                                                        <Edit size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Editar</span>
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        onClick={() => handleEliminar(cliente.idCliente)}
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                        title="Eliminar cliente"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
                         </Table>
                     </div>
                 </div>

@@ -90,26 +90,26 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
 
             <div className="table-responsive">
                 <Table bordered size="sm" className="mt-3">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {(productosSalida || []).map((detalle, idx) => (
-                        <tr key={idx}>
-                            <td>{detalle.producto?.nombreProducto || detalle.producto?.idProducto}</td>
-                            <td>{detalle.cantidad}</td>
-                            <td>S/{Number(detalle.precioUnitario).toFixed(2)}</td>
-                            <td>
-                                <Button variant="outline-danger" size="sm" onClick={() => eliminarDetalle(idx)}>Eliminar</Button>
-                            </td>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Acciones</th>
                         </tr>
-                    ))}
-                </tbody>
+                    </thead>
+                    <tbody>
+                        {(productosSalida || []).map((detalle, idx) => (
+                            <tr key={idx}>
+                                <td>{detalle.producto?.nombreProducto || detalle.producto?.idProducto}</td>
+                                <td>{detalle.cantidad}</td>
+                                <td>S/{Number(detalle.precioUnitario).toFixed(2)}</td>
+                                <td>
+                                    <Button variant="outline-danger" size="sm" onClick={() => eliminarDetalle(idx)}>Eliminar</Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
                 </Table>
             </div>
         </div>

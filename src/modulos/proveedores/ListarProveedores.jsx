@@ -107,9 +107,9 @@ function ListarProveedores() {
 
             {/* Botón Agregar + Buscador */}
             <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2 mb-4">
-                <Button 
-                    variant="success" 
-                    onClick={() => setShowAgregar(true)} 
+                <Button
+                    variant="success"
+                    onClick={() => setShowAgregar(true)}
                     size="sm"
                     className="w-100 w-sm-auto shadow-sm"
                     style={{ minWidth: '140px' }}
@@ -141,8 +141,8 @@ function ListarProveedores() {
                                 className="border-end-0"
                             />
                             {filtro ? (
-                                <Button 
-                                    variant="outline-secondary" 
+                                <Button
+                                    variant="outline-secondary"
                                     onClick={limpiarBuscador}
                                     className="border-start-0"
                                 >
@@ -223,98 +223,98 @@ function ListarProveedores() {
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <Table hover className="mb-0">
-                        <thead className="table-light text-center">
-                            <tr>
-                                <th className="fw-semibold py-3">#</th>
-                                <th className="fw-semibold py-3">Nombre</th>
-                                <th className="fw-semibold py-3">Tipo Documento</th>
-                                <th className="fw-semibold py-3">Número Documento</th>
-                                <th className="fw-semibold py-3">Dirección</th>
-                                <th className="fw-semibold py-3">Teléfono</th>
-                                <th className="fw-semibold py-3">Email</th>
-                                <th className="fw-semibold py-3">Estado</th>
-                                <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center align-middle">
-                            {loading ? (
+                            <thead className="table-light text-center">
                                 <tr>
-                                    <td colSpan="9" className="text-center py-4">
-                                        <div className="spinner-border text-success" role="status">
-                                            <span className="visually-hidden">Cargando...</span>
-                                        </div>
-                                    </td>
+                                    <th className="fw-semibold py-3">#</th>
+                                    <th className="fw-semibold py-3">Nombre</th>
+                                    <th className="fw-semibold py-3">Tipo Documento</th>
+                                    <th className="fw-semibold py-3">Número Documento</th>
+                                    <th className="fw-semibold py-3">Dirección</th>
+                                    <th className="fw-semibold py-3">Teléfono</th>
+                                    <th className="fw-semibold py-3">Email</th>
+                                    <th className="fw-semibold py-3">Estado</th>
+                                    <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
                                 </tr>
-                            ) : proveedoresFiltrados.length === 0 ? (
-                                <tr>
-                                    <td colSpan="9" className="text-center py-4 text-muted">
-                                        {filtro ? "No se encontraron proveedores" : "No hay proveedores registrados"}
-                                    </td>
-                                </tr>
-                            ) : (
-                                proveedoresFiltrados.map((proveedor, index) => (
-                                    <tr key={proveedor.idProveedor}>
-                                        <td>{index + 1}</td>
-                                        <td className="fw-medium">{proveedor.nombre}</td>
-                                        <td>{proveedor.tipoDocumento}</td>
-                                        <td>{proveedor.numeroDocumento}</td>
-                                        <td>{proveedor.direccion}</td>
-                                        <td>{proveedor.telefono}</td>
-                                        <td>{proveedor.email}</td>
-                                        <td>
-                                            {proveedor.activo ? (
-                                                <span className="badge bg-success">Activo</span>
-                                            ) : (
-                                                <span className="badge bg-secondary">Inactivo</span>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                                <Button
-                                                    variant="outline-warning"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setProveedorEditar(proveedor);
-                                                        setShowEditar(true);
-                                                    }}
-                                                    title="Editar proveedor"
-                                                    className="btn-sm shadow-sm"
-                                                    style={{ minWidth: '32px' }}
-                                                >
-                                                    <Edit size={12} />
-                                                    <span className="d-none d-xl-inline ms-1">Editar</span>
-                                                </Button>
-                                                {proveedor.activo ? (
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        size="sm"
-                                                        onClick={() => desactivarProveedor(proveedor.idProveedor)}
-                                                        title="Desactivar proveedor"
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                    >
-                                                        <PowerOff size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Desactivar</span>
-                                                    </Button>
-                                                ) : (
-                                                    <Button
-                                                        variant="outline-success"
-                                                        size="sm"
-                                                        onClick={() => activarProveedor(proveedor.idProveedor)}
-                                                        title="Activar proveedor"
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                    >
-                                                        <Power size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Activar</span>
-                                                    </Button>
-                                                )}
+                            </thead>
+                            <tbody className="text-center align-middle">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="9" className="text-center py-4">
+                                            <div className="spinner-border text-success" role="status">
+                                                <span className="visually-hidden">Cargando...</span>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
+                                ) : proveedoresFiltrados.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="9" className="text-center py-4 text-muted">
+                                            {filtro ? "No se encontraron proveedores" : "No hay proveedores registrados"}
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    proveedoresFiltrados.map((proveedor, index) => (
+                                        <tr key={proveedor.idProveedor}>
+                                            <td>{index + 1}</td>
+                                            <td className="fw-medium">{proveedor.nombre}</td>
+                                            <td>{proveedor.tipoDocumento}</td>
+                                            <td>{proveedor.numeroDocumento}</td>
+                                            <td>{proveedor.direccion}</td>
+                                            <td>{proveedor.telefono}</td>
+                                            <td>{proveedor.email}</td>
+                                            <td>
+                                                {proveedor.activo ? (
+                                                    <span className="badge bg-success">Activo</span>
+                                                ) : (
+                                                    <span className="badge bg-secondary">Inactivo</span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                                    <Button
+                                                        variant="outline-warning"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setProveedorEditar(proveedor);
+                                                            setShowEditar(true);
+                                                        }}
+                                                        title="Editar proveedor"
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                    >
+                                                        <Edit size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Editar</span>
+                                                    </Button>
+                                                    {proveedor.activo ? (
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => desactivarProveedor(proveedor.idProveedor)}
+                                                            title="Desactivar proveedor"
+                                                            className="btn-sm shadow-sm"
+                                                            style={{ minWidth: '32px' }}
+                                                        >
+                                                            <PowerOff size={12} />
+                                                            <span className="d-none d-xl-inline ms-1">Desactivar</span>
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            variant="outline-success"
+                                                            size="sm"
+                                                            onClick={() => activarProveedor(proveedor.idProveedor)}
+                                                            title="Activar proveedor"
+                                                            className="btn-sm shadow-sm"
+                                                            style={{ minWidth: '32px' }}
+                                                        >
+                                                            <Power size={12} />
+                                                            <span className="d-none d-xl-inline ms-1">Activar</span>
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
                         </Table>
                     </div>
                 </div>

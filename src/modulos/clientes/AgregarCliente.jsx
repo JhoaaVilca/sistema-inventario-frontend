@@ -12,7 +12,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
         telefono: "",
         email: ""
     });
-    
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [validatingDni, setValidatingDni] = useState(false);
@@ -67,10 +67,10 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
 
         setValidatingDni(true);
         setError("");
-        
+
         try {
             const { data } = await apiClient.get(`/clientes/buscar-dni/${formData.dni}`);
-            
+
             if (data.existeEnBD) {
                 // Cliente ya existe en BD
                 setDniValidation('found');
@@ -108,7 +108,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (dniValidation === 'found') {
             setError("Este DNI ya está registrado en la base de datos.");
             return;
@@ -171,7 +171,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
                     Agregar Nuevo Cliente
                 </Modal.Title>
             </Modal.Header>
-            
+
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     {error && (
@@ -208,21 +208,21 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
                                     )}
                                 </Button>
                             </div>
-                            
+
                             {/* Mensajes de validación */}
                             {dniValidation === 'invalid' && (
                                 <Form.Control.Feedback type="invalid">
                                     DNI inválido. Debe tener 8 dígitos.
                                 </Form.Control.Feedback>
                             )}
-                            
+
                             {dniValidation === 'valid' && (
                                 <div className="text-success small mt-1 d-flex align-items-center">
                                     <CheckCircle size={14} className="me-1" />
                                     DNI válido - Cliente encontrado en RENIEC
                                 </div>
                             )}
-                            
+
                             {dniValidation === 'found' && (
                                 <div className="text-warning small mt-1 d-flex align-items-center">
                                     <AlertCircle size={14} className="me-1" />
@@ -316,9 +316,9 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
                     <Button variant="secondary" onClick={handleClose}>
                         Cancelar
                     </Button>
-                    <Button 
-                        variant="success" 
-                        type="submit" 
+                    <Button
+                        variant="success"
+                        type="submit"
                         disabled={loading || dniValidation === 'found'}
                     >
                         {loading ? (

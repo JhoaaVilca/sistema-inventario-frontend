@@ -160,87 +160,87 @@ function ListarCategorias() {
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <Table hover className="mb-0">
-                         <thead className="table-light text-center">
-                             <tr>
-                                 <th className="fw-semibold py-3" style={{ width: '80px' }}>ID</th>
-                                 <th className="fw-semibold py-3">Nombre</th>
-                                 <th className="fw-semibold py-3">Descripción</th>
-                                 <th className="fw-semibold py-3" style={{ width: '120px' }}>Estado</th>
-                                 <th className="fw-semibold py-3" style={{ width: '180px' }}>Acciones</th>
-                             </tr>
-                         </thead>
-                        <tbody className="text-center align-middle">
-                            {loading ? (
+                            <thead className="table-light text-center">
                                 <tr>
-                                    <td colSpan="5" className="text-center py-4">
-                                        <div className="spinner-border text-primary" role="status">
-                                            <span className="visually-hidden">Cargando...</span>
-                                        </div>
-                                    </td>
+                                    <th className="fw-semibold py-3" style={{ width: '80px' }}>ID</th>
+                                    <th className="fw-semibold py-3">Nombre</th>
+                                    <th className="fw-semibold py-3">Descripción</th>
+                                    <th className="fw-semibold py-3" style={{ width: '120px' }}>Estado</th>
+                                    <th className="fw-semibold py-3" style={{ width: '180px' }}>Acciones</th>
                                 </tr>
-                            ) : categoriasFiltradas.length === 0 ? (
-                                <tr>
-                                    <td colSpan="5" className="text-center py-4 text-muted">
-                                        {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
-                                    </td>
-                                </tr>
-                            ) : (
-                                categoriasFiltradas.map((categoria) => (
-                                    <tr key={categoria.idCategoria}>
-                                        <td>{categoria.idCategoria}</td>
-                                        <td className="fw-medium">{categoria.nombre}</td>
-                                        <td className="text-start">{categoria.descripcion || "-"}</td>
-                                        <td>
-                                            {categoria.activo ? (
-                                                <Badge bg="success">🟢 Activo</Badge>
-                                            ) : (
-                                                <Badge bg="secondary">⚪ Inactivo</Badge>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                                <Button
-                                                    variant="outline-primary"
-                                                    size="sm"
-                                                    onClick={() => navigate(`/categoria/${categoria.idCategoria}`)}
-                                                    title="Ver productos de esta categoría"
-                                                    className="btn-sm shadow-sm"
-                                                    style={{ minWidth: '32px' }}
-                                                >
-                                                    <Eye size={12} />
-                                                    <span className="d-none d-xl-inline ms-1">Ver</span>
-                                                </Button>
-                                                <Button
-                                                    variant="outline-warning"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setCategoriaEditar(categoria);
-                                                        setShowEditar(true);
-                                                    }}
-                                                    title="Editar categoría"
-                                                    className="btn-sm shadow-sm"
-                                                    style={{ minWidth: '32px' }}
-                                                >
-                                                    <Edit size={12} />
-                                                    <span className="d-none d-xl-inline ms-1">Editar</span>
-                                                </Button>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => eliminarCategoria(categoria.idCategoria)}
-                                                    title="Eliminar categoría"
-                                                    className="btn-sm shadow-sm"
-                                                    style={{ minWidth: '32px' }}
-                                                >
-                                                    <Trash2 size={12} />
-                                                    <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                                </Button>
+                            </thead>
+                            <tbody className="text-center align-middle">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="5" className="text-center py-4">
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Cargando...</span>
                                             </div>
                                         </td>
                                     </tr>
-                                ))
-                            )}
-                        </tbody>
+                                ) : categoriasFiltradas.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" className="text-center py-4 text-muted">
+                                            {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    categoriasFiltradas.map((categoria) => (
+                                        <tr key={categoria.idCategoria}>
+                                            <td>{categoria.idCategoria}</td>
+                                            <td className="fw-medium">{categoria.nombre}</td>
+                                            <td className="text-start">{categoria.descripcion || "-"}</td>
+                                            <td>
+                                                {categoria.activo ? (
+                                                    <Badge bg="success">🟢 Activo</Badge>
+                                                ) : (
+                                                    <Badge bg="secondary">⚪ Inactivo</Badge>
+                                                )}
+                                            </td>
+                                            <td>
+                                                <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        size="sm"
+                                                        onClick={() => navigate(`/categoria/${categoria.idCategoria}`)}
+                                                        title="Ver productos de esta categoría"
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                    >
+                                                        <Eye size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Ver</span>
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline-warning"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setCategoriaEditar(categoria);
+                                                            setShowEditar(true);
+                                                        }}
+                                                        title="Editar categoría"
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                    >
+                                                        <Edit size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Editar</span>
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        onClick={() => eliminarCategoria(categoria.idCategoria)}
+                                                        title="Eliminar categoría"
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                    >
+                                                        <Trash2 size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
                         </Table>
                     </div>
                 </div>
@@ -269,10 +269,10 @@ function ListarCategorias() {
 
             {/* Toast de notificaciones */}
             <ToastContainer position="top-end" className="p-3">
-                <Toast 
-                    show={showToast} 
-                    onClose={() => setShowToast(false)} 
-                    delay={3000} 
+                <Toast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    delay={3000}
                     autohide
                     bg={toastVariant}
                 >

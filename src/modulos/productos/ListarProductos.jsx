@@ -18,7 +18,7 @@ const ListarProductos = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
-    
+
     // Estados para el modal de lotes
     const [showLotesModal, setShowLotesModal] = useState(false);
     const [lotesProducto, setLotesProducto] = useState([]);
@@ -42,23 +42,23 @@ const ListarProductos = () => {
             ]);
 
             const alertasPorProducto = {};
-            
+
             // Procesar lotes vencidos
             lotesVencidos.forEach(lote => {
                 const idProducto = lote.detalleEntrada.producto.idProducto;
                 if (!alertasPorProducto[idProducto]) {
-                    alertasPorProducto[idProducto] = { 
-                        vencidos: 0, 
-                        proximos: 0, 
+                    alertasPorProducto[idProducto] = {
+                        vencidos: 0,
+                        proximos: 0,
                         fechaMasProxima: null,
                         tipoAlerta: null
                     };
                 }
                 alertasPorProducto[idProducto].vencidos++;
                 alertasPorProducto[idProducto].tipoAlerta = 'vencido';
-                
+
                 // Guardar la fecha más próxima (la más reciente de los vencidos)
-                if (!alertasPorProducto[idProducto].fechaMasProxima || 
+                if (!alertasPorProducto[idProducto].fechaMasProxima ||
                     new Date(lote.fechaVencimiento) > new Date(alertasPorProducto[idProducto].fechaMasProxima)) {
                     alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
                 }
@@ -68,9 +68,9 @@ const ListarProductos = () => {
             lotesProximos.forEach(lote => {
                 const idProducto = lote.detalleEntrada.producto.idProducto;
                 if (!alertasPorProducto[idProducto]) {
-                    alertasPorProducto[idProducto] = { 
-                        vencidos: 0, 
-                        proximos: 0, 
+                    alertasPorProducto[idProducto] = {
+                        vencidos: 0,
+                        proximos: 0,
                         fechaMasProxima: null,
                         tipoAlerta: null
                     };
@@ -79,9 +79,9 @@ const ListarProductos = () => {
                 if (alertasPorProducto[idProducto].tipoAlerta !== 'vencido') {
                     alertasPorProducto[idProducto].tipoAlerta = 'proximo';
                 }
-                
+
                 // Guardar la fecha más próxima (la más cercana a vencer)
-                if (!alertasPorProducto[idProducto].fechaMasProxima || 
+                if (!alertasPorProducto[idProducto].fechaMasProxima ||
                     new Date(lote.fechaVencimiento) < new Date(alertasPorProducto[idProducto].fechaMasProxima)) {
                     alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
                 }
@@ -129,10 +129,10 @@ const ListarProductos = () => {
     const obtenerTipoAlerta = (producto) => {
         const alerta = alertas[producto.idProducto];
         if (!alerta || !alerta.tipoAlerta) return null;
-        
-        return { 
-            tipo: alerta.tipoAlerta, 
-            cantidad: alerta.vencidos + alerta.proximos, 
+
+        return {
+            tipo: alerta.tipoAlerta,
+            cantidad: alerta.vencidos + alerta.proximos,
             color: alerta.tipoAlerta === 'vencido' ? 'danger' : 'warning',
             fechaMasProxima: alerta.fechaMasProxima
         };
@@ -141,17 +141,17 @@ const ListarProductos = () => {
     const verLotes = async (producto) => {
         try {
             const lotes = await loteService.obtenerLotesPorProducto(producto.idProducto);
-            
+
             if (lotes.length === 0) {
                 mostrarNotificacion(`No hay lotes registrados para ${producto.nombreProducto}`, 'info');
                 return;
             }
-            
+
             // Guardar los lotes y producto seleccionado
             setLotesProducto(lotes);
             setProductoSeleccionado(producto);
             setShowLotesModal(true);
-            
+
         } catch (error) {
             console.error('Error al cargar lotes:', error);
             mostrarNotificacion('Error al cargar los lotes del producto', 'danger');
@@ -178,7 +178,7 @@ const ListarProductos = () => {
     const productosFiltrados = productos.filter((p) => {
         // Filtro por nombre
         const cumpleFiltroNombre = p.nombreProducto.toLowerCase().includes(filtro.toLowerCase());
-        
+
         // Filtro por tipo de alerta
         let cumpleFiltroAlerta = true;
         if (filtroAlerta) {
@@ -200,7 +200,7 @@ const ListarProductos = () => {
                     cumpleFiltroAlerta = true;
             }
         }
-        
+
         return cumpleFiltroNombre && cumpleFiltroAlerta;
     });
 
@@ -219,8 +219,8 @@ const ListarProductos = () => {
             {/* Botón Agregar y Filtros */}
             <div className="d-flex justify-content-between align-items-center gap-2 mb-3">
                 <div className="d-flex align-items-center gap-2">
-                    <Button 
-                        variant="outline-primary" 
+                    <Button
+                        variant="outline-primary"
                         onClick={() => setMostrarFiltros(!mostrarFiltros)}
                         size="sm"
                     >
@@ -228,8 +228,8 @@ const ListarProductos = () => {
                         Filtros
                     </Button>
                     {(filtro || filtroAlerta) && (
-                        <Button 
-                            variant="outline-secondary" 
+                        <Button
+                            variant="outline-secondary"
                             onClick={limpiarFiltros}
                             size="sm"
                         >
@@ -253,7 +253,7 @@ const ListarProductos = () => {
                         <div className="row g-3">
                             <div className="col-md-6">
                                 <label className="form-label">Filtrar por tipo de alerta:</label>
-                                <select 
+                                <select
                                     className="form-select"
                                     value={filtroAlerta}
                                     onChange={(e) => setFiltroAlerta(e.target.value)}
@@ -342,160 +342,160 @@ const ListarProductos = () => {
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <Table hover className="mb-0">
-                        <thead className="table-light text-center">
-                            <tr>
-                                <th className="fw-semibold py-3">ID</th>
-                                <th className="fw-semibold py-3">Nombre</th>
-                                <th className="fw-semibold py-3">Precio Venta</th>
-                                <th className="fw-semibold py-3">Precio Compra</th>
-                                <th className="fw-semibold py-3">Stock</th>
-                                <th className="fw-semibold py-3">Stock Mín.</th>
-                                <th className="fw-semibold py-3">Unidad</th>
-                                <th className="fw-semibold py-3">Categoría</th>
-                                <th className="fw-semibold py-3">Alertas</th>
-                                <th className="fw-semibold py-3" style={{ width: "160px" }}>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-center align-middle">
-                            {loading ? (
+                            <thead className="table-light text-center">
                                 <tr>
-                                    <td colSpan="10" className="text-center py-4">
-                                        <div className="spinner-border text-primary" role="status">
-                                            <span className="visually-hidden">Cargando...</span>
-                                        </div>
-                                    </td>
+                                    <th className="fw-semibold py-3">ID</th>
+                                    <th className="fw-semibold py-3">Nombre</th>
+                                    <th className="fw-semibold py-3">Precio Venta</th>
+                                    <th className="fw-semibold py-3">Precio Compra</th>
+                                    <th className="fw-semibold py-3">Stock</th>
+                                    <th className="fw-semibold py-3">Stock Mín.</th>
+                                    <th className="fw-semibold py-3">Unidad</th>
+                                    <th className="fw-semibold py-3">Categoría</th>
+                                    <th className="fw-semibold py-3">Alertas</th>
+                                    <th className="fw-semibold py-3" style={{ width: "160px" }}>Acciones</th>
                                 </tr>
-                            ) : productosFiltrados.length === 0 ? (
-                                <tr>
-                                    <td colSpan="10" className="text-center py-4 text-muted">
-                                        {filtro ? "No se encontraron productos" : "No hay productos registrados"}
-                                    </td>
-                                </tr>
-                            ) : (
-                                productosFiltrados.map((producto) => {
-                                    // Determinar el color de la fila basado en alertas
-                                    const getRowClass = () => {
-                                        const alerta = obtenerTipoAlerta(producto);
-                                        if (alerta && alerta.tipo === 'vencido') return "table-danger";
-                                        if (alerta && alerta.tipo === 'proximo') return "table-warning";
-                                        if (producto.stockBajo) return "table-info";
-                                        return "";
-                                    };
+                            </thead>
+                            <tbody className="text-center align-middle">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="10" className="text-center py-4">
+                                            <div className="spinner-border text-primary" role="status">
+                                                <span className="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : productosFiltrados.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="10" className="text-center py-4 text-muted">
+                                            {filtro ? "No se encontraron productos" : "No hay productos registrados"}
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    productosFiltrados.map((producto) => {
+                                        // Determinar el color de la fila basado en alertas
+                                        const getRowClass = () => {
+                                            const alerta = obtenerTipoAlerta(producto);
+                                            if (alerta && alerta.tipo === 'vencido') return "table-danger";
+                                            if (alerta && alerta.tipo === 'proximo') return "table-warning";
+                                            if (producto.stockBajo) return "table-info";
+                                            return "";
+                                        };
 
-                                    return (
-                                        <tr key={producto.idProducto} className={getRowClass()}>
-                                            <td>{producto.idProducto}</td>
-                                            <td className="fw-medium text-start">
-                                                <div>
-                                                    <div>{producto.nombreProducto}</div>
-                                                    {producto.descripcionCorta && (
-                                                        <small className="text-muted">{producto.descripcionCorta}</small>
+                                        return (
+                                            <tr key={producto.idProducto} className={getRowClass()}>
+                                                <td>{producto.idProducto}</td>
+                                                <td className="fw-medium text-start">
+                                                    <div>
+                                                        <div>{producto.nombreProducto}</div>
+                                                        {producto.descripcionCorta && (
+                                                            <small className="text-muted">{producto.descripcionCorta}</small>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="fw-bold text-success">
+                                                        S/. {producto.precio?.toFixed(2) || '0.00'}
+                                                    </div>
+                                                    {producto.margenGanancia && (
+                                                        <small className="text-success">
+                                                            Gana: S/. {((producto.precio - (producto.precio / (1 + producto.margenGanancia / 100))) || 0).toFixed(2)}
+                                                        </small>
                                                     )}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="fw-bold text-success">
-                                                    S/. {producto.precio?.toFixed(2) || '0.00'}
-                                                </div>
-                                                {producto.margenGanancia && (
-                                                    <small className="text-success">
-                                                        Gana: S/. {((producto.precio - (producto.precio / (1 + producto.margenGanancia / 100))) || 0).toFixed(2)}
-                                                    </small>
-                                                )}
-                                            </td>
-                                            <td>
-                                                <div className="text-primary">
-                                                    S/. {producto.precioCompra?.toFixed(2) || '0.00'}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className={`fw-bold ${producto.stockBajo ? 'text-danger' : ''}`}>
-                                                    {producto.stock || 0}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="text-muted">
-                                                    {producto.stockMinimo || 0}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className="badge bg-secondary">
-                                                    {producto.unidadMedida || 'N/A'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span className="badge bg-primary">
-                                                    {producto.nombreCategoria || "Sin categoría"}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex flex-column gap-1">
-                                                    {(() => {
-                                                        const alerta = obtenerTipoAlerta(producto);
-                                                        if (alerta) {
+                                                </td>
+                                                <td>
+                                                    <div className="text-primary">
+                                                        S/. {producto.precioCompra?.toFixed(2) || '0.00'}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className={`fw-bold ${producto.stockBajo ? 'text-danger' : ''}`}>
+                                                        {producto.stock || 0}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="text-muted">
+                                                        {producto.stockMinimo || 0}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span className="badge bg-secondary">
+                                                        {producto.unidadMedida || 'N/A'}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span className="badge bg-primary">
+                                                        {producto.nombreCategoria || "Sin categoría"}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div className="d-flex flex-column gap-1">
+                                                        {(() => {
+                                                            const alerta = obtenerTipoAlerta(producto);
+                                                            if (alerta) {
+                                                                return (
+                                                                    <div>
+                                                                        <span className={`badge bg-${alerta.color} d-flex align-items-center mb-1`}>
+                                                                            <AlertTriangle size={12} className="me-1" />
+                                                                            {alerta.tipo === 'vencido' ? 'Vencido' : 'Próximo a Vencer'}
+                                                                        </span>
+                                                                        <small className="text-muted">
+                                                                            {new Date(alerta.fechaMasProxima).toLocaleDateString('es-ES')}
+                                                                        </small>
+                                                                    </div>
+                                                                );
+                                                            }
                                                             return (
-                                                                <div>
-                                                                    <span className={`badge bg-${alerta.color} d-flex align-items-center mb-1`}>
-                                                                        <AlertTriangle size={12} className="me-1" />
-                                                                        {alerta.tipo === 'vencido' ? 'Vencido' : 'Próximo a Vencer'}
-                                                                    </span>
-                                                                    <small className="text-muted">
-                                                                        {new Date(alerta.fechaMasProxima).toLocaleDateString('es-ES')}
-                                                                    </small>
-                                                                </div>
+                                                                <span className="text-muted small">Sin alertas</span>
                                                             );
-                                                        }
-                                                        return (
-                                                            <span className="text-muted small">Sin alertas</span>
-                                                        );
-                                                    })()}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                                    <Button
-                                                        variant="outline-info"
-                                                        size="sm"
-                                                        onClick={() => verLotes(producto)}
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                        title="Ver lotes del producto"
-                                                    >
-                                                        <Eye size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Lotes</span>
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline-warning"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            setProductoEditar(producto);
-                                                            setShowEditar(true);
-                                                        }}
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                        title="Editar producto"
-                                                    >
-                                                        <Edit size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Editar</span>
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        size="sm"
-                                                        onClick={() => handleEliminar(producto.idProducto)}
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                        title="Eliminar producto"
-                                                    >
-                                                        <Trash2 size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
+                                                        })()}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                                        <Button
+                                                            variant="outline-info"
+                                                            size="sm"
+                                                            onClick={() => verLotes(producto)}
+                                                            className="btn-sm shadow-sm"
+                                                            style={{ minWidth: '32px' }}
+                                                            title="Ver lotes del producto"
+                                                        >
+                                                            <Eye size={12} />
+                                                            <span className="d-none d-xl-inline ms-1">Lotes</span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-warning"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                setProductoEditar(producto);
+                                                                setShowEditar(true);
+                                                            }}
+                                                            className="btn-sm shadow-sm"
+                                                            style={{ minWidth: '32px' }}
+                                                            title="Editar producto"
+                                                        >
+                                                            <Edit size={12} />
+                                                            <span className="d-none d-xl-inline ms-1">Editar</span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => handleEliminar(producto.idProducto)}
+                                                            className="btn-sm shadow-sm"
+                                                            style={{ minWidth: '32px' }}
+                                                            title="Eliminar producto"
+                                                        >
+                                                            <Trash2 size={12} />
+                                                            <span className="d-none d-xl-inline ms-1">Eliminar</span>
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
                         </Table>
                     </div>
                 </div>
@@ -580,7 +580,7 @@ const ListarProductos = () => {
                                         {lotesProducto.map((lote, index) => {
                                             const fechaEntrada = lote.fechaEntrada; // ✅ CORREGIDO: Usar el campo directo del lote
                                             const cantidad = lote.detalleEntrada?.cantidad;
-                                            
+
                                             return (
                                                 <tr key={lote.idLote || index}>
                                                     <td>
@@ -589,14 +589,14 @@ const ListarProductos = () => {
                                                         </span>
                                                     </td>
                                                     <td>
-                                                        {fechaEntrada ? 
-                                                            new Date(fechaEntrada).toLocaleDateString('es-ES') : 
+                                                        {fechaEntrada ?
+                                                            new Date(fechaEntrada).toLocaleDateString('es-ES') :
                                                             'N/A'
                                                         }
                                                     </td>
                                                     <td>
-                                                        {lote.fechaVencimiento ? 
-                                                            new Date(lote.fechaVencimiento).toLocaleDateString('es-ES') : 
+                                                        {lote.fechaVencimiento ?
+                                                            new Date(lote.fechaVencimiento).toLocaleDateString('es-ES') :
                                                             'Sin fecha'
                                                         }
                                                     </td>
@@ -651,13 +651,13 @@ const ListarProductos = () => {
                 >
                     <Toast.Header closeButton>
                         <strong className="me-auto">
-                            {toastVariant === "success" ? "Éxito" : 
-                             toastVariant === "info" ? "Información" : 
-                             toastVariant === "warning" ? "Advertencia" : "Error"}
+                            {toastVariant === "success" ? "Éxito" :
+                                toastVariant === "info" ? "Información" :
+                                    toastVariant === "warning" ? "Advertencia" : "Error"}
                         </strong>
                     </Toast.Header>
-                    <Toast.Body className={toastVariant === "success" ? "text-white" : 
-                                           toastVariant === "info" ? "text-dark" : ""}>
+                    <Toast.Body className={toastVariant === "success" ? "text-white" :
+                        toastVariant === "info" ? "text-dark" : ""}>
                         {toastMessage}
                     </Toast.Body>
                 </Toast>

@@ -78,7 +78,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             }
         } catch (error) {
             console.error("Error al actualizar producto:", error);
-            
+
             if (error.response?.data?.error) {
                 setError(error.response.data.error);
             } else if (error.response?.data?.message) {
@@ -108,14 +108,14 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                         <Col md={12}>
                             <Form.Group controlId="formNombreProducto" className="mb-3">
                                 <Form.Label>Nombre del Producto <span className="text-danger">*</span></Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={nombreProducto}
-                            onChange={(e) => setNombreProducto(e.target.value)}
+                                <Form.Control
+                                    type="text"
+                                    value={nombreProducto}
+                                    onChange={(e) => setNombreProducto(e.target.value)}
                                     placeholder="Ingresa el nombre del producto"
-                            required
-                        />
-                    </Form.Group>
+                                    required
+                                />
+                            </Form.Group>
                         </Col>
                     </Row>
 
@@ -153,16 +153,16 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                         <Col md={6}>
                             <Form.Group controlId="formPrecio" className="mb-3">
                                 <Form.Label>Precio de Venta <span className="text-danger">*</span></Form.Label>
-                        <Form.Control
-                            type="number"
+                                <Form.Control
+                                    type="number"
                                     step="0.01"
                                     min="0"
-                            value={precio}
-                            onChange={(e) => setPrecio(e.target.value)}
+                                    value={precio}
+                                    onChange={(e) => setPrecio(e.target.value)}
                                     placeholder="0.00"
-                            required
-                        />
-                    </Form.Group>
+                                    required
+                                />
+                            </Form.Group>
                         </Col>
                     </Row>
 
@@ -171,28 +171,28 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                         <Col md={4}>
                             <Form.Group controlId="formStock" className="mb-3">
                                 <Form.Label>Stock Actual <span className="text-danger">*</span></Form.Label>
-                        <Form.Control
-                            type="number"
+                                <Form.Control
+                                    type="number"
                                     min="0"
-                            value={stock}
-                            onChange={(e) => setStock(e.target.value)}
+                                    value={stock}
+                                    onChange={(e) => setStock(e.target.value)}
                                     placeholder="0"
-                            required
-                        />
-                    </Form.Group>
+                                    required
+                                />
+                            </Form.Group>
                         </Col>
                         <Col md={4}>
                             <Form.Group controlId="formStockMinimo" className="mb-3">
                                 <Form.Label>Stock Mínimo <span className="text-danger">*</span></Form.Label>
-                        <Form.Control
+                                <Form.Control
                                     type="number"
                                     min="0"
                                     value={stockMinimo}
                                     onChange={(e) => setStockMinimo(e.target.value)}
                                     placeholder="0"
-                            required
-                        />
-                    </Form.Group>
+                                    required
+                                />
+                            </Form.Group>
                         </Col>
                         <Col md={4}>
                             <Form.Group controlId="formUnidadMedida" className="mb-3">
@@ -223,19 +223,19 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                         <Col md={6}>
                             <Form.Group controlId="formCategoria" className="mb-3">
                                 <Form.Label>Categoría <span className="text-danger">*</span></Form.Label>
-                        <Form.Select
-                            value={categoria}
-                            onChange={(e) => setCategoria(e.target.value)}
-                            required
-                        >
+                                <Form.Select
+                                    value={categoria}
+                                    onChange={(e) => setCategoria(e.target.value)}
+                                    required
+                                >
                                     <option value="">Selecciona una categoría</option>
-                            {categorias.map((cat) => (
-                                <option key={cat.idCategoria} value={cat.idCategoria}>
-                                    {cat.nombre}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
+                                    {categorias.map((cat) => (
+                                        <option key={cat.idCategoria} value={cat.idCategoria}>
+                                            {cat.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
                         </Col>
                     </Row>
 
@@ -252,7 +252,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        
+
                     </Row>
 
                     {/* Fecha de Vencimiento (condicional) */}

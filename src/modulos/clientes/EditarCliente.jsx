@@ -12,7 +12,7 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
         telefono: "",
         email: ""
     });
-    
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -39,7 +39,7 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!formData.dni || !formData.nombres) {
             setError("El DNI y los nombres son obligatorios.");
             return;
@@ -76,7 +76,7 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
                     Editar Cliente
                 </Modal.Title>
             </Modal.Header>
-            
+
             <Form onSubmit={handleSubmit}>
                 <Modal.Body>
                     {error && (
@@ -169,7 +169,7 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
                             <strong>ID:</strong> {cliente?.idCliente}
                         </p>
                         <p className="mb-1">
-                            <strong>Fecha de Registro:</strong> {cliente?.fechaRegistro ? 
+                            <strong>Fecha de Registro:</strong> {cliente?.fechaRegistro ?
                                 new Date(cliente.fechaRegistro).toLocaleDateString('es-ES') : 'N/A'
                             }
                         </p>
@@ -183,9 +183,9 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
                     <Button variant="secondary" onClick={handleClose}>
                         Cancelar
                     </Button>
-                    <Button 
-                        variant="primary" 
-                        type="submit" 
+                    <Button
+                        variant="primary"
+                        type="submit"
                         disabled={loading}
                     >
                         {loading ? (

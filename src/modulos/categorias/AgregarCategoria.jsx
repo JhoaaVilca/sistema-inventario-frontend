@@ -23,7 +23,7 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        
+
         if (form.checkValidity() === false) {
             e.stopPropagation();
             setValidated(true);
@@ -41,14 +41,14 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
             };
 
             await apiClient.post("/categorias", nuevaCategoria);
-            
+
             // Limpiar formulario y cerrar modal
             setNombre("");
             setDescripcion("");
             setActivo(true);
             setValidated(false);
             handleClose();
-            
+
             // Notificar al componente padre
             onCategoriaAdded();
         } catch (error) {
@@ -105,10 +105,10 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
                             disabled={loading}
                         />
                         <Form.Control.Feedback type="invalid">
-                            {!nombre.trim() 
-                                ? "El nombre es obligatorio" 
-                                : nombre.trim().length < 2 
-                                    ? "El nombre debe tener al menos 2 caracteres" 
+                            {!nombre.trim()
+                                ? "El nombre es obligatorio"
+                                : nombre.trim().length < 2
+                                    ? "El nombre debe tener al menos 2 caracteres"
                                     : "El nombre no puede exceder 100 caracteres"
                             }
                         </Form.Control.Feedback>
@@ -149,15 +149,15 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
                     </Form.Group>
 
                     <div className="d-flex justify-content-end gap-2 mt-4">
-                        <Button 
-                            variant="secondary" 
+                        <Button
+                            variant="secondary"
                             onClick={handleCloseModal}
                             disabled={loading}
                         >
                             Cancelar
                         </Button>
-                        <Button 
-                            variant="success" 
+                        <Button
+                            variant="success"
                             type="submit"
                             disabled={loading || !nombre.trim()}
                         >

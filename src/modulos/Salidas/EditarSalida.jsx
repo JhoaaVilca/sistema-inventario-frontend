@@ -24,7 +24,7 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
                 }))
             );
             setFechaSalida(salida.fechaSalida || "");
-            
+
             // Configurar cliente si existe
             if (salida.cliente) {
                 setClienteSeleccionado({
@@ -37,7 +37,7 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
                     email: salida.cliente.email
                 });
             }
-            
+
             setTipoVenta(salida.tipoVenta || "CONTADO");
             setErrorMsg("");
         }

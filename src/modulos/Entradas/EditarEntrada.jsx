@@ -62,12 +62,12 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
                 estado,
                 detalles: productosEntrada
             });
-            
+
             // Si hay archivo de factura, subirlo
             if (archivoFactura) {
                 await subirFactura(entrada.idEntrada);
             }
-            
+
             onEntradaEditada();
             handleClose();
         } catch (error) {
@@ -232,7 +232,7 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
                     <FileText size={20} className="me-2" />
                     Factura del Proveedor (Opcional)
                 </h6>
-                
+
                 <div className="row">
                     <div className="col-md-8">
                         <Form.Group className="mb-3">

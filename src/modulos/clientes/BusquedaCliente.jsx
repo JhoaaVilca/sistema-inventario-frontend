@@ -3,9 +3,9 @@ import { Form, Button, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { Search, User, CheckCircle } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 
-const BusquedaCliente = ({ 
-    onClienteSeleccionado, 
-    clienteSeleccionado, 
+const BusquedaCliente = ({
+    onClienteSeleccionado,
+    clienteSeleccionado,
     required = false,
     showAgregarCliente = false
 }) => {
@@ -45,10 +45,10 @@ const BusquedaCliente = ({
 
         setValidatingDni(true);
         setError("");
-        
+
         try {
             const { data } = await apiClient.get(`/clientes/buscar-dni/${dni}`);
-            
+
             if (data.existeEnBD) {
                 // Cliente encontrado en BD local
                 setClienteEncontrado(data);
@@ -64,7 +64,7 @@ const BusquedaCliente = ({
             } else if (data.nombres) {
                 // Cliente encontrado en RENIEC - Agregarlo automáticamente a la BD
                 console.log("Cliente encontrado en RENIEC, agregando a BD local...");
-                
+
                 try {
                     const clienteData = {
                         dni: data.dni,
@@ -74,11 +74,11 @@ const BusquedaCliente = ({
                         telefono: data.telefono,
                         email: data.email
                     };
-                    
+
                     const { data: clienteGuardado } = await apiClient.post("/clientes", clienteData);
-                    
+
                     console.log("Cliente agregado automáticamente:", clienteGuardado);
-                    
+
                     // Seleccionar automáticamente el cliente guardado
                     setClienteEncontrado(clienteGuardado);
                     onClienteSeleccionado({
@@ -90,14 +90,14 @@ const BusquedaCliente = ({
                         telefono: clienteGuardado.telefono,
                         email: clienteGuardado.email
                     });
-                    
+
                     // Recargar la lista de clientes para el dropdown
                     cargarClientes();
-                    
+
                     // Mostrar mensaje de éxito
                     setError("");
                     setSuccessMsg(`✅ Cliente "${clienteGuardado.nombres} ${clienteGuardado.apellidos}" agregado automáticamente. Ahora aparece en la lista de clientes.`);
-                    
+
                 } catch (err) {
                     console.error("Error al agregar cliente automáticamente:", err);
                     setError("Error al agregar cliente a la BD. Intente nuevamente.");
@@ -121,7 +121,7 @@ const BusquedaCliente = ({
         setClienteEncontrado(cliente);
         setDni(cliente.dni);
         setShowDropdown(false);
-        
+
         const clienteData = {
             idCliente: cliente.idCliente,
             dni: cliente.dni,
@@ -131,7 +131,7 @@ const BusquedaCliente = ({
             telefono: cliente.telefono,
             email: cliente.email
         };
-        
+
         console.log("Datos del cliente a enviar:", clienteData);
         onClienteSeleccionado(clienteData);
     };
@@ -156,7 +156,7 @@ const BusquedaCliente = ({
             <Form.Label>
                 Cliente {required && <span className="text-danger">*</span>}
             </Form.Label>
-            
+
             {/* Búsqueda por DNI */}
             <div className="d-flex gap-2 mb-2">
                 <Form.Control
@@ -198,8 +198,8 @@ const BusquedaCliente = ({
             {showAgregarCliente && (
                 <div className="mb-2">
                     <Dropdown show={showDropdown} onToggle={setShowDropdown}>
-                        <Dropdown.Toggle 
-                            variant="outline-secondary" 
+                        <Dropdown.Toggle
+                            variant="outline-secondary"
                             size="sm"
                             disabled={loadingClientes}
                         >
@@ -232,7 +232,7 @@ const BusquedaCliente = ({
                         </Dropdown.Menu>
                     </Dropdown>
 
-                    
+
                 </div>
             )}
 
@@ -242,7 +242,7 @@ const BusquedaCliente = ({
                     <small>{error}</small>
                 </Alert>
             )}
-            
+
             {successMsg && (
                 <Alert variant="success" className="py-2 mb-2">
                     <small>{successMsg}</small>
@@ -258,7 +258,7 @@ const BusquedaCliente = ({
                             <strong>Cliente seleccionado:</strong>
                             <br />
                             <small>
-                                <strong>DNI:</strong> {clienteEncontrado.dni} | 
+                                <strong>DNI:</strong> {clienteEncontrado.dni} |
                                 <strong> Nombre:</strong> {getNombreCompleto(clienteEncontrado)}
                                 {clienteEncontrado.direccion && (
                                     <> | <strong> Dirección:</strong> {clienteEncontrado.direccion}</>
@@ -278,7 +278,7 @@ const BusquedaCliente = ({
                             <strong>Cliente seleccionado:</strong>
                             <br />
                             <small>
-                                <strong>DNI:</strong> {clienteSeleccionado.dni} | 
+                                <strong>DNI:</strong> {clienteSeleccionado.dni} |
                                 <strong> Nombre:</strong> {getNombreCompleto(clienteSeleccionado)}
                                 {clienteSeleccionado.direccion && (
                                     <> | <strong> Dirección:</strong> {clienteSeleccionado.direccion}</>
@@ -289,7 +289,7 @@ const BusquedaCliente = ({
                 </Alert>
             )}
 
-            
+
         </div>
     );
 };

@@ -52,7 +52,7 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                     precioUnitario: d.precioUnitario
                 }))
             };
-            
+
             await apiClient.post("/salidas", dataToSend);
             onSalidaAgregada();
             handleClose();
@@ -60,7 +60,7 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
             console.error("Error completo:", error);
             console.error("Response data:", error.response?.data);
             console.error("Response status:", error.response?.status);
-            
+
             if (error.response && error.response.status === 400) {
                 const mensaje = error.response.data?.message || error.response.data?.error || "Error de validación.";
                 setErrorMsg(mensaje);

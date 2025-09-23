@@ -34,9 +34,9 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
         }
         const subtotal = cantidadNum * precioNum;
         const nuevoDetalle = {
-            producto: { 
+            producto: {
                 idProducto: productoSeleccionado.idProducto,
-                nombreProducto: productoSeleccionado.nombreProducto 
+                nombreProducto: productoSeleccionado.nombreProducto
             },
             cantidad: cantidadNum,
             precioUnitario: precioNum,
@@ -45,23 +45,23 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
         };
 
         setProductosEntrada([...(productosEntrada || []), nuevoDetalle]);
-        
+
         // Efecto de resaltado
         setProductoRecienAgregado(productoSeleccionado.nombreProducto);
         setTimeout(() => setProductoRecienAgregado(null), 2000);
-        
+
         // Notificar que se agregó el producto
         if (onProductoAgregado) {
             onProductoAgregado(`${productoSeleccionado.nombreProducto} agregado correctamente (${cantidadNum} unidades)`);
         }
-        
+
         // Limpiar campos después de agregar
         setProductoSeleccionado(null);
         setCantidad("");
         setPrecioUnitario("");
         setFechaVencimiento("");
         setLimpiarBuscador(true);
-        
+
         // Resetear el flag de limpiar después de un momento
         setTimeout(() => {
             setLimpiarBuscador(false);
@@ -126,54 +126,53 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
 
             <div className="table-responsive">
                 <Table bordered size="sm" className="mt-3">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Precio Unitario</th>
-                        <th>Fecha Vencimiento</th>
-                        <th>Subtotal</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {productosEntrada.map((detalle, index) => (
-                        <tr 
-                            key={index} 
-                            className={`animate__animated animate__fadeIn ${
-                                productoRecienAgregado === detalle.producto.nombreProducto ? 'table-success' : ''
-                            }`}
-                            style={{
-                                transition: 'background-color 0.3s ease',
-                                backgroundColor: productoRecienAgregado === detalle.producto.nombreProducto ? '#d1edff' : 'transparent'
-                            }}
-                        >
-                            <td>
-                                <div className="fw-medium">{detalle.producto.nombreProducto}</div>
-                            </td>
-                            <td>{detalle.cantidad}</td>
-                            <td>S/{detalle.precioUnitario}</td>
-                            <td>
-                                {detalle.fechaVencimiento ? 
-                                    new Date(detalle.fechaVencimiento).toLocaleDateString('es-ES') : 
-                                    <span className="text-muted">Sin fecha</span>
-                                }
-                            </td>
-                            <td>S/{detalle.subtotal}</td>
-                            <td>
-                                <Button 
-                                    variant="outline-danger" 
-                                    size="sm" 
-                                    onClick={() => eliminarDetalle(index)}
-                                    title="Eliminar producto de la entrada"
-                                >
-                                    <X size={14} className="me-1" />
-                                    Eliminar
-                                </Button>
-                            </td>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Fecha Vencimiento</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
                         </tr>
-                    ))}
-                </tbody>
+                    </thead>
+                    <tbody>
+                        {productosEntrada.map((detalle, index) => (
+                            <tr
+                                key={index}
+                                className={`animate__animated animate__fadeIn ${productoRecienAgregado === detalle.producto.nombreProducto ? 'table-success' : ''
+                                    }`}
+                                style={{
+                                    transition: 'background-color 0.3s ease',
+                                    backgroundColor: productoRecienAgregado === detalle.producto.nombreProducto ? '#d1edff' : 'transparent'
+                                }}
+                            >
+                                <td>
+                                    <div className="fw-medium">{detalle.producto.nombreProducto}</div>
+                                </td>
+                                <td>{detalle.cantidad}</td>
+                                <td>S/{detalle.precioUnitario}</td>
+                                <td>
+                                    {detalle.fechaVencimiento ?
+                                        new Date(detalle.fechaVencimiento).toLocaleDateString('es-ES') :
+                                        <span className="text-muted">Sin fecha</span>
+                                    }
+                                </td>
+                                <td>S/{detalle.subtotal}</td>
+                                <td>
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        onClick={() => eliminarDetalle(index)}
+                                        title="Eliminar producto de la entrada"
+                                    >
+                                        <X size={14} className="me-1" />
+                                        Eliminar
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
                 </Table>
             </div>
         </div>

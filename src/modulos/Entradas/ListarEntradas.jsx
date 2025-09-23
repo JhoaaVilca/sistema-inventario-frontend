@@ -51,16 +51,16 @@ function ListarEntradas() {
             setCargando(true);
             let url = `/entradas`;
             const params = new URLSearchParams();
-            
+
             if (idProveedor) params.append('idProveedor', idProveedor);
             if (numeroFactura) params.append('numeroFactura', numeroFactura);
             if (fechaInicio) params.append('fechaInicio', fechaInicio);
             if (fechaFin) params.append('fechaFin', fechaFin);
-            
+
             if (params.toString()) {
                 url += `/filtrar?${params.toString()}`;
             }
-            
+
             const { data } = await apiClient.get(url);
             setEntradas(data);
             setFiltrosActivos(Boolean(idProveedor || numeroFactura || (fechaInicio && fechaFin)));
@@ -159,7 +159,7 @@ function ListarEntradas() {
                     },
                 }
             );
-            
+
             alert('Factura subida exitosamente');
             obtenerEntradas();
             setSubiendoFactura(false);
@@ -341,141 +341,141 @@ function ListarEntradas() {
                     <Card.Body className="text-center text-muted">No hay entradas para mostrar.</Card.Body>
                 </Card>
             ) : (
-            <div className="card shadow-sm border-0">
-                <div className="card-header bg-white border-0 py-3">
-                    <h5 className="mb-0 text-dark fw-semibold">
-                        Lista de Entradas
-                        {entradas.length > 0 && (
-                            <span className="badge bg-primary ms-2">{entradas.length}</span>
-                        )}
-                    </h5>
-                </div>
-                <div className="card-body p-0">
-                    <div className="table-responsive">
-                        <Table hover className="mb-0">
-                            <thead className="table-light text-center">
-                                <tr>
-                                    <th className="fw-semibold py-3">ID</th>
-                                    <th className="fw-semibold py-3">Proveedor</th>
-                                    <th className="fw-semibold py-3">Fecha</th>
-                                    <th className="fw-semibold py-3">N° Factura</th>
-                                    <th className="fw-semibold py-3">Estado</th>
-                                    <th className="fw-semibold py-3">Total</th>
-                                    <th className="fw-semibold py-3">Factura</th>
-                                    <th className="fw-semibold py-3">Detalles</th>
-                                    <th className="fw-semibold py-3" style={{ width: '160px' }}>Acciones</th>
-                                </tr>
-                            </thead>
-                <tbody>
-                    {entradas?.map((entrada) => (
-                        <tr key={entrada.idEntrada}>
-                            <td>{entrada.idEntrada}</td>
-                            <td>{entrada.proveedor?.nombre}</td>
-                            <td>{entrada.fechaEntrada}</td>
-                            <td>
-                                <span className="fw-medium text-primary">
-                                    {entrada.numeroFactura || 'Sin número'}
-                                </span>
-                            </td>
-                            <td>
-                                <Badge 
-                                    bg={
-                                        entrada.estado === 'Registrada' ? 'success' : 
-                                        entrada.estado === 'Pendiente de pago' ? 'warning' : 
-                                        'danger'
-                                    }
-                                    className="px-2 py-1"
-                                >
-                                    {entrada.estado || 'Registrada'}
-                                </Badge>
-                            </td>
-                            <td>S/{entrada.totalEntrada?.toFixed(2)}</td>
-                            <td>
-                                <div className="d-flex justify-content-center gap-1">
-                                    {entrada.facturaUrl ? (
-                                        <Button
-                                            variant="success"
-                                            size="sm"
-                                            onClick={() => handleVerFactura(entrada)}
-                                            title="Ver factura"
-                                            className="d-flex align-items-center"
-                                        >
-                                            <Eye size={14} className="me-1" />
-                                            <span className="d-none d-md-inline">Ver</span>
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant="outline-primary"
-                                            size="sm"
-                                            onClick={() => handleSubirFactura(entrada)}
-                                            title="Subir factura"
-                                            className="d-flex align-items-center"
-                                        >
-                                            <Upload size={14} className="me-1" />
-                                            <span className="d-none d-md-inline">Subir</span>
-                                        </Button>
-                                    )}
-                                </div>
-                            </td>
-                            <td>
-                                <Table size="sm" bordered>
-                                    <thead>
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th>Cantidad</th>
-                                            <th>Precio Unitario</th>
-                                            <th>Subtotal</th>
+                <div className="card shadow-sm border-0">
+                    <div className="card-header bg-white border-0 py-3">
+                        <h5 className="mb-0 text-dark fw-semibold">
+                            Lista de Entradas
+                            {entradas.length > 0 && (
+                                <span className="badge bg-primary ms-2">{entradas.length}</span>
+                            )}
+                        </h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <Table hover className="mb-0">
+                                <thead className="table-light text-center">
+                                    <tr>
+                                        <th className="fw-semibold py-3">ID</th>
+                                        <th className="fw-semibold py-3">Proveedor</th>
+                                        <th className="fw-semibold py-3">Fecha</th>
+                                        <th className="fw-semibold py-3">N° Factura</th>
+                                        <th className="fw-semibold py-3">Estado</th>
+                                        <th className="fw-semibold py-3">Total</th>
+                                        <th className="fw-semibold py-3">Factura</th>
+                                        <th className="fw-semibold py-3">Detalles</th>
+                                        <th className="fw-semibold py-3" style={{ width: '160px' }}>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {entradas?.map((entrada) => (
+                                        <tr key={entrada.idEntrada}>
+                                            <td>{entrada.idEntrada}</td>
+                                            <td>{entrada.proveedor?.nombre}</td>
+                                            <td>{entrada.fechaEntrada}</td>
+                                            <td>
+                                                <span className="fw-medium text-primary">
+                                                    {entrada.numeroFactura || 'Sin número'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <Badge
+                                                    bg={
+                                                        entrada.estado === 'Registrada' ? 'success' :
+                                                            entrada.estado === 'Pendiente de pago' ? 'warning' :
+                                                                'danger'
+                                                    }
+                                                    className="px-2 py-1"
+                                                >
+                                                    {entrada.estado || 'Registrada'}
+                                                </Badge>
+                                            </td>
+                                            <td>S/{entrada.totalEntrada?.toFixed(2)}</td>
+                                            <td>
+                                                <div className="d-flex justify-content-center gap-1">
+                                                    {entrada.facturaUrl ? (
+                                                        <Button
+                                                            variant="success"
+                                                            size="sm"
+                                                            onClick={() => handleVerFactura(entrada)}
+                                                            title="Ver factura"
+                                                            className="d-flex align-items-center"
+                                                        >
+                                                            <Eye size={14} className="me-1" />
+                                                            <span className="d-none d-md-inline">Ver</span>
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            variant="outline-primary"
+                                                            size="sm"
+                                                            onClick={() => handleSubirFactura(entrada)}
+                                                            title="Subir factura"
+                                                            className="d-flex align-items-center"
+                                                        >
+                                                            <Upload size={14} className="me-1" />
+                                                            <span className="d-none d-md-inline">Subir</span>
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <Table size="sm" bordered>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Producto</th>
+                                                            <th>Cantidad</th>
+                                                            <th>Precio Unitario</th>
+                                                            <th>Subtotal</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {entrada.detalles?.map((detalle, idx) => (
+                                                            <tr key={idx}>
+                                                                <td>{detalle.producto?.nombreProducto}</td>
+                                                                <td>{detalle.cantidad}</td>
+                                                                <td>S/{detalle.precioUnitario}</td>
+                                                                <td>S/{detalle.subtotal}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </Table>
+                                            </td>
+                                            <td>
+                                                <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                                    <Button
+                                                        variant="outline-warning"
+                                                        size="sm"
+                                                        onClick={() => handleEditar(entrada)}
+                                                        title="Editar entrada"
+                                                        disabled={cargando}
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                    >
+                                                        <Edit size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Editar</span>
+                                                    </Button>
+
+                                                    <Button
+                                                        variant="outline-danger"
+                                                        size="sm"
+                                                        onClick={() => handleEliminacion(entrada.idEntrada)}
+                                                        title="Eliminar entrada"
+                                                        disabled={cargando}
+                                                        className="btn-sm shadow-sm"
+                                                        style={{ minWidth: '32px' }}
+                                                    >
+                                                        <Trash2 size={12} />
+                                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
+                                                    </Button>
+                                                </div>
+                                            </td>
+
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {entrada.detalles?.map((detalle, idx) => (
-                                            <tr key={idx}>
-                                                <td>{detalle.producto?.nombreProducto}</td>
-                                                <td>{detalle.cantidad}</td>
-                                                <td>S/{detalle.precioUnitario}</td>
-                                                <td>S/{detalle.subtotal}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </td>
-                            <td>
-                                <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                    <Button
-                                        variant="outline-warning"
-                                        size="sm"
-                                        onClick={() => handleEditar(entrada)}
-                                        title="Editar entrada"
-                                        disabled={cargando}
-                                        className="btn-sm shadow-sm"
-                                        style={{ minWidth: '32px' }}
-                                    >
-                                        <Edit size={12} />
-                                        <span className="d-none d-xl-inline ms-1">Editar</span>
-                                    </Button>
-
-                                    <Button
-                                        variant="outline-danger"
-                                        size="sm"
-                                        onClick={() => handleEliminacion(entrada.idEntrada)}
-                                        title="Eliminar entrada"
-                                        disabled={cargando}
-                                        className="btn-sm shadow-sm"
-                                        style={{ minWidth: '32px' }}
-                                    >
-                                        <Trash2 size={12} />
-                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                    </Button>
-                                </div>
-                            </td>
-
-                        </tr>
-                    ))}
-                </tbody>
-                        </Table>
+                                    ))}
+                                </tbody>
+                            </Table>
+                        </div>
                     </div>
                 </div>
-            </div>
             )}
 
             {/* Modal Agregar */}
@@ -505,12 +505,12 @@ function ListarEntradas() {
                     <p><strong>Proveedor:</strong> {entradaFactura?.proveedor?.nombre}</p>
                     <p><strong>Fecha:</strong> {entradaFactura?.fechaEntrada}</p>
                     <p><strong>N° Factura:</strong> {entradaFactura?.numeroFactura || 'Sin número'}</p>
-                    <p><strong>Estado:</strong> 
-                        <Badge 
+                    <p><strong>Estado:</strong>
+                        <Badge
                             bg={
-                                entradaFactura?.estado === 'Registrada' ? 'success' : 
-                                entradaFactura?.estado === 'Pendiente de pago' ? 'warning' : 
-                                'danger'
+                                entradaFactura?.estado === 'Registrada' ? 'success' :
+                                    entradaFactura?.estado === 'Pendiente de pago' ? 'warning' :
+                                        'danger'
                             }
                             className="ms-2"
                         >

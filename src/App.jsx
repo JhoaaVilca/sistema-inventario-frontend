@@ -18,10 +18,10 @@ function App() {
                     <Route path="/productos" element={<ListarProductos />} />
                     <Route path="/categoria/:categoriaId" element={<ProductosPorCategoria />} />
                     <Route path="/categorias" element={<ListarCategorias />} />
-                    <Route path='/proveedores' element={<ListarProveedores/>}/>
-                    <Route path='/clientes' element={<ListarClientes/>}/>
-                    <Route path='/entradas' element={<ListarEntradas/>}/>
-                    <Route path='/salidas' element={<ListarSalidas/>}/>
+                    <Route path='/proveedores' element={<ListarProveedores />} />
+                    <Route path='/clientes' element={<ListarClientes />} />
+                    <Route path='/entradas' element={<ListarEntradas />} />
+                    <Route path='/salidas' element={<ListarSalidas />} />
                 </Routes>
             </Layout>
         </Router>

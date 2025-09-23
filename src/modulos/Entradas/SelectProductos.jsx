@@ -10,7 +10,7 @@ function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar product
     const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
     const [cargando, setCargando] = useState(true);
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
-    
+
     const inputRef = useRef(null);
     const timeoutRef = useRef(null);
 
@@ -103,7 +103,7 @@ function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar product
                     {productoSeleccionado ? <X size={16} /> : <Search size={16} />}
                 </Button>
             </div>
-            
+
             {/* Texto de ayuda */}
             {!productoSeleccionado && query.length === 0 && (
                 <small className="text-muted mt-1 d-block">

@@ -230,90 +230,90 @@ function ListarSalidas() {
                                     <th className="fw-semibold py-3" style={{ width: '120px' }}>Acciones</th>
                                 </tr>
                             </thead>
-                <tbody>
-                    {salidas?.map((salida) => (
-                        <tr key={salida.idSalida}>
-                            <td>{salida.idSalida}</td>
-                            <td>{salida.fechaSalida}</td>
-                            <td>
-                                {salida.nombreCliente ? (
-                                    <div>
-                                        <strong>{salida.dniCliente}</strong>
-                                        <br />
-                                        <small>{salida.nombreCliente}</small>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <span className="text-muted">Sin cliente</span>
-                                        <br />
-                                        <Button 
-                                            variant="outline-primary" 
-                                            size="sm" 
-                                            className="mt-1"
-                                            onClick={() => handleAsignarCliente(salida.idSalida)}
-                                        >
-                                            Asignar Cliente
-                                        </Button>
-                                    </div>
-                                )}
-                            </td>
-                            <td>
-                                <Badge bg={salida.tipoVenta === 'CONTADO' ? 'success' : 'warning'}>
-                                    {salida.tipoVenta || 'CONTADO'}
-                                </Badge>
-                            </td>
-                            <td>S/{salida.totalSalida?.toFixed(2)}</td>
-                            <td>
-                                <Table size="sm" bordered>
-                                    <thead>
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th>Cantidad</th>
-                                            <th>Precio Unitario</th>
-                                            <th>Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {salida.detalles?.map((detalle, idx) => (
-                                            <tr key={idx}>
-                                                <td>{detalle.nombreProducto}</td>
-                                                <td>{detalle.cantidad}</td>
-                                                <td>S/{detalle.precioUnitario}</td>
-                                                <td>S/{detalle.subtotal}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            </td>
-                            <td>
-                                <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                    <Button
-                                        variant="outline-warning"
-                                        size="sm"
-                                        onClick={() => handleEditar(salida)}
-                                        title="Ver/Editar salida"
-                                        className="btn-sm shadow-sm"
-                                        style={{ minWidth: '32px' }}
-                                    >
-                                        <Edit size={12} />
-                                        <span className="d-none d-xl-inline ms-1">Ver/Editar</span>
-                                    </Button>
-                                    <Button
-                                        variant="outline-danger"
-                                        size="sm"
-                                        onClick={() => handleEliminacion(salida.idSalida)}
-                                        title="Eliminar salida"
-                                        className="btn-sm shadow-sm"
-                                        style={{ minWidth: '32px' }}
-                                    >
-                                        <Trash2 size={12} />
-                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                    </Button>
-                                </div>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
+                            <tbody>
+                                {salidas?.map((salida) => (
+                                    <tr key={salida.idSalida}>
+                                        <td>{salida.idSalida}</td>
+                                        <td>{salida.fechaSalida}</td>
+                                        <td>
+                                            {salida.nombreCliente ? (
+                                                <div>
+                                                    <strong>{salida.dniCliente}</strong>
+                                                    <br />
+                                                    <small>{salida.nombreCliente}</small>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    <span className="text-muted">Sin cliente</span>
+                                                    <br />
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        size="sm"
+                                                        className="mt-1"
+                                                        onClick={() => handleAsignarCliente(salida.idSalida)}
+                                                    >
+                                                        Asignar Cliente
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td>
+                                            <Badge bg={salida.tipoVenta === 'CONTADO' ? 'success' : 'warning'}>
+                                                {salida.tipoVenta || 'CONTADO'}
+                                            </Badge>
+                                        </td>
+                                        <td>S/{salida.totalSalida?.toFixed(2)}</td>
+                                        <td>
+                                            <Table size="sm" bordered>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Producto</th>
+                                                        <th>Cantidad</th>
+                                                        <th>Precio Unitario</th>
+                                                        <th>Subtotal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {salida.detalles?.map((detalle, idx) => (
+                                                        <tr key={idx}>
+                                                            <td>{detalle.nombreProducto}</td>
+                                                            <td>{detalle.cantidad}</td>
+                                                            <td>S/{detalle.precioUnitario}</td>
+                                                            <td>S/{detalle.subtotal}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </td>
+                                        <td>
+                                            <div className="d-flex justify-content-center gap-1 flex-wrap">
+                                                <Button
+                                                    variant="outline-warning"
+                                                    size="sm"
+                                                    onClick={() => handleEditar(salida)}
+                                                    title="Ver/Editar salida"
+                                                    className="btn-sm shadow-sm"
+                                                    style={{ minWidth: '32px' }}
+                                                >
+                                                    <Edit size={12} />
+                                                    <span className="d-none d-xl-inline ms-1">Ver/Editar</span>
+                                                </Button>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleEliminacion(salida.idSalida)}
+                                                    title="Eliminar salida"
+                                                    className="btn-sm shadow-sm"
+                                                    style={{ minWidth: '32px' }}
+                                                >
+                                                    <Trash2 size={12} />
+                                                    <span className="d-none d-xl-inline ms-1">Eliminar</span>
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
                         </Table>
                     </div>
                 </div>

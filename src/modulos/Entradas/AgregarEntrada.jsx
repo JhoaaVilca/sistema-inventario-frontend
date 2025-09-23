@@ -67,15 +67,15 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                 estado,
                 detalles: productosEntrada
             });
-            
+
             // Guardar la entrada creada para subir factura después
             setEntradaCreada(data);
-            
+
             // Si hay archivo de factura, subirlo
             if (archivoFactura) {
                 await subirFactura(data.idEntrada);
             }
-            
+
             onEntradaAgregada();
             handleClose();
         } catch (error) {
@@ -152,7 +152,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
         const subtotal = productosEntrada.reduce((acc, detalle) => acc + (detalle.subtotal || 0), 0);
         const igv = subtotal * 0.18; // 18% IGV
         const total = subtotal + igv;
-        
+
         return {
             totalProductos,
             subtotal,
@@ -259,8 +259,8 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                     </Col>
                 </Row>
 
-                <TablaProductosEntrada 
-                    productosEntrada={productosEntrada} 
+                <TablaProductosEntrada
+                    productosEntrada={productosEntrada}
                     setProductosEntrada={setProductosEntrada}
                     onProductoAgregado={mostrarToast}
                 />
@@ -274,7 +274,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                     <FileText size={20} className="me-2" />
                     Factura del Proveedor (Opcional)
                 </h6>
-                
+
                 <Row>
                     <Col md={8}>
                         <Form.Group className="mb-3">
@@ -347,42 +347,42 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                             <Row>
                                 <Col md={6}>
                                     <div className="mb-2">
-                                        <strong>Proveedor:</strong> 
+                                        <strong>Proveedor:</strong>
                                         <span className="text-muted ms-2">
                                             {proveedores.find(p => p.idProveedor === parseInt(idProveedor))?.nombre || 'No seleccionado'}
                                         </span>
                                     </div>
                                     <div className="mb-2">
-                                        <strong>Fecha:</strong> 
+                                        <strong>Fecha:</strong>
                                         <span className="text-muted ms-2">{fechaEntrada || 'No seleccionada'}</span>
                                     </div>
                                     <div className="mb-2">
-                                        <strong>N° Factura:</strong> 
+                                        <strong>N° Factura:</strong>
                                         <span className="text-muted ms-2">{numeroFactura || 'No ingresado'}</span>
                                     </div>
                                     <div className="mb-2">
-                                        <strong>Estado:</strong> 
+                                        <strong>Estado:</strong>
                                         <Badge bg={estado === 'Registrada' ? 'success' : estado === 'Pendiente de pago' ? 'warning' : 'danger'} className="ms-2">
                                             {estado}
                                         </Badge>
                                     </div>
                                     <div className="mb-2">
-                                        <strong>Total de Productos:</strong> 
+                                        <strong>Total de Productos:</strong>
                                         <Badge bg="info" className="ms-2">{calcularResumen().totalProductos}</Badge>
                                     </div>
                                 </Col>
                                 <Col md={6}>
                                     <div className="text-end">
                                         <div className="mb-2">
-                                            <strong>Subtotal:</strong> 
+                                            <strong>Subtotal:</strong>
                                             <span className="text-muted ms-2">S/ {calcularResumen().subtotal.toFixed(2)}</span>
                                         </div>
                                         <div className="mb-2">
-                                            <strong>IGV (18%):</strong> 
+                                            <strong>IGV (18%):</strong>
                                             <span className="text-muted ms-2">S/ {calcularResumen().igv.toFixed(2)}</span>
                                         </div>
                                         <div className="border-top pt-2">
-                                            <strong className="text-primary fs-5">Total a Pagar:</strong> 
+                                            <strong className="text-primary fs-5">Total a Pagar:</strong>
                                             <span className="text-primary fs-5 ms-2">S/ {calcularResumen().total.toFixed(2)}</span>
                                         </div>
                                     </div>
@@ -411,7 +411,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                                     </div>
                                 ) : (
                                     <div>
-                                        ✅ Formulario completo<br/>
+                                        ✅ Formulario completo<br />
                                         Listo para guardar
                                     </div>
                                 )}
@@ -419,10 +419,10 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                         }
                     >
                         <span>
-                            <Button 
-                                variant={esFormularioValido() ? "primary" : "outline-secondary"} 
-                                onClick={handleGuardar} 
-                                disabled={guardando || !esFormularioValido()} 
+                            <Button
+                                variant={esFormularioValido() ? "primary" : "outline-secondary"}
+                                onClick={handleGuardar}
+                                disabled={guardando || !esFormularioValido()}
                                 className="w-100 w-sm-auto"
                             >
                                 {guardando ? (
@@ -450,9 +450,9 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                             <strong className="me-auto">
                                 {toastType === 'success' ? '✅ Éxito' : '❌ Error'}
                             </strong>
-                            <button 
-                                type="button" 
-                                className="btn-close btn-close-white" 
+                            <button
+                                type="button"
+                                className="btn-close btn-close-white"
                                 onClick={() => setShowToast(false)}
                             ></button>
                         </div>

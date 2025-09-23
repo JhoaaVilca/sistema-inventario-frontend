@@ -10,7 +10,7 @@ function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar produ
     const [cargando, setCargando] = useState(false);
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
     const [todosProductos, setTodosProductos] = useState([]);
-    
+
     const inputRef = useRef(null);
     const timeoutRef = useRef(null);
 
@@ -38,7 +38,7 @@ function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar produ
         const productosFiltrados = todosProductos.filter(producto =>
             producto.nombreProducto.toLowerCase().includes(searchQuery.toLowerCase())
         );
-        
+
         setProductos(productosFiltrados.slice(0, 10)); // Limitar a 10 resultados
         setMostrarSugerencias(true);
     };
