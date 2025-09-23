@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, InputGroup, Toast, ToastContainer } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
     const [proveedor, setProveedor] = useState({
@@ -34,8 +34,8 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
         }
 
         try {
-            const response = await axios.get(
-                `http://localhost:8080/api/proveedores/consultar?tipo=${proveedor.tipoDocumento}&numero=${proveedor.numeroDocumento}`
+            const response = await apiClient.get(
+                `/proveedores/consultar`, { params: { tipo: proveedor.tipoDocumento, numero: proveedor.numeroDocumento } }
             );
 
             if (response.data && response.data.data) {
@@ -62,7 +62,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
         const { estado, ...proveedorSinEstado } = proveedor;
 
         try {
-            const response = await axios.post("http://localhost:8080/api/proveedores", proveedorSinEstado);
+            const response = await apiClient.post("/proveedores", proveedorSinEstado);
 
             if (response && response.data) {
                 onProveedorAdded(response.data);

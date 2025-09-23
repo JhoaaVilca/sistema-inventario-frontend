@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Form, Spinner, Alert, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 import { useCategorias } from "./useCategorias";
 
 const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
@@ -67,8 +67,8 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
         };
 
         try {
-            const response = await axios.put(
-                `http://localhost:8080/api/productos/${producto.idProducto}`,
+            const response = await apiClient.put(
+                `/productos/${producto.idProducto}`,
                 productoActualizado
             );
 
@@ -252,18 +252,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={6}>
-                            <Form.Group controlId="formEsPerecible" className="mb-3">
-                                <Form.Label>¿El producto vence?</Form.Label>
-                                <Form.Select
-                                    value={esPerecible}
-                                    onChange={(e) => setEsPerecible(e.target.value === "true")}
-                                >
-                                    <option value={false}>No vence</option>
-                                    <option value={true}>Sí vence</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
+                        
                     </Row>
 
                     {/* Fecha de Vencimiento (condicional) */}

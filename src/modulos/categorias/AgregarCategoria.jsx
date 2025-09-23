@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
     const [nombre, setNombre] = useState("");
@@ -40,7 +40,7 @@ function AgregarCategoria({ show, handleClose, onCategoriaAdded }) {
                 activo: activo
             };
 
-            await axios.post("http://localhost:8080/api/categorias", nuevaCategoria);
+            await apiClient.post("/categorias", nuevaCategoria);
             
             // Limpiar formulario y cerrar modal
             setNombre("");

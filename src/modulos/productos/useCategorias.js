@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../servicios/apiClient';
 
 export const useCategorias = () => {
     const [categorias, setCategorias] = useState([]);
@@ -10,8 +10,8 @@ export const useCategorias = () => {
         setLoading(true);
         try {
             // Usar el endpoint de categorías activas para productos
-            const response = await axios.get("http://localhost:8080/api/categorias/activas");
-            setCategorias(response.data);
+            const { data } = await apiClient.get("/categorias/activas");
+            setCategorias(data);
             setError("");
         } catch (error) {
             console.error("Error al obtener categorías activas:", error);

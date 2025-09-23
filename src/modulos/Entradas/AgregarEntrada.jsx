@@ -2,7 +2,7 @@
 
 import { Modal, Button, Form, Alert, Row, Col, Card, Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 import TablaProductosEntrada from "./TablaProductosEntrada";
 import { Upload, Eye, FileText, X, CheckCircle, AlertCircle, Info } from "lucide-react";
 
@@ -26,10 +26,8 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
     useEffect(() => {
         const obtenerProveedores = async () => {
             try {
-                const response = await axios.get(
-                    "http://localhost:8080/api/proveedores/activos"
-                );
-                setProveedores(response.data);
+                const { data } = await apiClient.get("/proveedores/activos");
+                setProveedores(data);
             } catch (error) {
                 console.error("Error al obtener proveedores:", error);
             }
@@ -60,7 +58,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
 
         try {
             setGuardando(true);
-            const response = await axios.post("http://localhost:8080/api/entradas", {
+            const { data } = await apiClient.post("/entradas", {
                 proveedor: { idProveedor: parseInt(idProveedor) },
                 fechaEntrada,
                 totalEntrada,
@@ -71,11 +69,11 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
             });
             
             // Guardar la entrada creada para subir factura después
-            setEntradaCreada(response.data);
+            setEntradaCreada(data);
             
             // Si hay archivo de factura, subirlo
             if (archivoFactura) {
-                await subirFactura(response.data.idEntrada);
+                await subirFactura(data.idEntrada);
             }
             
             onEntradaAgregada();
@@ -95,8 +93,8 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
         formData.append('file', archivoFactura);
 
         try {
-            await axios.post(
-                `http://localhost:8080/api/entradas/${idEntrada}/factura`,
+            await apiClient.post(
+                `/entradas/${idEntrada}/factura`,
                 formData,
                 {
                     headers: {

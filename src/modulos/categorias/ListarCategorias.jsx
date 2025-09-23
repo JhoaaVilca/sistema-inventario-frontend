@@ -13,7 +13,7 @@ import {
     ToastContainer,
     Badge
 } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function ListarCategorias() {
     const navigate = useNavigate();
@@ -38,8 +38,8 @@ function ListarCategorias() {
     const obtenerCategorias = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/categorias");
-            setCategorias(response.data);
+            const { data } = await apiClient.get("/categorias");
+            setCategorias(data);
             setError("");
         } catch (error) {
             console.error("Error al obtener categorías:", error);
@@ -52,7 +52,7 @@ function ListarCategorias() {
     const eliminarCategoria = async (id) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
             try {
-                await axios.delete(`http://localhost:8080/api/categorias/${id}`);
+                await apiClient.delete(`/categorias/${id}`);
                 mostrarNotificacion("Categoría eliminada exitosamente", "success");
                 obtenerCategorias();
             } catch (error) {

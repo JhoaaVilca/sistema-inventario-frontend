@@ -3,7 +3,7 @@ import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer, B
 import { Edit, Trash2, Search, X, User, Plus } from "lucide-react";
 import AgregarCliente from "./AgregarCliente";
 import EditarCliente from "./EditarCliente";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 const ListarClientes = () => {
     const [clientes, setClientes] = useState([]);
@@ -28,9 +28,9 @@ const ListarClientes = () => {
         setLoading(true);
         try {
             console.log("Cargando clientes...");
-            const response = await axios.get("http://localhost:8080/api/clientes");
-            console.log("Clientes recibidos:", response.data);
-            setClientes(response.data);
+            const { data } = await apiClient.get("/clientes");
+            console.log("Clientes recibidos:", data);
+            setClientes(data);
             setError("");
         } catch (err) {
             console.error("Error al cargar clientes:", err);
@@ -43,7 +43,7 @@ const ListarClientes = () => {
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este cliente?")) {
             try {
-                await axios.delete(`http://localhost:8080/api/clientes/${id}`);
+                await apiClient.delete(`/clientes/${id}`);
                 mostrarNotificacion("Cliente eliminado exitosamente", "success");
                 cargarClientes();
             } catch (err) {

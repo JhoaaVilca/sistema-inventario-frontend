@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Form, ListGroup, Button, Dropdown } from "react-bootstrap";
 import { Search, X, ChevronDown } from "lucide-react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar producto..." }) {
     const [query, setQuery] = useState("");
@@ -18,8 +18,8 @@ function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar produ
     useEffect(() => {
         const cargarProductos = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/api/productos");
-                setTodosProductos(response.data);
+                const { data } = await apiClient.get("/productos");
+                setTodosProductos(data);
             } catch (error) {
                 console.error("Error al cargar productos:", error);
             }

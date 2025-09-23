@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Button, Alert, Spinner, Dropdown } from "react-bootstrap";
 import { Search, User, CheckCircle } from "lucide-react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 const BusquedaCliente = ({ 
     onClienteSeleccionado, 
@@ -27,8 +27,8 @@ const BusquedaCliente = ({
     const cargarClientes = async () => {
         setLoadingClientes(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/clientes/activos");
-            setClientes(response.data);
+            const { data } = await apiClient.get("/clientes/activos");
+            setClientes(data);
         } catch (err) {
             console.error("Error al cargar clientes:", err);
         } finally {
@@ -47,36 +47,35 @@ const BusquedaCliente = ({
         setError("");
         
         try {
-            const response = await axios.get(`http://localhost:8080/api/clientes/buscar-dni/${dni}`);
+            const { data } = await apiClient.get(`/clientes/buscar-dni/${dni}`);
             
-            if (response.data.existeEnBD) {
+            if (data.existeEnBD) {
                 // Cliente encontrado en BD local
-                setClienteEncontrado(response.data);
+                setClienteEncontrado(data);
                 onClienteSeleccionado({
-                    idCliente: response.data.idCliente,
-                    dni: response.data.dni,
-                    nombres: response.data.nombres,
-                    apellidos: response.data.apellidos,
-                    direccion: response.data.direccion,
-                    telefono: response.data.telefono,
-                    email: response.data.email
+                    idCliente: data.idCliente,
+                    dni: data.dni,
+                    nombres: data.nombres,
+                    apellidos: data.apellidos,
+                    direccion: data.direccion,
+                    telefono: data.telefono,
+                    email: data.email
                 });
-            } else if (response.data.nombres) {
+            } else if (data.nombres) {
                 // Cliente encontrado en RENIEC - Agregarlo automáticamente a la BD
                 console.log("Cliente encontrado en RENIEC, agregando a BD local...");
                 
                 try {
                     const clienteData = {
-                        dni: response.data.dni,
-                        nombres: response.data.nombres,
-                        apellidos: response.data.apellidos,
-                        direccion: response.data.direccion,
-                        telefono: response.data.telefono,
-                        email: response.data.email
+                        dni: data.dni,
+                        nombres: data.nombres,
+                        apellidos: data.apellidos,
+                        direccion: data.direccion,
+                        telefono: data.telefono,
+                        email: data.email
                     };
                     
-                    const clienteResponse = await axios.post("http://localhost:8080/api/clientes", clienteData);
-                    const clienteGuardado = clienteResponse.data;
+                    const { data: clienteGuardado } = await apiClient.post("/clientes", clienteData);
                     
                     console.log("Cliente agregado automáticamente:", clienteGuardado);
                     

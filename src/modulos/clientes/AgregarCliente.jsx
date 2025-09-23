@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { User, Search, CheckCircle, AlertCircle } from "lucide-react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null }) => {
     const [formData, setFormData] = useState({
@@ -69,27 +69,27 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
         setError("");
         
         try {
-            const response = await axios.get(`http://localhost:8080/api/clientes/buscar-dni/${formData.dni}`);
+            const { data } = await apiClient.get(`/clientes/buscar-dni/${formData.dni}`);
             
-            if (response.data.existeEnBD) {
+            if (data.existeEnBD) {
                 // Cliente ya existe en BD
                 setDniValidation('found');
-                setClienteEncontrado(response.data);
+                setClienteEncontrado(data);
                 setFormData(prev => ({
                     ...prev,
-                    nombres: response.data.nombres,
-                    apellidos: response.data.apellidos,
-                    direccion: response.data.direccion || ""
+                    nombres: data.nombres,
+                    apellidos: data.apellidos,
+                    direccion: data.direccion || ""
                 }));
-            } else if (response.data.nombres) {
+            } else if (data.nombres) {
                 // Cliente encontrado en RENIEC
                 setDniValidation('valid');
-                setClienteEncontrado(response.data);
+                setClienteEncontrado(data);
                 setFormData(prev => ({
                     ...prev,
-                    nombres: response.data.nombres,
-                    apellidos: response.data.apellidos,
-                    direccion: response.data.direccion || ""
+                    nombres: data.nombres,
+                    apellidos: data.apellidos,
+                    direccion: data.direccion || ""
                 }));
             } else {
                 // DNI no encontrado
@@ -123,9 +123,9 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8080/api/clientes", formData);
+            const { data } = await apiClient.post("/clientes", formData);
             // Pasar el cliente creado al callback
-            onClienteAgregado(response.data);
+            onClienteAgregado(data);
         } catch (err) {
             console.error("Error al crear cliente:", err);
             if (err.response?.data?.error) {

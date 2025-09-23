@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Alert, Toast, ToastContainer, Spinner } from 'react-bootstrap';
 import { ArrowLeft, Package, Edit, Trash2 } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '../../servicios/apiClient';
 import EditarProducto from './EditarProductos';
 
 const ProductosPorCategoria = () => {
@@ -28,8 +28,8 @@ const ProductosPorCategoria = () => {
         try {
             // Cargar todos los productos y categorías
             const [productosResponse, categoriasResponse] = await Promise.all([
-                axios.get("http://localhost:8080/api/productos"),
-                axios.get("http://localhost:8080/api/categorias")
+                apiClient.get("/productos"),
+                apiClient.get("/categorias")
             ]);
 
             // Filtrar productos por categoría
@@ -56,7 +56,7 @@ const ProductosPorCategoria = () => {
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
             try {
-                await axios.delete(`http://localhost:8080/api/productos/${id}`);
+                await apiClient.delete(`/productos/${id}`);
                 mostrarNotificacion("Producto eliminado exitosamente", "success");
                 cargarDatos();
             } catch (err) {

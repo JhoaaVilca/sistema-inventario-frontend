@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, Form, Table, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function TablaProductosSalida({ productosSalida, setProductosSalida }) {
     const [productos, setProductos] = useState([]);
@@ -11,8 +11,8 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
     useEffect(() => {
         const obtenerProductos = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/api/productos");
-                setProductos(response.data);
+                const { data } = await apiClient.get("/productos");
+                setProductos(data);
             } catch (error) {
                 console.error("Error al obtener productos:", error);
             }

@@ -1,6 +1,6 @@
 import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 import TablaProductosSalida from "./TablaProductosSalida";
 import BusquedaCliente from "../clientes/BusquedaCliente";
 
@@ -64,7 +64,7 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada }) {
         }
 
         try {
-            await axios.put(`http://localhost:8080/api/salidas/${salida.idSalida}`, {
+            await apiClient.put(`/salidas/${salida.idSalida}`, {
                 fechaSalida,
                 cliente: { idCliente: clienteSeleccionado.idCliente },
                 tipoVenta,

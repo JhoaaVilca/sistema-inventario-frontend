@@ -3,7 +3,7 @@ import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer, M
 import { Edit, Trash2, Search, X, Package, Plus, AlertTriangle, Clock, DollarSign, Filter, Eye } from "lucide-react";
 import AgregarProducto from "./AgregarProductos";
 import EditarProducto from "./EditarProductos";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 import { loteService } from "../../servicios/loteService";
 
 const ListarProductos = () => {
@@ -96,8 +96,8 @@ const ListarProductos = () => {
     const cargarProductos = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/productos");
-            setProductos(response.data);
+            const { data } = await apiClient.get("/productos");
+            setProductos(data);
             setError("");
         } catch (err) {
             console.error("Error al cargar productos:", err);
@@ -110,7 +110,7 @@ const ListarProductos = () => {
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este producto?")) {
             try {
-                await axios.delete(`http://localhost:8080/api/productos/${id}`);
+                await apiClient.delete(`/productos/${id}`);
                 mostrarNotificacion("Producto eliminado exitosamente", "success");
                 cargarProductos();
             } catch (err) {

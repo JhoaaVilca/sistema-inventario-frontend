@@ -1,6 +1,6 @@
 import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 import TablaProductosEntrada from "./TablaProductosEntrada";
 import { Upload, Eye, FileText, X } from "lucide-react";
 
@@ -20,8 +20,8 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
     useEffect(() => {
         const obtenerProveedores = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/api/proveedores/activos");
-                setProveedores(response.data);
+                const { data } = await apiClient.get("/proveedores/activos");
+                setProveedores(data);
             } catch (error) {
                 console.error("Error al obtener proveedores:", error);
             }
@@ -53,7 +53,7 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
 
         try {
             setGuardando(true);
-            await axios.put(`http://localhost:8080/api/entradas/${entrada.idEntrada}`, {
+            await apiClient.put(`/entradas/${entrada.idEntrada}`, {
                 proveedor: { idProveedor: parseInt(idProveedor) },
                 fechaEntrada,
                 totalEntrada,
@@ -85,8 +85,8 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
         formData.append('file', archivoFactura);
 
         try {
-            await axios.post(
-                `http://localhost:8080/api/entradas/${idEntrada}/factura`,
+            await apiClient.post(
+                `/entradas/${idEntrada}/factura`,
                 formData,
                 {
                     headers: {

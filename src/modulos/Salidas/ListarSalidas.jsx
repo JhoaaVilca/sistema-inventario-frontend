@@ -3,6 +3,7 @@ import { Table, Button, Form, Card, Badge, Collapse, Alert } from "react-bootstr
 import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
 import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2 } from "lucide-react";
+import apiClient from "../../servicios/apiClient";
 
 function ListarSalidas() {
     const [salidas, setSalidas] = useState([]);
@@ -18,8 +19,7 @@ function ListarSalidas() {
     const obtenerSalidas = async () => {
         try {
             setErrorListado("");
-            const response = await fetch("http://localhost:8080/api/salidas");
-            const data = await response.json();
+            const { data } = await apiClient.get("/salidas");
             setSalidas(data);
         } catch (error) {
             console.error("Error al obtener salidas:", error);
@@ -29,12 +29,11 @@ function ListarSalidas() {
 
     const filtrarSalidas = async () => {
         try {
-            let url = `http://localhost:8080/api/salidas`;
+            let url = `/salidas`;
             if (fechaInicio && fechaFin) {
                 url += `/filtrar/rango?inicio=${fechaInicio}&fin=${fechaFin}`;
             }
-            const response = await fetch(url);
-            const data = await response.json();
+            const { data } = await apiClient.get(url);
             setSalidas(data);
             setFiltrosActivos(Boolean(fechaInicio && fechaFin));
         } catch (error) {
@@ -83,7 +82,7 @@ function ListarSalidas() {
         if (!window.confirm("¿Seguro que quieres eliminar esta salida?")) return;
 
         try {
-            await fetch(`http://localhost:8080/api/salidas/${idSalida}`, { method: "DELETE" });
+            await apiClient.delete(`/salidas/${idSalida}`);
             obtenerSalidas();
         } catch (error) {
             console.error("Error al eliminar salida:", error);

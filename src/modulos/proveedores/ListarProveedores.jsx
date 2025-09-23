@@ -11,7 +11,7 @@ import {
     Toast,
     ToastContainer
 } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function ListarProveedores() {
     const [proveedores, setProveedores] = useState([]);
@@ -35,8 +35,8 @@ function ListarProveedores() {
     const obtenerProveedores = async () => {
         setLoading(true);
         try {
-            const response = await axios.get("http://localhost:8080/api/proveedores");
-            setProveedores(response.data);
+            const { data } = await apiClient.get("/proveedores");
+            setProveedores(data);
             setError("");
         } catch (error) {
             console.error("Error al obtener proveedores:", error);
@@ -50,7 +50,7 @@ function ListarProveedores() {
     const desactivarProveedor = async (id) => {
         if (window.confirm("¿Seguro que deseas desactivar este proveedor?")) {
             try {
-                await axios.put(`http://localhost:8080/api/proveedores/${id}/desactivar`);
+                await apiClient.put(`/proveedores/${id}/desactivar`);
                 mostrarNotificacion("Proveedor desactivado exitosamente", "success");
                 obtenerProveedores();
             } catch (error) {
@@ -63,7 +63,7 @@ function ListarProveedores() {
     // 🟢 Activar proveedor
     const activarProveedor = async (id) => {
         try {
-            await axios.put(`http://localhost:8080/api/proveedores/${id}/activar`);
+            await apiClient.put(`/proveedores/${id}/activar`);
             mostrarNotificacion("Proveedor activado exitosamente", "success");
             obtenerProveedores();
         } catch (error) {

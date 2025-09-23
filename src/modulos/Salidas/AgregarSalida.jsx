@@ -1,6 +1,6 @@
 import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 import TablaProductosSalida from "./TablaProductosSalida";
 import BusquedaCliente from "../clientes/BusquedaCliente";
 
@@ -53,7 +53,7 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                 }))
             };
             
-            await axios.post("http://localhost:8080/api/salidas", dataToSend);
+            await apiClient.post("/salidas", dataToSend);
             onSalidaAgregada();
             handleClose();
         } catch (error) {

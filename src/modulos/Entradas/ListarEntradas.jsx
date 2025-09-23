@@ -3,7 +3,7 @@ import { Table, Button, Form, Card, Badge, Collapse, Alert, Spinner, Modal } fro
 import AgregarEntrada from "./AgregarEntrada";
 import EditarEntrada from "./EditarEntrada";
 import { Plus, Search, X, Filter, Calendar, Building, ChevronDown, ChevronUp, Edit, Trash2, Upload, FileText, Eye } from "lucide-react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function ListarEntradas() {
     const [entradas, setEntradas] = useState([]);
@@ -26,9 +26,7 @@ function ListarEntradas() {
         try {
             setErrorListado("");
             setCargando(true);
-            const response = await fetch("http://localhost:8080/api/entradas");
-            if (!response.ok) throw new Error("Error de servidor");
-            const data = await response.json();
+            const { data } = await apiClient.get("/entradas");
             setEntradas(data);
         } catch (error) {
             console.error("Error al obtener entradas:", error);
@@ -40,9 +38,7 @@ function ListarEntradas() {
 
     const obtenerProveedores = async () => {
         try {
-            const response = await fetch("http://localhost:8080/api/proveedores");
-            if (!response.ok) throw new Error();
-            const data = await response.json();
+            const { data } = await apiClient.get("/proveedores");
             setProveedores(data);
         } catch (error) {
             console.error("Error al obtener proveedores:", error);
@@ -53,7 +49,7 @@ function ListarEntradas() {
         try {
             setErrorListado("");
             setCargando(true);
-            let url = `http://localhost:8080/api/entradas`;
+            let url = `/entradas`;
             const params = new URLSearchParams();
             
             if (idProveedor) params.append('idProveedor', idProveedor);
@@ -65,9 +61,7 @@ function ListarEntradas() {
                 url += `/filtrar?${params.toString()}`;
             }
             
-            const response = await fetch(url);
-            if (!response.ok) throw new Error();
-            const data = await response.json();
+            const { data } = await apiClient.get(url);
             setEntradas(data);
             setFiltrosActivos(Boolean(idProveedor || numeroFactura || (fechaInicio && fechaFin)));
         } catch (error) {
@@ -122,7 +116,7 @@ function ListarEntradas() {
         if (!window.confirm("¿Seguro que quieres eliminar esta entrada?")) return;
 
         try {
-            await fetch(`http://localhost:8080/api/entradas/${idEntrada}`, { method: "DELETE" });
+            await apiClient.delete(`/entradas/${idEntrada}`);
             obtenerEntradas();
         } catch (error) {
             console.error("Error al eliminar entrada:", error);
@@ -156,8 +150,8 @@ function ListarEntradas() {
         formData.append('file', file);
 
         try {
-            const response = await axios.post(
-                `http://localhost:8080/api/entradas/${entradaFactura.idEntrada}/factura`,
+            await apiClient.post(
+                `/entradas/${entradaFactura.idEntrada}/factura`,
                 formData,
                 {
                     headers: {
@@ -178,7 +172,9 @@ function ListarEntradas() {
 
     const handleVerFactura = (entrada) => {
         if (entrada.facturaUrl) {
-            const url = `http://localhost:8080${entrada.facturaUrl}`;
+            const apiBase = apiClient.defaults.baseURL || '';
+            const backendRoot = apiBase.replace(/\/api\/?$/, '');
+            const url = `${backendRoot}${entrada.facturaUrl}`;
             window.open(url, '_blank');
         } else {
             alert('Esta entrada no tiene factura asociada');

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { User, Edit } from "lucide-react";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
     const [formData, setFormData] = useState({
@@ -49,7 +49,7 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
         setError("");
 
         try {
-            await axios.put(`http://localhost:8080/api/clientes/${cliente.idCliente}`, formData);
+            await apiClient.put(`/clientes/${cliente.idCliente}`, formData);
             onClienteEditado();
         } catch (err) {
             console.error("Error al actualizar cliente:", err);

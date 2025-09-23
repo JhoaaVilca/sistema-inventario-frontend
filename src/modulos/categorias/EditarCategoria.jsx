@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function EditarCategoria({ show, handleClose, categoria, onCategoriaEditada }) {
     const [nombre, setNombre] = useState("");
@@ -40,7 +40,7 @@ function EditarCategoria({ show, handleClose, categoria, onCategoriaEditada }) {
                 activo: activo
             };
 
-            await axios.put(`http://localhost:8080/api/categorias/${categoria.idCategoria}`, categoriaActualizada);
+            await apiClient.put(`/categorias/${categoria.idCategoria}`, categoriaActualizada);
             
             // Limpiar formulario y cerrar modal
             setNombre("");

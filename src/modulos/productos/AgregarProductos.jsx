@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 import { useCategorias } from "./useCategorias";
 
 function AgregarProductos({ show, handleClose, onProductoAdded }) {
@@ -67,7 +67,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:8080/api/productos", nuevoProducto);
+            const response = await apiClient.post("/productos", nuevoProducto);
 
             // limpiar formulario
             setNombreProducto("");

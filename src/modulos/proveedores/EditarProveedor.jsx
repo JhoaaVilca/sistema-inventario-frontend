@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import axios from "axios";
+import apiClient from "../../servicios/apiClient";
 
 function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
     const [formulario, setFormulario] = useState({
@@ -40,9 +40,9 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
 
     const buscarEstado = async (tipo, numero) => {
         try {
-            const response = await axios.get(
-                `http://localhost:8080/api/proveedores/consultar?tipo=${tipo}&numero=${numero}`
-            );
+            const response = await apiClient.get(`/proveedores/consultar`, {
+                params: { tipo, numero }
+            });
 
             if (response.data?.data?.estado) {
                 setFormulario((prev) => ({ ...prev, estado: response.data.data.estado }));
@@ -58,22 +58,9 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const respuesta = await fetch(
-                `http://localhost:8080/api/proveedores/${formulario.idProveedor}`,
-                {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(formulario),
-                }
-            );
-
-            if (respuesta.ok) {
-                const actualizado = await respuesta.json();
-                onProveedorUpdated(actualizado); // ✅ nombre correcto
-                handleClose(); // ✅ cerrar modal al guardar
-            } else {
-                console.error("Error al actualizar proveedor");
-            }
+            const { data } = await apiClient.put(`/proveedores/${formulario.idProveedor}`, formulario);
+            onProveedorUpdated(data);
+            handleClose();
         } catch (error) {
             console.error("Error de red:", error);
         }
