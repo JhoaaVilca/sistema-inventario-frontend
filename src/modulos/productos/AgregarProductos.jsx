@@ -12,7 +12,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
     const [unidadMedida, setUnidadMedida] = useState("");
     const [categoria, setCategoria] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
-    const [esPerecible, setEsPerecible] = useState(false);
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -30,7 +29,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setUnidadMedida("");
             setCategoria("");
             setFechaIngreso("");
-            setEsPerecible(false);
             setDescripcionCorta("");
             setError("");
         }
@@ -58,7 +56,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             stockMinimo: parseInt(stockMinimo, 10),
             unidadMedida,
             fechaIngreso,
-            esPerecible,
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
         };
@@ -78,7 +75,6 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setUnidadMedida("");
             setCategoria("");
             setFechaIngreso("");
-            setEsPerecible(false);
             setDescripcionCorta("");
             setError("");
 
@@ -135,7 +131,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                     </Row>
 
                     <Row>
-                        <Col md={12}>
+                        <Col md={6}>
                             <Form.Group controlId="formDescripcion" className="mb-3">
                                 <Form.Label>Descripción Corta</Form.Label>
                                 <Form.Control
@@ -147,7 +143,30 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                 />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    
+                    <Col md={6}>
+                            <Form.Group controlId="formUnidadMedida" className="mb-3">
+                                <Form.Label>Unidad de Medida <span className="text-danger">*</span></Form.Label>
+                                <Form.Select
+                                    value={unidadMedida}
+                                    onChange={(e) => setUnidadMedida(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Selecciona unidad</option>
+                                    <option value="unidad">Unidad</option>
+                                    <option value="kg">Kilogramo (kg)</option>
+                                    <option value="g">Gramo (g)</option>
+                                    <option value="litro">Litro (L)</option>
+                                    <option value="ml">Mililitro (ml)</option>
+                                    <option value="caja">Caja</option>
+                                    <option value="paquete">Paquete</option>
+                                    <option value="bolsa">Bolsa</option>
+                                    <option value="botella">Botella</option>
+                                    <option value="lata">Lata</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        </Row>
 
                     {/* Precios */}
                     <Row>
@@ -183,7 +202,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
 
                     {/* Stock e Inventario */}
                     <Row>
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Group controlId="formStock" className="mb-3">
                                 <Form.Label>Stock Actual <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
@@ -196,7 +215,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Group controlId="formStockMinimo" className="mb-3">
                                 <Form.Label>Stock Mínimo <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
@@ -209,28 +228,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
-                            <Form.Group controlId="formUnidadMedida" className="mb-3">
-                                <Form.Label>Unidad de Medida <span className="text-danger">*</span></Form.Label>
-                                <Form.Select
-                                    value={unidadMedida}
-                                    onChange={(e) => setUnidadMedida(e.target.value)}
-                                    required
-                                >
-                                    <option value="">Selecciona unidad</option>
-                                    <option value="unidad">Unidad</option>
-                                    <option value="kg">Kilogramo (kg)</option>
-                                    <option value="g">Gramo (g)</option>
-                                    <option value="litro">Litro (L)</option>
-                                    <option value="ml">Mililitro (ml)</option>
-                                    <option value="caja">Caja</option>
-                                    <option value="paquete">Paquete</option>
-                                    <option value="bolsa">Bolsa</option>
-                                    <option value="botella">Botella</option>
-                                    <option value="lata">Lata</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
+                        
                     </Row>
 
                     {/* Categoría y Proveedor */}
@@ -252,10 +250,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                    </Row>
-
-                    {/* Fechas */}
-                    <Row>
+                        {/* Fechas */}
                         <Col md={6}>
                             <Form.Group controlId="formFechaIngreso" className="mb-3">
                                 <Form.Label>Fecha de Ingreso <span className="text-danger">*</span></Form.Label>
@@ -267,21 +262,8 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={6}>
-                            <Form.Group controlId="formEsPerecible" className="mb-3">
-                                <Form.Label>¿El producto vence?</Form.Label>
-                                <Form.Select
-                                    value={esPerecible}
-                                    onChange={(e) => setEsPerecible(e.target.value === "true")}
-                                >
-                                    <option value={false}>No vence</option>
-                                    <option value={true}>Sí vence</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
                     </Row>
 
-                    {/* Fecha de Vencimiento (condicional) */}
 
                     <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
                         <Button
@@ -313,5 +295,4 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
         </Modal>
     );
 }
-
 export default AgregarProductos;
