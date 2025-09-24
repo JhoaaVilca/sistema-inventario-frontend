@@ -1,7 +1,15 @@
-import { Modal } from "react-bootstrap";
-import { useMemo } from "react";
+import { Modal, Button } from "react-bootstrap";
+import { useMemo, useEffect, useState } from "react";
+import { loteService } from "../../servicios/loteService";
 
-function LotesModal({ show, onHide, producto, lotes }) {
+function LotesModal({ show, onHide, producto, lotes, onChanged }) {
+  const [lotesLocal, setLotesLocal] = useState(lotes || []);
+  const [bajandoId, setBajandoId] = useState(null);
+
+  useEffect(() => {
+    setLotesLocal(lotes || []);
+  }, [lotes]);
+
   const formatearFechaLocalDate = (str) => {
     if (!str) return "N/A";
     const [y, m, d] = str.split('-');
@@ -9,12 +17,73 @@ function LotesModal({ show, onHide, producto, lotes }) {
     return `${d}/${m}/${y}`;
   };
 
+  // Helpers para calcular estados a partir de la fecha (compatibles con flags del backend si existen)
+  const parseLocalDate = (str) => {
+    if (!str) return null;
+    const [y, m, d] = str.split('-').map(Number);
+    return new Date(y, (m || 1) - 1, d || 1);
+  };
+
+  const hoy = useMemo(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }, []);
+
+  const umbralDiasProximo = 15; // ventana para considerar "próximo a vencer"
+
+  const esVencido = (lote) => {
+    if (lote?.estaVencido === true) return true; // respetar flag si viene del backend
+    const fv = parseLocalDate(lote?.fechaVencimiento);
+    // Considerar vencido si la fecha de vencimiento es ANTES o IGUAL a hoy
+    return fv ? fv <= hoy : false;
+  };
+
+  const esProximo = (lote) => {
+    if (lote?.estaProximoAVencer === true) return true; // respetar flag si viene del backend
+    const fv = parseLocalDate(lote?.fechaVencimiento);
+    if (!fv) return false;
+    if (fv <= hoy) return false; // hoy o pasado ya se considera vencido
+    const limite = new Date(hoy);
+    limite.setDate(limite.getDate() + umbralDiasProximo);
+    return fv <= limite;
+  };
+
   const resumen = useMemo(() => {
-    const total = lotes?.length || 0;
-    const vencidos = (lotes || []).filter((l) => l.estaVencido).length;
-    const proximos = (lotes || []).filter((l) => l.estaProximoAVencer).length;
+    const total = lotesLocal?.length || 0;
+    const vencidos = (lotesLocal || []).filter((l) => esVencido(l)).length;
+    const proximos = (lotesLocal || []).filter((l) => esProximo(l)).length;
     return { total, vencidos, proximos };
-  }, [lotes]);
+  }, [lotesLocal, hoy]);
+
+  const refrescarLotes = async () => {
+    if (!producto?.idProducto) return;
+    try {
+      const data = await loteService.obtenerLotesPorProducto(producto.idProducto);
+      setLotesLocal(data || []);
+    } catch (e) {
+      console.error("Error al refrescar lotes:", e);
+    }
+  };
+  const handleDarDeBaja = async (lote) => {
+    const confirmar = window.confirm(`¿Dar de baja el lote ${lote.numeroLote}? Esta acción registrará merma y lo excluirá del stock.`);
+    if (!confirmar) return;
+    const observacion = window.prompt("Observación (opcional):", "Vencimiento");
+    try {
+      setBajandoId(lote.idLote);
+      await loteService.darDeBaja(lote.idLote, { motivo: "Vencimiento", observacion: observacion || "" });
+      await refrescarLotes();
+      // Notificar al componente padre para refrescar panel de alertas
+      if (typeof onChanged === 'function') {
+        try { onChanged(); } catch (_) {}
+      }
+      window.alert("Lote dado de baja correctamente.");
+    } catch (e) {
+      console.error("Error al dar de baja el lote:", e);
+      window.alert("Ocurrió un error al dar de baja el lote.");
+    } finally {
+      setBajandoId(null);
+    }
+  };
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
@@ -24,7 +93,7 @@ function LotesModal({ show, onHide, producto, lotes }) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {(lotes && lotes.length > 0) ? (
+        {(lotesLocal && lotesLocal.length > 0) ? (
           <div>
             <div className="row mb-3">
               <div className="col-md-4">
@@ -65,9 +134,11 @@ function LotesModal({ show, onHide, producto, lotes }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {lotes.map((lote, index) => {
+                  {lotesLocal.map((lote, index) => {
                     const fechaEntrada = lote.fechaEntrada;
                     const cantidad = lote.detalleEntrada?.cantidad;
+                    const vencido = esVencido(lote);
+                    const proximo = !vencido && esProximo(lote);
 
                     return (
                       <tr key={lote.idLote || index}>
@@ -86,13 +157,20 @@ function LotesModal({ show, onHide, producto, lotes }) {
                           <span className="badge bg-info">{cantidad || 'N/A'}</span>
                         </td>
                         <td>
-                          {lote.estaVencido ? (
-                            <span className="badge bg-danger">🔴 Vencido</span>
-                          ) : lote.estaProximoAVencer ? (
-                            <span className="badge bg-warning">🟡 Próximo a Vencer</span>
-                          ) : (
-                            <span className="badge bg-success">🟢 Activo</span>
-                          )}
+                          <div className="d-flex align-items-center gap-2">
+                            {vencido ? (
+                              <span className="badge bg-danger">🔴 Vencido</span>
+                            ) : proximo ? (
+                              <span className="badge bg-warning">🟡 Próximo a Vencer</span>
+                            ) : (
+                              <span className="badge bg-success">🟢 Activo</span>
+                            )}
+                            {vencido && (
+                              <Button variant="outline-danger" size="sm" onClick={() => handleDarDeBaja(lote)} disabled={bajandoId === lote.idLote}>
+                                Dar de baja
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );

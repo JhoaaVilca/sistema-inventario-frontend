@@ -30,5 +30,12 @@ export const loteService = {
   async obtenerResumenAlertas() {
     const { data } = await apiClient.get('/lotes/alertas/resumen');
     return data;
+  },
+
+  // Dar de baja un lote (registrar merma por vencimiento u otro motivo)
+  async darDeBaja(idLote, payload) {
+    // payload: { motivo: string, observacion?: string }
+    const { data } = await apiClient.post(`/lotes/${idLote}/baja`, payload);
+    return data;
   }
 };

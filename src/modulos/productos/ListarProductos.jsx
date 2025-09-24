@@ -27,6 +27,7 @@ const ListarProductos = () => {
     const [filtroAlerta, setFiltroAlerta] = useState(""); // Filtro por tipo de alerta
     const [mostrarFiltros, setMostrarFiltros] = useState(false); // Mostrar/ocultar filtros
     const [alertas, setAlertas] = useState({}); // Almacenar alertas por producto
+    const [stockMap, setStockMap] = useState({}); // Stock calculado desde lotes activos por producto
 
     const inputRef = useRef(null);
 
@@ -57,6 +58,10 @@ const ListarProductos = () => {
             ]);
 
             const alertasPorProducto = {};
+
+            // Definir "hoy" sin hora para comparaciones consistentes
+            const now = new Date();
+            const hoy = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
             // Procesar lotes vencidos
             lotesVencidos.forEach(lote => {
@@ -93,18 +98,33 @@ const ListarProductos = () => {
                         tipoAlerta: null
                     };
                 }
-                alertasPorProducto[idProducto].proximos++;
-                if (alertasPorProducto[idProducto].tipoAlerta !== 'vencido') {
-                    alertasPorProducto[idProducto].tipoAlerta = 'proximo';
-                }
-
-                // Guardar la fecha más próxima (la más cercana a vencer)
                 const fechaLote = parseLocalDate(lote.fechaVencimiento);
-                const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
-                    ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
-                    : null;
-                if (!fechaActual || (fechaLote && fechaLote < fechaActual)) {
-                    alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
+                // Si la fecha de vencimiento es hoy o antes, reclasificar como vencido
+                if (fechaLote && fechaLote <= hoy) {
+                    alertasPorProducto[idProducto].vencidos++;
+                    alertasPorProducto[idProducto].tipoAlerta = 'vencido';
+
+                    // Para vencidos, conservar la más reciente fecha vencida
+                    const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
+                        ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
+                        : null;
+                    if (!fechaActual || (fechaLote && fechaLote > fechaActual)) {
+                        alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
+                    }
+                } else {
+                    // Caso normal: sigue siendo próximo
+                    alertasPorProducto[idProducto].proximos++;
+                    if (alertasPorProducto[idProducto].tipoAlerta !== 'vencido') {
+                        alertasPorProducto[idProducto].tipoAlerta = 'proximo';
+                    }
+
+                    // Para próximos, conservar la fecha más cercana en el futuro
+                    const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
+                        ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
+                        : null;
+                    if (!fechaActual || (fechaLote && fechaLote < fechaActual)) {
+                        alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
+                    }
                 }
             });
 
@@ -120,6 +140,24 @@ const ListarProductos = () => {
             const { data } = await apiClient.get("/productos");
             setProductos(data);
             setError("");
+            // Cargar stock basado en lotes activos para cada producto
+            try {
+                const entries = await Promise.all(
+                    (data || []).map(async (p) => {
+                        try {
+                            const total = await loteService.obtenerStockTotalPorProducto(p.idProducto);
+                            return [p.idProducto, total ?? 0];
+                        } catch (e) {
+                            console.error("Error obteniendo stock por producto", p.idProducto, e);
+                            return [p.idProducto, p.stock ?? 0];
+                        }
+                    })
+                );
+                const map = Object.fromEntries(entries);
+                setStockMap(map);
+            } catch (e) {
+                console.error("Error cargando stock desde lotes:", e);
+            }
         } catch (err) {
             console.error("Error al cargar productos:", err);
             setError("Error al cargar los productos. Intente nuevamente.");
@@ -153,7 +191,8 @@ const ListarProductos = () => {
 
         return {
             tipo: alerta.tipoAlerta,
-            cantidad: alerta.vencidos + alerta.proximos,
+            vencidos: alerta.vencidos,
+            proximos: alerta.proximos,
             color: alerta.tipoAlerta === 'vencido' ? 'danger' : 'warning',
             fechaMasProxima: alerta.fechaMasProxima
         };
@@ -431,7 +470,7 @@ const ListarProductos = () => {
                                                 </td>
                                                 <td>
                                                     <div className={`fw-bold ${producto.stockBajo ? 'text-danger' : ''}`}>
-                                                        {producto.stock || 0}
+                                                        {producto.stock ?? stockMap[producto.idProducto] ?? 0}
                                                     </div>
                                                 </td>
                                                 <td>
@@ -458,7 +497,9 @@ const ListarProductos = () => {
                                                                     <div>
                                                                         <span className={`badge bg-${alerta.color} d-flex align-items-center mb-1`}>
                                                                             <AlertTriangle size={12} className="me-1" />
-                                                                            {alerta.tipo === 'vencido' ? 'Vencido' : 'Próximo a Vencer'}
+                                                                            {alerta.tipo === 'vencido'
+                                                                                ? `Vencido (${alerta.vencidos})`
+                                                                                : `Próximo a Vencer (${alerta.proximos})`}
                                                                         </span>
                                                                         <small className="text-muted">
                                                                             {formatearFechaLocalDate(alerta.fechaMasProxima)}
@@ -546,9 +587,10 @@ const ListarProductos = () => {
             {/* Modal de Lotes */}
             <LotesModal
                 show={showLotesModal}
-                onHide={() => setShowLotesModal(false)}
+                onHide={() => { setShowLotesModal(false); cargarProductos(); cargarAlertas(); }}
                 producto={productoSeleccionado}
                 lotes={lotesProducto}
+                onChanged={() => { cargarProductos(); cargarAlertas(); }}
             />
 
             {/* Toasts */}
