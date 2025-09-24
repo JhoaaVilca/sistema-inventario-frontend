@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
-import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer, Modal } from "react-bootstrap";
+import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer } from "react-bootstrap";
 import { Edit, Trash2, Search, X, Package, Plus, AlertTriangle, Clock, DollarSign, Filter, Eye } from "lucide-react";
+import LotesModal from "./LotesModal";
 import AgregarProducto from "./AgregarProductos";
 import EditarProducto from "./EditarProductos";
 import apiClient from "../../servicios/apiClient";
@@ -34,6 +35,20 @@ const ListarProductos = () => {
         cargarAlertas();
     }, []);
 
+    // Utilidades para manejar fechas 'YYYY-MM-DD' sin desfases de zona horaria
+    const parseLocalDate = (str) => {
+        if (!str) return null;
+        const [y, m, d] = str.split('-').map(Number);
+        return new Date(y, (m || 1) - 1, d || 1);
+    };
+
+    const formatearFechaLocalDate = (str) => {
+        if (!str) return 'N/A';
+        const [y, m, d] = str.split('-');
+        if (!y || !m || !d) return str;
+        return `${d}/${m}/${y}`;
+    };
+
     const cargarAlertas = async () => {
         try {
             const [lotesVencidos, lotesProximos] = await Promise.all([
@@ -58,8 +73,11 @@ const ListarProductos = () => {
                 alertasPorProducto[idProducto].tipoAlerta = 'vencido';
 
                 // Guardar la fecha más próxima (la más reciente de los vencidos)
-                if (!alertasPorProducto[idProducto].fechaMasProxima ||
-                    new Date(lote.fechaVencimiento) > new Date(alertasPorProducto[idProducto].fechaMasProxima)) {
+                const fechaLote = parseLocalDate(lote.fechaVencimiento);
+                const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
+                    ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
+                    : null;
+                if (!fechaActual || (fechaLote && fechaLote > fechaActual)) {
                     alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
                 }
             });
@@ -81,8 +99,11 @@ const ListarProductos = () => {
                 }
 
                 // Guardar la fecha más próxima (la más cercana a vencer)
-                if (!alertasPorProducto[idProducto].fechaMasProxima ||
-                    new Date(lote.fechaVencimiento) < new Date(alertasPorProducto[idProducto].fechaMasProxima)) {
+                const fechaLote = parseLocalDate(lote.fechaVencimiento);
+                const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
+                    ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
+                    : null;
+                if (!fechaActual || (fechaLote && fechaLote < fechaActual)) {
                     alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
                 }
             });
@@ -440,7 +461,7 @@ const ListarProductos = () => {
                                                                             {alerta.tipo === 'vencido' ? 'Vencido' : 'Próximo a Vencer'}
                                                                         </span>
                                                                         <small className="text-muted">
-                                                                            {new Date(alerta.fechaMasProxima).toLocaleDateString('es-ES')}
+                                                                            {formatearFechaLocalDate(alerta.fechaMasProxima)}
                                                                         </small>
                                                                     </div>
                                                                 );
@@ -523,122 +544,12 @@ const ListarProductos = () => {
             />
 
             {/* Modal de Lotes */}
-            <Modal show={showLotesModal} onHide={() => setShowLotesModal(false)} size="lg">
-                <Modal.Header closeButton>
-                    <Modal.Title>
-                        📦 Lotes de {productoSeleccionado?.nombreProducto}
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {lotesProducto.length > 0 ? (
-                        <div>
-                            {/* Resumen */}
-                            <div className="row mb-3">
-                                <div className="col-md-4">
-                                    <div className="card bg-light">
-                                        <div className="card-body text-center">
-                                            <h5 className="card-title text-primary">{lotesProducto.length}</h5>
-                                            <p className="card-text small">Total Lotes</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-4">
-                                    <div className="card bg-light">
-                                        <div className="card-body text-center">
-                                            <h5 className="card-title text-danger">
-                                                {lotesProducto.filter(lote => lote.estaVencido).length}
-                                            </h5>
-                                            <p className="card-text small">Vencidos</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-md-4">
-                                    <div className="card bg-light">
-                                        <div className="card-body text-center">
-                                            <h5 className="card-title text-warning">
-                                                {lotesProducto.filter(lote => lote.estaProximoAVencer).length}
-                                            </h5>
-                                            <p className="card-text small">Próximos a Vencer</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Tabla de Lotes */}
-                            <div className="table-responsive">
-                                <table className="table table-hover">
-                                    <thead className="table-dark">
-                                        <tr>
-                                            <th>Número de Lote</th>
-                                            <th>Fecha Entrada</th>
-                                            <th>Fecha Vencimiento</th>
-                                            <th>Cantidad</th>
-                                            <th>Estado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {lotesProducto.map((lote, index) => {
-                                            const fechaEntrada = lote.fechaEntrada; // ✅ CORREGIDO: Usar el campo directo del lote
-                                            const cantidad = lote.detalleEntrada?.cantidad;
-
-                                            return (
-                                                <tr key={lote.idLote || index}>
-                                                    <td>
-                                                        <span className="badge bg-secondary">
-                                                            {lote.numeroLote}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        {fechaEntrada ?
-                                                            new Date(fechaEntrada).toLocaleDateString('es-ES') :
-                                                            'N/A'
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        {lote.fechaVencimiento ?
-                                                            new Date(lote.fechaVencimiento).toLocaleDateString('es-ES') :
-                                                            'Sin fecha'
-                                                        }
-                                                    </td>
-                                                    <td>
-                                                        <span className="badge bg-info">
-                                                            {cantidad || 'N/A'}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        {lote.estaVencido ? (
-                                                            <span className="badge bg-danger">
-                                                                🔴 Vencido
-                                                            </span>
-                                                        ) : lote.estaProximoAVencer ? (
-                                                            <span className="badge bg-warning">
-                                                                🟡 Próximo a Vencer
-                                                            </span>
-                                                        ) : (
-                                                            <span className="badge bg-success">
-                                                                🟢 Activo
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="text-center py-4">
-                            <p className="text-muted">No hay lotes registrados para este producto.</p>
-                        </div>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowLotesModal(false)}>
-                        Cerrar
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <LotesModal
+                show={showLotesModal}
+                onHide={() => setShowLotesModal(false)}
+                producto={productoSeleccionado}
+                lotes={lotesProducto}
+            />
 
             {/* Toasts */}
             <ToastContainer position="top-end" className="p-3">

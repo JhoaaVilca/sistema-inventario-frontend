@@ -11,14 +11,26 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
     const [cantidad, setCantidad] = useState("");
     const [precioUnitario, setPrecioUnitario] = useState("");
     const [fechaVencimiento, setFechaVencimiento] = useState("");
+    const [requiereVencimiento, setRequiereVencimiento] = useState(false);
     const [errorInline, setErrorInline] = useState("");
     const [limpiarBuscador, setLimpiarBuscador] = useState(false);
     const [productoRecienAgregado, setProductoRecienAgregado] = useState(null);
 
+    const formatearFechaLocalDate = (str) => {
+        if (!str) return 'Sin fecha';
+        const [y, m, d] = str.split('-');
+        if (!y || !m || !d) return str;
+        return `${d}/${m}/${y}`;
+    };
+
     const agregarProducto = () => {
         setErrorInline("");
-        if (!productoSeleccionado || cantidad === "" || precioUnitario === "") {
-            setErrorInline("Complete producto, cantidad y precio.");
+        if (!productoSeleccionado) {
+            setErrorInline("Seleccione un producto.");
+            return;
+        }
+        if (cantidad === "" || precioUnitario === "") {
+            setErrorInline("Complete cantidad y precio unitario.");
             return;
         }
 
@@ -32,6 +44,10 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
             setErrorInline("El precio no puede ser negativo.");
             return;
         }
+        if (requiereVencimiento && !fechaVencimiento) {
+            setErrorInline("Seleccione la fecha de vencimiento.");
+            return;
+        }
         const subtotal = cantidadNum * precioNum;
         const nuevoDetalle = {
             producto: {
@@ -41,7 +57,7 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
             cantidad: cantidadNum,
             precioUnitario: precioNum,
             subtotal: subtotal,
-            fechaVencimiento: fechaVencimiento || null
+            fechaVencimiento: requiereVencimiento ? fechaVencimiento : null
         };
 
         setProductosEntrada([...(productosEntrada || []), nuevoDetalle]);
@@ -60,6 +76,7 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
         setCantidad("");
         setPrecioUnitario("");
         setFechaVencimiento("");
+        setRequiereVencimiento(false);
         setLimpiarBuscador(true);
 
         // Resetear el flag de limpiar después de un momento
@@ -89,15 +106,18 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
                     />
                 </Col>
                 <Col md={2} sm={3}>
+                    <Form.Label className="form-label small text-muted">Cantidad <span className="text-danger">*</span></Form.Label>
                     <Form.Control
                         type="number"
                         placeholder="Cantidad"
                         value={cantidad}
                         onChange={(e) => setCantidad(e.target.value)}
                         min="1"
+                        required
                     />
                 </Col>
                 <Col md={2} sm={6}>
+                    <Form.Label className="form-label small text-muted">Precio unitario <span className="text-danger">*</span></Form.Label>
                     <Form.Control
                         type="number"
                         placeholder="Precio unitario"
@@ -105,18 +125,36 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
                         onChange={(e) => setPrecioUnitario(e.target.value)}
                         min="0"
                         step="0.01"
+                        required
                     />
                 </Col>
-                <Col md={3} sm={6}>
-                    <Form.Label className="form-label small text-muted">Fecha de Vencimiento</Form.Label>
-                    <Form.Control
-                        type="date"
-                        placeholder="Fecha de vencimiento"
-                        value={fechaVencimiento}
-                        onChange={(e) => setFechaVencimiento(e.target.value)}
-                        title="Fecha de vencimiento del lote (opcional)"
-                    />
+                <Col md={2} sm={6}>
+                    <Form.Label className="form-label small text-muted">¿Vence?</Form.Label>
+                    <Form.Select
+                        value={requiereVencimiento ? "si" : "no"}
+                        onChange={(e) => {
+                            const val = e.target.value === "si";
+                            setRequiereVencimiento(val);
+                            if (!val) setFechaVencimiento("");
+                        }}
+                    >
+                        <option value="no">No</option>
+                        <option value="si">Sí</option>
+                    </Form.Select>
                 </Col>
+                {requiereVencimiento && (
+                    <Col md={3} sm={6}>
+                        <Form.Label className="form-label small text-muted">Fecha de Vencimiento <span className="text-danger">*</span></Form.Label>
+                        <Form.Control
+                            type="date"
+                            placeholder="Fecha de vencimiento"
+                            value={fechaVencimiento}
+                            onChange={(e) => setFechaVencimiento(e.target.value)}
+                            title="Fecha de vencimiento del lote"
+                            required
+                        />
+                    </Col>
+                )}
                 <Col md={2} sm={3}>
                     <Button variant="primary" onClick={agregarProducto} className="w-100">
                         Agregar
@@ -154,8 +192,8 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
                                 <td>S/{detalle.precioUnitario}</td>
                                 <td>
                                     {detalle.fechaVencimiento ?
-                                        new Date(detalle.fechaVencimiento).toLocaleDateString('es-ES') :
-                                        <span className="text-muted">Sin fecha</span>
+                                        formatearFechaLocalDate(detalle.fechaVencimiento) :
+                                        <span className="text-muted">Producto sin fecha</span>
                                     }
                                 </td>
                                 <td>S/{detalle.subtotal}</td>
