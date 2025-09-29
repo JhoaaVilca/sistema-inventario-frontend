@@ -19,9 +19,9 @@ function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar product
         const cargarProductos = async () => {
             try {
                 setCargando(true);
-                const { data } = await apiClient.get("/productos");
-                setProductos(data);
-                setProductosFiltrados(data);
+                const { data } = await apiClient.get("/productos", { params: { page: 0, size: 1000 } });
+                setProductos(data?.content || []);
+                setProductosFiltrados(data?.content || []);
             } catch (error) {
                 console.error("Error al cargar productos:", error);
             } finally {

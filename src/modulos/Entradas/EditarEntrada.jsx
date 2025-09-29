@@ -20,8 +20,8 @@ function EditarEntrada({ show, handleClose, entrada, onEntradaEditada }) {
     useEffect(() => {
         const obtenerProveedores = async () => {
             try {
-                const { data } = await apiClient.get("/proveedores/activos");
-                setProveedores(data);
+                const { data } = await apiClient.get("/proveedores/activos", { params: { page: 0, size: 1000 } });
+                setProveedores(data?.content || []);
             } catch (error) {
                 console.error("Error al obtener proveedores:", error);
             }

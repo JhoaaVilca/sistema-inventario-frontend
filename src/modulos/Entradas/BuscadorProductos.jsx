@@ -18,8 +18,8 @@ function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar produ
     useEffect(() => {
         const cargarProductos = async () => {
             try {
-                const { data } = await apiClient.get("/productos");
-                setTodosProductos(data);
+                const { data } = await apiClient.get("/productos", { params: { page: 0, size: 1000 } });
+                setTodosProductos(data?.content || []);
             } catch (error) {
                 console.error("Error al cargar productos:", error);
             }

@@ -26,8 +26,8 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
     useEffect(() => {
         const obtenerProveedores = async () => {
             try {
-                const { data } = await apiClient.get("/proveedores/activos");
-                setProveedores(data);
+                const { data } = await apiClient.get("/proveedores/activos", { params: { page: 0, size: 1000 } });
+                setProveedores(data?.content || []);
             } catch (error) {
                 console.error("Error al obtener proveedores:", error);
             }
@@ -36,7 +36,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
             obtenerProveedores();
             setIdProveedor("");
             setProductosEntrada([]);
-            setFechaEntrada("");
+            setFechaEntrada(new Date().toISOString().split('T')[0]); // Fecha de hoy
             setNumeroFactura("");
             setObservaciones("");
             setEstado("Registrada");

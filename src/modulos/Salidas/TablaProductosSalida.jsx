@@ -11,8 +11,8 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
     useEffect(() => {
         const obtenerProductos = async () => {
             try {
-                const { data } = await apiClient.get("/productos");
-                setProductos(data);
+                const { data } = await apiClient.get("/productos", { params: { page: 0, size: 1000 } });
+                setProductos(data?.content || []);
             } catch (error) {
                 console.error("Error al obtener productos:", error);
             }

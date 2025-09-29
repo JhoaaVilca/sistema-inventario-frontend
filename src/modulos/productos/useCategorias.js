@@ -10,8 +10,8 @@ export const useCategorias = () => {
         setLoading(true);
         try {
             // Usar el endpoint de categorías activas para productos
-            const { data } = await apiClient.get("/categorias/activas");
-            setCategorias(data);
+            const { data } = await apiClient.get("/categorias/activas", { params: { page: 0, size: 1000 } });
+            setCategorias(data?.content || []);
             setError("");
         } catch (error) {
             console.error("Error al obtener categorías activas:", error);

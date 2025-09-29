@@ -4,6 +4,7 @@ import { Edit, Trash2, Search, X, User, Plus } from "lucide-react";
 import AgregarCliente from "./AgregarCliente";
 import EditarCliente from "./EditarCliente";
 import apiClient from "../../servicios/apiClient";
+import Paginador from "../common/Paginador";
 
 const ListarClientes = () => {
     const [clientes, setClientes] = useState([]);
@@ -17,20 +18,22 @@ const ListarClientes = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10); // Tamaño normal
+    const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
 
     useEffect(() => {
         cargarClientes();
-    }, []);
+    }, [page, size]);
 
     const cargarClientes = async () => {
         setLoading(true);
         try {
-            console.log("Cargando clientes...");
-            const { data } = await apiClient.get("/clientes");
-            console.log("Clientes recibidos:", data);
-            setClientes(data);
+            const { data } = await apiClient.get("/clientes", { params: { page, size } });
+            setClientes(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
             setError("");
         } catch (err) {
             console.error("Error al cargar clientes:", err);
@@ -239,6 +242,7 @@ const ListarClientes = () => {
                             </tbody>
                         </Table>
                     </div>
+                    <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={loading} />
                 </div>
             </div>
 

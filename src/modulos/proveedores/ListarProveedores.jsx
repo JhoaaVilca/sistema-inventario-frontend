@@ -12,6 +12,7 @@ import {
     ToastContainer
 } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
+import Paginador from "../common/Paginador";
 
 function ListarProveedores() {
     const [proveedores, setProveedores] = useState([]);
@@ -25,18 +26,22 @@ function ListarProveedores() {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10); // Tamaño normal
+    const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
 
     useEffect(() => {
         obtenerProveedores();
-    }, []);
+    }, [page, size]);
 
     const obtenerProveedores = async () => {
         setLoading(true);
         try {
-            const { data } = await apiClient.get("/proveedores");
-            setProveedores(data);
+            const { data } = await apiClient.get("/proveedores", { params: { page, size } });
+            setProveedores(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
             setError("");
         } catch (error) {
             console.error("Error al obtener proveedores:", error);
@@ -317,6 +322,7 @@ function ListarProveedores() {
                             </tbody>
                         </Table>
                     </div>
+                    <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={loading} />
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
 import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2 } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
+import Paginador from "../common/Paginador";
 
 function ListarSalidas() {
     const [salidas, setSalidas] = useState([]);
@@ -15,12 +16,16 @@ function ListarSalidas() {
     const [filtrosActivos, setFiltrosActivos] = useState(false);
     const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
     const [errorListado, setErrorListado] = useState("");
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10); // Tamaño normal
+    const [totalPages, setTotalPages] = useState(0);
 
     const obtenerSalidas = async () => {
         try {
             setErrorListado("");
-            const { data } = await apiClient.get("/salidas");
-            setSalidas(data);
+            const { data } = await apiClient.get("/salidas", { params: { page, size } });
+            setSalidas(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
         } catch (error) {
             console.error("Error al obtener salidas:", error);
             setErrorListado("No se pudo cargar el listado de salidas.");
@@ -54,7 +59,7 @@ function ListarSalidas() {
 
     useEffect(() => {
         obtenerSalidas();
-    }, []);
+    }, [page, size]);
 
     const handleAgregarSalida = () => setShowAddModal(true);
     const handleCerrarModalAgregar = () => setShowAddModal(false);
@@ -316,6 +321,7 @@ function ListarSalidas() {
                             </tbody>
                         </Table>
                     </div>
+                    <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={false} />
                 </div>
             </div>
 

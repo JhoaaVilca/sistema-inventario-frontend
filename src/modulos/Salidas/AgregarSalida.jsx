@@ -14,7 +14,7 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
     useEffect(() => {
         if (show) {
             setProductosSalida([]);
-            setFechaSalida("");
+            setFechaSalida(new Date().toISOString().split('T')[0]); // Fecha de hoy
             setClienteSeleccionado(null);
             setTipoVenta("CONTADO");
             setErrorMsg("");

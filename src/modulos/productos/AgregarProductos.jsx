@@ -28,7 +28,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setStockMinimo("");
             setUnidadMedida("");
             setCategoria("");
-            setFechaIngreso("");
+            setFechaIngreso(new Date().toISOString().split('T')[0]); // Fecha de hoy
             setDescripcionCorta("");
             setError("");
         }

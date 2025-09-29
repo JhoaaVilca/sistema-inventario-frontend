@@ -27,8 +27,8 @@ const BusquedaCliente = ({
     const cargarClientes = async () => {
         setLoadingClientes(true);
         try {
-            const { data } = await apiClient.get("/clientes/activos");
-            setClientes(data);
+            const { data } = await apiClient.get("/clientes/activos", { params: { page: 0, size: 1000 } });
+            setClientes(data?.content || []);
         } catch (err) {
             console.error("Error al cargar clientes:", err);
         } finally {

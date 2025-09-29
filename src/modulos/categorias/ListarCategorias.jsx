@@ -14,6 +14,7 @@ import {
     Badge
 } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
+import Paginador from "../common/Paginador";
 
 function ListarCategorias() {
     const navigate = useNavigate();
@@ -28,18 +29,22 @@ function ListarCategorias() {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10); // Tamaño normal
+    const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
 
     useEffect(() => {
         obtenerCategorias();
-    }, []);
+    }, [page, size]);
 
     const obtenerCategorias = async () => {
         setLoading(true);
         try {
-            const { data } = await apiClient.get("/categorias");
-            setCategorias(data);
+            const { data } = await apiClient.get("/categorias", { params: { page, size } });
+            setCategorias(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
             setError("");
         } catch (error) {
             console.error("Error al obtener categorías:", error);
@@ -243,6 +248,7 @@ function ListarCategorias() {
                             </tbody>
                         </Table>
                     </div>
+                    <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={loading} />
                 </div>
             </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer } from "react-bootstrap";
 import { Edit, Trash2, Search, X, Package, Plus, AlertTriangle, Clock, DollarSign, Filter, Eye } from "lucide-react";
+import Paginador from "../common/Paginador";
 import LotesModal from "./LotesModal";
 import AgregarProducto from "./AgregarProductos";
 import EditarProducto from "./EditarProductos";
@@ -9,6 +10,9 @@ import { loteService } from "../../servicios/loteService";
 
 const ListarProductos = () => {
     const [productos, setProductos] = useState([]);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10); // Tamaño normal
+    const [totalPages, setTotalPages] = useState(0);
     const [productoEditar, setProductoEditar] = useState(null);
     const [showAgregar, setShowAgregar] = useState(false);
     const [showEditar, setShowEditar] = useState(false);
@@ -34,7 +38,7 @@ const ListarProductos = () => {
     useEffect(() => {
         cargarProductos();
         cargarAlertas();
-    }, []);
+    }, [page, size]);
 
     // Utilidades para manejar fechas 'YYYY-MM-DD' sin desfases de zona horaria
     const parseLocalDate = (str) => {
@@ -137,13 +141,14 @@ const ListarProductos = () => {
     const cargarProductos = async () => {
         setLoading(true);
         try {
-            const { data } = await apiClient.get("/productos");
-            setProductos(data);
+            const { data } = await apiClient.get(`/productos`, { params: { page, size } });
+            setProductos(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
             setError("");
             // Cargar stock basado en lotes activos para cada producto
             try {
                 const entries = await Promise.all(
-                    (data || []).map(async (p) => {
+                    ((data?.content) || []).map(async (p) => {
                         try {
                             const total = await loteService.obtenerStockTotalPorProducto(p.idProducto);
                             return [p.idProducto, total ?? 0];
@@ -560,6 +565,7 @@ const ListarProductos = () => {
                             </tbody>
                         </Table>
                     </div>
+                    <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={loading} />
                 </div>
             </div>
 

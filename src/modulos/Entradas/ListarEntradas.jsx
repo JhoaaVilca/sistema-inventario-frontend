@@ -4,6 +4,7 @@ import AgregarEntrada from "./AgregarEntrada";
 import EditarEntrada from "./EditarEntrada";
 import { Plus, Search, X, Filter, Calendar, Building, ChevronDown, ChevronUp, Edit, Trash2, Upload, FileText, Eye } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
+import Paginador from "../common/Paginador";
 
 function ListarEntradas() {
     const [entradas, setEntradas] = useState([]);
@@ -21,13 +22,17 @@ function ListarEntradas() {
     const [errorListado, setErrorListado] = useState("");
     const [subiendoFactura, setSubiendoFactura] = useState(false);
     const [entradaFactura, setEntradaFactura] = useState(null);
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10); // Tamaño normal
+    const [totalPages, setTotalPages] = useState(0);
 
     const obtenerEntradas = async () => {
         try {
             setErrorListado("");
             setCargando(true);
-            const { data } = await apiClient.get("/entradas");
-            setEntradas(data);
+            const { data } = await apiClient.get("/entradas", { params: { page, size } });
+            setEntradas(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
         } catch (error) {
             console.error("Error al obtener entradas:", error);
             setErrorListado("No se pudo cargar el listado de entradas.");
@@ -38,8 +43,8 @@ function ListarEntradas() {
 
     const obtenerProveedores = async () => {
         try {
-            const { data } = await apiClient.get("/proveedores");
-            setProveedores(data);
+            const { data } = await apiClient.get("/proveedores/activos", { params: { page: 0, size: 1000 } });
+            setProveedores(data?.content || []);
         } catch (error) {
             console.error("Error al obtener proveedores:", error);
         }
@@ -61,8 +66,9 @@ function ListarEntradas() {
                 url += `/filtrar?${params.toString()}`;
             }
 
-            const { data } = await apiClient.get(url);
-            setEntradas(data);
+            const { data } = await apiClient.get(url, { params: { page, size } });
+            setEntradas(data?.content || []);
+            setTotalPages(data?.totalPages || 0);
             setFiltrosActivos(Boolean(idProveedor || numeroFactura || (fechaInicio && fechaFin)));
         } catch (error) {
             console.error("Error al filtrar entradas:", error);
@@ -88,7 +94,7 @@ function ListarEntradas() {
     useEffect(() => {
         obtenerEntradas();
         obtenerProveedores();
-    }, []);
+    }, [page, size]);
 
     const handleAgregarEntrada = () => setShowAddModal(true);
     const handleCerrarModalAgregar = () => setShowAddModal(false);
@@ -474,6 +480,7 @@ function ListarEntradas() {
                                 </tbody>
                             </Table>
                         </div>
+                        <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={cargando} />
                     </div>
                 </div>
             )}

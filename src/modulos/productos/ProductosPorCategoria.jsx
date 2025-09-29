@@ -28,17 +28,17 @@ const ProductosPorCategoria = () => {
         try {
             // Cargar todos los productos y categorías
             const [productosResponse, categoriasResponse] = await Promise.all([
-                apiClient.get("/productos"),
-                apiClient.get("/categorias")
+                apiClient.get("/productos", { params: { page: 0, size: 1000 } }),
+                apiClient.get("/categorias", { params: { page: 0, size: 1000 } })
             ]);
 
             // Filtrar productos por categoría
-            const productosFiltrados = productosResponse.data.filter(
+            const productosFiltrados = (productosResponse.data?.content || []).filter(
                 producto => producto.idCategoria === parseInt(categoriaId)
             );
 
             // Obtener información de la categoría
-            const categoriaEncontrada = categoriasResponse.data.find(
+            const categoriaEncontrada = (categoriasResponse.data?.content || []).find(
                 cat => cat.idCategoria === parseInt(categoriaId)
             );
 
