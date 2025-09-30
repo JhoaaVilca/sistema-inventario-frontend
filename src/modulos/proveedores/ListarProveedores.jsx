@@ -230,11 +230,8 @@ function ListarProveedores() {
                         <Table hover className="mb-0">
                             <thead className="table-light text-center">
                                 <tr>
-                                    <th className="fw-semibold py-3">#</th>
                                     <th className="fw-semibold py-3">Nombre</th>
-                                    <th className="fw-semibold py-3">Tipo Documento</th>
-                                    <th className="fw-semibold py-3">Número Documento</th>
-                                    <th className="fw-semibold py-3">Dirección</th>
+                                    <th className="fw-semibold py-3">Documento</th>
                                     <th className="fw-semibold py-3">Teléfono</th>
                                     <th className="fw-semibold py-3">Email</th>
                                     <th className="fw-semibold py-3">Estado</th>
@@ -244,7 +241,7 @@ function ListarProveedores() {
                             <tbody className="text-center align-middle">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="9" className="text-center py-4">
+                                        <td colSpan="6" className="text-center py-4">
                                             <div className="spinner-border text-success" role="status">
                                                 <span className="visually-hidden">Cargando...</span>
                                             </div>
@@ -252,20 +249,23 @@ function ListarProveedores() {
                                     </tr>
                                 ) : proveedoresFiltrados.length === 0 ? (
                                     <tr>
-                                        <td colSpan="9" className="text-center py-4 text-muted">
+                                        <td colSpan="6" className="text-center py-4 text-muted">
                                             {filtro ? "No se encontraron proveedores" : "No hay proveedores registrados"}
                                         </td>
                                     </tr>
                                 ) : (
-                                    proveedoresFiltrados.map((proveedor, index) => (
+                                    proveedoresFiltrados.map((proveedor) => (
                                         <tr key={proveedor.idProveedor}>
-                                            <td>{index + 1}</td>
-                                            <td className="fw-medium">{proveedor.nombre}</td>
-                                            <td>{proveedor.tipoDocumento}</td>
-                                            <td>{proveedor.numeroDocumento}</td>
-                                            <td>{proveedor.direccion}</td>
-                                            <td>{proveedor.telefono}</td>
-                                            <td>{proveedor.email}</td>
+                                            <td className="fw-medium">
+                                                {proveedor.nombre}
+                                            </td>
+                                            <td>
+                                                <span className="badge bg-light text-dark border">
+                                                    {`${proveedor.tipoDocumento || ''} ${proveedor.numeroDocumento || ''}`.trim()}
+                                                </span>
+                                            </td>
+                                            <td>{proveedor.telefono || '-'}</td>
+                                            <td>{proveedor.email || '-'}</td>
                                             <td>
                                                 {proveedor.activo ? (
                                                     <span className="badge bg-success">Activo</span>

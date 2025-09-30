@@ -167,7 +167,6 @@ function ListarCategorias() {
                         <Table hover className="mb-0">
                             <thead className="table-light text-center">
                                 <tr>
-                                    <th className="fw-semibold py-3" style={{ width: '80px' }}>ID</th>
                                     <th className="fw-semibold py-3">Nombre</th>
                                     <th className="fw-semibold py-3">Descripción</th>
                                     <th className="fw-semibold py-3" style={{ width: '120px' }}>Estado</th>
@@ -177,7 +176,7 @@ function ListarCategorias() {
                             <tbody className="text-center align-middle">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="5" className="text-center py-4">
+                                        <td colSpan="4" className="text-center py-4">
                                             <div className="spinner-border text-primary" role="status">
                                                 <span className="visually-hidden">Cargando...</span>
                                             </div>
@@ -185,14 +184,13 @@ function ListarCategorias() {
                                     </tr>
                                 ) : categoriasFiltradas.length === 0 ? (
                                     <tr>
-                                        <td colSpan="5" className="text-center py-4 text-muted">
+                                        <td colSpan="4" className="text-center py-4 text-muted">
                                             {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
                                         </td>
                                     </tr>
                                 ) : (
                                     categoriasFiltradas.map((categoria) => (
                                         <tr key={categoria.idCategoria}>
-                                            <td>{categoria.idCategoria}</td>
                                             <td className="fw-medium">{categoria.nombre}</td>
                                             <td className="text-start">{categoria.descripcion || "-"}</td>
                                             <td>

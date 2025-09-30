@@ -361,7 +361,6 @@ function ListarEntradas() {
                             <Table hover className="mb-0">
                                 <thead className="table-light text-center">
                                     <tr>
-                                        <th className="fw-semibold py-3">ID</th>
                                         <th className="fw-semibold py-3">Proveedor</th>
                                         <th className="fw-semibold py-3">Fecha</th>
                                         <th className="fw-semibold py-3">N° Factura</th>
@@ -375,7 +374,6 @@ function ListarEntradas() {
                                 <tbody>
                                     {entradas?.map((entrada) => (
                                         <tr key={entrada.idEntrada}>
-                                            <td>{entrada.idEntrada}</td>
                                             <td>{entrada.proveedor?.nombre}</td>
                                             <td>{entrada.fechaEntrada}</td>
                                             <td>

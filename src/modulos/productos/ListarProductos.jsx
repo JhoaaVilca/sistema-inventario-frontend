@@ -409,7 +409,6 @@ const ListarProductos = () => {
                         <Table hover className="mb-0">
                             <thead className="table-light text-center">
                                 <tr>
-                                    <th className="fw-semibold py-3">ID</th>
                                     <th className="fw-semibold py-3">Nombre</th>
                                     <th className="fw-semibold py-3">Precio Venta</th>
                                     <th className="fw-semibold py-3">Precio Compra</th>
@@ -424,7 +423,7 @@ const ListarProductos = () => {
                             <tbody className="text-center align-middle">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="10" className="text-center py-4">
+                                        <td colSpan="9" className="text-center py-4">
                                             <div className="spinner-border text-primary" role="status">
                                                 <span className="visually-hidden">Cargando...</span>
                                             </div>
@@ -432,7 +431,7 @@ const ListarProductos = () => {
                                     </tr>
                                 ) : productosFiltrados.length === 0 ? (
                                     <tr>
-                                        <td colSpan="10" className="text-center py-4 text-muted">
+                                        <td colSpan="9" className="text-center py-4 text-muted">
                                             {filtro ? "No se encontraron productos" : "No hay productos registrados"}
                                         </td>
                                     </tr>
@@ -449,7 +448,6 @@ const ListarProductos = () => {
 
                                         return (
                                             <tr key={producto.idProducto} className={getRowClass()}>
-                                                <td>{producto.idProducto}</td>
                                                 <td className="fw-medium text-start">
                                                     <div>
                                                         <div>{producto.nombreProducto}</div>

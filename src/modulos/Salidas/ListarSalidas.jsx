@@ -226,7 +226,6 @@ function ListarSalidas() {
                         <Table hover className="mb-0">
                             <thead className="table-light text-center">
                                 <tr>
-                                    <th className="fw-semibold py-3">ID</th>
                                     <th className="fw-semibold py-3">Fecha</th>
                                     <th className="fw-semibold py-3">Cliente</th>
                                     <th className="fw-semibold py-3">Tipo Venta</th>
@@ -238,7 +237,6 @@ function ListarSalidas() {
                             <tbody>
                                 {salidas?.map((salida) => (
                                     <tr key={salida.idSalida}>
-                                        <td>{salida.idSalida}</td>
                                         <td>{salida.fechaSalida}</td>
                                         <td>
                                             {salida.nombreCliente ? (
