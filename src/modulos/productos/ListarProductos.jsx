@@ -61,6 +61,10 @@ const ListarProductos = () => {
                 loteService.obtenerLotesProximosAVencer()
             ]);
 
+            // Normalizar resultados para evitar null/undefined
+            const lotesVencidosArr = Array.isArray(lotesVencidos) ? lotesVencidos : [];
+            const lotesProximosArr = Array.isArray(lotesProximos) ? lotesProximos : [];
+
             const alertasPorProducto = {};
 
             // Definir "hoy" sin hora para comparaciones consistentes
@@ -68,8 +72,9 @@ const ListarProductos = () => {
             const hoy = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
             // Procesar lotes vencidos
-            lotesVencidos.forEach(lote => {
-                const idProducto = lote.detalleEntrada.producto.idProducto;
+            lotesVencidosArr.forEach(lote => {
+                const idProducto = lote?.detalleEntrada?.producto?.idProducto;
+                if (!idProducto) return; // Saltar lotes mal formados
                 if (!alertasPorProducto[idProducto]) {
                     alertasPorProducto[idProducto] = {
                         vencidos: 0,
@@ -82,18 +87,19 @@ const ListarProductos = () => {
                 alertasPorProducto[idProducto].tipoAlerta = 'vencido';
 
                 // Guardar la fecha más próxima (la más reciente de los vencidos)
-                const fechaLote = parseLocalDate(lote.fechaVencimiento);
+                const fechaLote = lote?.fechaVencimiento ? parseLocalDate(lote.fechaVencimiento) : null;
                 const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
                     ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
                     : null;
-                if (!fechaActual || (fechaLote && fechaLote > fechaActual)) {
+                if (fechaLote && (!fechaActual || fechaLote > fechaActual)) {
                     alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
                 }
             });
 
             // Procesar lotes próximos a vencer
-            lotesProximos.forEach(lote => {
-                const idProducto = lote.detalleEntrada.producto.idProducto;
+            lotesProximosArr.forEach(lote => {
+                const idProducto = lote?.detalleEntrada?.producto?.idProducto;
+                if (!idProducto) return; // Saltar lotes mal formados
                 if (!alertasPorProducto[idProducto]) {
                     alertasPorProducto[idProducto] = {
                         vencidos: 0,
@@ -102,7 +108,8 @@ const ListarProductos = () => {
                         tipoAlerta: null
                     };
                 }
-                const fechaLote = parseLocalDate(lote.fechaVencimiento);
+                const fechaLote = lote?.fechaVencimiento ? parseLocalDate(lote.fechaVencimiento) : null;
+                if (!fechaLote) return; // Si no hay fecha, no clasificar
                 // Si la fecha de vencimiento es hoy o antes, reclasificar como vencido
                 if (fechaLote && fechaLote <= hoy) {
                     alertasPorProducto[idProducto].vencidos++;
@@ -112,7 +119,7 @@ const ListarProductos = () => {
                     const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
                         ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
                         : null;
-                    if (!fechaActual || (fechaLote && fechaLote > fechaActual)) {
+                    if (!fechaActual || fechaLote > fechaActual) {
                         alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
                     }
                 } else {
@@ -126,7 +133,7 @@ const ListarProductos = () => {
                     const fechaActual = alertasPorProducto[idProducto].fechaMasProxima
                         ? parseLocalDate(alertasPorProducto[idProducto].fechaMasProxima)
                         : null;
-                    if (!fechaActual || (fechaLote && fechaLote < fechaActual)) {
+                    if (!fechaActual || fechaLote < fechaActual) {
                         alertasPorProducto[idProducto].fechaMasProxima = lote.fechaVencimiento;
                     }
                 }

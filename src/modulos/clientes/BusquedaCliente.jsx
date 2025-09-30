@@ -28,7 +28,9 @@ const BusquedaCliente = ({
         setLoadingClientes(true);
         try {
             const { data } = await apiClient.get("/clientes/activos", { params: { page: 0, size: 1000 } });
-            setClientes(data?.content || []);
+            // Backend devuelve una lista simple (no paginada). Aceptamos ambos formatos.
+            const lista = Array.isArray(data) ? data : (data?.content || []);
+            setClientes(lista);
         } catch (err) {
             console.error("Error al cargar clientes:", err);
         } finally {
