@@ -444,17 +444,13 @@ const ListarProductos = () => {
                                     </tr>
                                 ) : (
                                     productosFiltrados.map((producto) => {
-                                        // Determinar el color de la fila basado en alertas
-                                        const getRowClass = () => {
-                                            const alerta = obtenerTipoAlerta(producto);
-                                            if (alerta && alerta.tipo === 'vencido') return "table-danger";
-                                            if (alerta && alerta.tipo === 'proximo') return "table-warning";
-                                            if (producto.stockBajo) return "table-info";
-                                            return "";
-                                        };
+                                        const alerta = obtenerTipoAlerta(producto);
+                                        const stockActual = (producto.stock ?? stockMap[producto.idProducto] ?? 0);
+                                        const stockTdClass = stockActual === 0 ? 'table-danger' : '';
+                                        const alertTdClass = alerta ? (alerta.tipo === 'vencido' ? 'table-danger' : 'table-warning') : '';
 
                                         return (
-                                            <tr key={producto.idProducto} className={getRowClass()}>
+                                            <tr key={producto.idProducto}>
                                                 <td className="fw-medium text-start">
                                                     <div>
                                                         <div>{producto.nombreProducto}</div>
@@ -478,9 +474,9 @@ const ListarProductos = () => {
                                                         S/. {producto.precioCompra?.toFixed(2) || '0.00'}
                                                     </div>
                                                 </td>
-                                                <td>
+                                                <td className={stockTdClass}>
                                                     <div className={`fw-bold ${producto.stockBajo ? 'text-danger' : ''}`}>
-                                                        {producto.stock ?? stockMap[producto.idProducto] ?? 0}
+                                                        {stockActual}
                                                     </div>
                                                 </td>
                                                 <td>
@@ -498,10 +494,9 @@ const ListarProductos = () => {
                                                         {producto.nombreCategoria || "Sin categoría"}
                                                     </span>
                                                 </td>
-                                                <td>
+                                                <td className={alertTdClass}>
                                                     <div className="d-flex flex-column gap-1">
                                                         {(() => {
-                                                            const alerta = obtenerTipoAlerta(producto);
                                                             if (alerta) {
                                                                 return (
                                                                     <div>

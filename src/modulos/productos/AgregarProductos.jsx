@@ -12,6 +12,8 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
     const [unidadMedida, setUnidadMedida] = useState("");
     const [categoria, setCategoria] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
+    const [esPerecible, setEsPerecible] = useState(false);
+    const [fechaVencimientoInicial, setFechaVencimientoInicial] = useState("");
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -29,6 +31,8 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setUnidadMedida("");
             setCategoria("");
             setFechaIngreso(new Date().toISOString().split('T')[0]); // Fecha de hoy
+            setEsPerecible(false);
+            setFechaVencimientoInicial("");
             setDescripcionCorta("");
             setError("");
         }
@@ -56,6 +60,8 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             stockMinimo: parseInt(stockMinimo, 10),
             unidadMedida,
             fechaIngreso,
+            esPerecible,
+            fechaVencimientoInicial: (esPerecible && parseInt(stock || 0, 10) > 0) ? (fechaVencimientoInicial || null) : null,
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
         };
@@ -75,6 +81,8 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setUnidadMedida("");
             setCategoria("");
             setFechaIngreso("");
+            setEsPerecible(false);
+            setFechaVencimientoInicial("");
             setDescripcionCorta("");
             setError("");
 
@@ -260,6 +268,35 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                     onChange={(e) => setFechaIngreso(e.target.value)}
                                     required
                                 />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+
+                    {/* Perecible y vencimiento */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group controlId="formEsPerecible" className="mb-3">
+                                <Form.Check
+                                    type="switch"
+                                    label="Producto perecible (requiere vencimiento en stock inicial)"
+                                    checked={esPerecible}
+                                    onChange={(e) => setEsPerecible(e.target.checked)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group controlId="formFechaVencimientoInicial" className="mb-3">
+                                <Form.Label>Fecha de Vencimiento (lote inicial)</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    value={fechaVencimientoInicial}
+                                    onChange={(e) => setFechaVencimientoInicial(e.target.value)}
+                                    required={esPerecible && parseInt(stock || 0, 10) > 0}
+                                    disabled={!esPerecible || parseInt(stock || 0, 10) <= 0}
+                                />
+                                <Form.Text muted>
+                                    Obligatorio si el producto es perecible y el stock inicial es mayor a 0.
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                     </Row>

@@ -9,6 +9,8 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
     const [fechaSalida, setFechaSalida] = useState("");
     const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
     const [tipoVenta, setTipoVenta] = useState("CONTADO");
+    const [fechaPagoCredito, setFechaPagoCredito] = useState("");
+    const [totalSalida, setTotalSalida] = useState(0);
     const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
@@ -17,6 +19,8 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
             setFechaSalida(new Date().toISOString().split('T')[0]); // Fecha de hoy
             setClienteSeleccionado(null);
             setTipoVenta("CONTADO");
+            setFechaPagoCredito("");
+            setTotalSalida(0);
             setErrorMsg("");
         }
     }, [show]);
@@ -30,6 +34,10 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
         for (const d of productosSalida) {
             if (d.cantidad <= 0) return "La cantidad debe ser mayor a 0.";
             if (d.precioUnitario < 0) return "El precio no puede ser negativo.";
+        }
+        if (tipoVenta === 'CREDITO') {
+            if (!fechaPagoCredito) return "Ingrese la fecha de pago para el crédito.";
+            if (!totalSalida || Number(totalSalida) <= 0) return "El monto total debe ser mayor a 0.";
         }
         return "";
     };
@@ -53,6 +61,8 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                 fechaSalida: fechaSalida,
                 cliente: { idCliente: clienteSeleccionado.idCliente },
                 tipoVenta: tipoVenta,
+                totalSalida: Number(((productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 1.18)).toFixed(2)),
+                fechaPagoCredito: tipoVenta === 'CREDITO' ? fechaPagoCredito : null,
                 detalles: productosSalida.map(d => ({
                     producto: { idProducto: d.producto.idProducto },
                     cantidad: parseInt(d.cantidad),
@@ -115,6 +125,34 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                         </Form.Group>
                     </Col>
                 </Row>
+
+                {tipoVenta === 'CREDITO' && (
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Fecha de pago (crédito)</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    value={fechaPagoCredito}
+                                    onChange={(e) => setFechaPagoCredito(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Monto total (editable)</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={totalSalida || ((productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 1.18).toFixed(2))}
+                                    onChange={(e) => setTotalSalida(e.target.value)}
+                                />
+                                <Form.Text className="text-muted">Prefijado según el detalle (incluye IGV), puedes ajustarlo.</Form.Text>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                )}
 
                 {/* Búsqueda de Cliente */}
                 <BusquedaCliente
