@@ -42,17 +42,25 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
         }
 
         try {
-            const dataToSend = {
+            console.log("Datos a enviar:", {
                 fechaSalida,
-                cliente: { idCliente: clienteSeleccionado.idCliente },
+                cliente: clienteSeleccionado,
                 tipoVenta,
+                productosSalida
+            });
+
+            const dataToSend = {
+                fechaSalida: fechaSalida,
+                cliente: { idCliente: clienteSeleccionado.idCliente },
+                tipoVenta: tipoVenta,
                 detalles: productosSalida.map(d => ({
                     producto: { idProducto: d.producto.idProducto },
-                    cantidad: d.cantidad,
-                    precioUnitario: d.precioUnitario
+                    cantidad: parseInt(d.cantidad),
+                    precioUnitario: parseFloat(d.precioUnitario)
                 }))
             };
 
+            console.log("Payload final:", dataToSend);
             await apiClient.post("/salidas", dataToSend);
             onSalidaAgregada();
             handleClose();
@@ -116,10 +124,32 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                     showAgregarCliente={true}
                 />
 
-                <TablaProductosSalida
+                <TablaProductosSalida 
                     productosSalida={productosSalida}
                     setProductosSalida={setProductosSalida}
                 />
+                
+                {/* Resumen de totales */}
+                {productosSalida.length > 0 && (
+                    <div className="mt-3 p-3 bg-light rounded">
+                        <Row>
+                            <Col md={6}>
+                                <strong>Subtotal:</strong> S/ {productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0).toFixed(2)}
+                            </Col>
+                            <Col md={6}>
+                                <strong>IGV (18%):</strong> S/ {(productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 0.18).toFixed(2)}
+                            </Col>
+                        </Row>
+                        <hr />
+                        <Row>
+                            <Col>
+                                <h5 className="text-primary">
+                                    <strong>Total: S/ {(productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 1.18).toFixed(2)}</strong>
+                                </h5>
+                            </Col>
+                        </Row>
+                    </div>
+                )}
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>

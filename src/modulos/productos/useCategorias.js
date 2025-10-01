@@ -9,9 +9,9 @@ export const useCategorias = () => {
     const obtenerCategorias = async () => {
         setLoading(true);
         try {
-            // Usar el endpoint de categorías activas para productos
-            const { data } = await apiClient.get("/categorias/activas", { params: { page: 0, size: 1000 } });
-            setCategorias(data?.content || []);
+            const { data } = await apiClient.get("/categorias/activas");
+            // data ya es un array simple
+            setCategorias(data || []);
             setError("");
         } catch (error) {
             console.error("Error al obtener categorías activas:", error);
@@ -20,6 +20,7 @@ export const useCategorias = () => {
             setLoading(false);
         }
     };
+
 
     const obtenerNombreCategoria = (idCategoria) => {
         const categoria = categorias.find(cat => cat.idCategoria === idCategoria);
