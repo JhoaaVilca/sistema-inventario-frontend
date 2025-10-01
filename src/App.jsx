@@ -8,6 +8,8 @@ import ListarProveedores from './modulos/proveedores/ListarProveedores';
 import ListarClientes from './modulos/clientes/ListarClientes';
 import ListarEntradas from './modulos/Entradas/ListarEntradas';
 import ListarSalidas from './modulos/Salidas/ListarSalidas';
+import ListarCreditos from './modulos/Creditos/ListarCreditos';
+import DetalleCredito from './modulos/Creditos/DetalleCredito';
 
 function App() {
     return (
@@ -22,6 +24,8 @@ function App() {
                     <Route path='/clientes' element={<ListarClientes />} />
                     <Route path='/entradas' element={<ListarEntradas />} />
                     <Route path='/salidas' element={<ListarSalidas />} />
+                    <Route path='/creditos' element={<ListarCreditos />} />
+                    <Route path='/creditos/:id' element={<DetalleCredito />} />
                 </Routes>
             </Layout>
         </Router>

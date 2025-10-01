@@ -2,6 +2,7 @@ import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import apiClient from "../../servicios/apiClient";
 import TablaProductosSalida from "./TablaProductosSalida";
+import { loteService } from "../../servicios/loteService";
 import BusquedaCliente from "../clientes/BusquedaCliente";
 
 function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
@@ -35,9 +36,12 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
             if (d.cantidad <= 0) return "La cantidad debe ser mayor a 0.";
             if (d.precioUnitario < 0) return "El precio no puede ser negativo.";
         }
+        const subtotal = productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0);
         if (tipoVenta === 'CREDITO') {
             if (!fechaPagoCredito) return "Ingrese la fecha de pago para el crédito.";
-            if (!totalSalida || Number(totalSalida) <= 0) return "El monto total debe ser mayor a 0.";
+            const totalNormalizado = parseFloat(String(totalSalida || '').replace(',', '.'));
+            const totalEfectivo = (!isNaN(totalNormalizado) && totalNormalizado > 0) ? totalNormalizado : subtotal;
+            if (!(totalEfectivo > 0)) return "El monto total debe ser mayor a 0.";
         }
         return "";
     };
@@ -50,6 +54,17 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
         }
 
         try {
+            // Validación previa contra stock disponible por lotes
+            for (const d of productosSalida) {
+                const lotes = await loteService.obtenerLotesPorProducto(d.producto.idProducto);
+                const disponible = (lotes || [])
+                    .filter(l => (l.estado || '').toLowerCase() === 'activo' && (l.cantidadDisponible ?? 0) > 0)
+                    .reduce((sum, l) => sum + (l.cantidadDisponible ?? 0), 0);
+                if (disponible < d.cantidad) {
+                    setErrorMsg(`Stock insuficiente por lotes para '${d.producto.nombreProducto}' (disp: ${disponible}, solicitado: ${d.cantidad}).`);
+                    return;
+                }
+            }
             console.log("Datos a enviar:", {
                 fechaSalida,
                 cliente: clienteSeleccionado,
@@ -57,11 +72,16 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                 productosSalida
             });
 
+            const subtotal = productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0);
+            const totalCredito = parseFloat(String(totalSalida || '').replace(',', '.'));
+            const totalEfectivo = tipoVenta === 'CREDITO'
+                ? ((!isNaN(totalCredito) && totalCredito > 0) ? totalCredito : subtotal)
+                : subtotal;
             const dataToSend = {
                 fechaSalida: fechaSalida,
                 cliente: { idCliente: clienteSeleccionado.idCliente },
                 tipoVenta: tipoVenta,
-                totalSalida: Number(((productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 1.18)).toFixed(2)),
+                totalSalida: Number(totalEfectivo.toFixed(2)),
                 fechaPagoCredito: tipoVenta === 'CREDITO' ? fechaPagoCredito : null,
                 detalles: productosSalida.map(d => ({
                     producto: { idProducto: d.producto.idProducto },
@@ -145,10 +165,10 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    value={totalSalida || ((productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 1.18).toFixed(2))}
-                                    onChange={(e) => setTotalSalida(e.target.value)}
+                                    value={totalSalida || (productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0).toFixed(2))}
+                                    onChange={(e) => setTotalSalida(e.target.value.replace(',', '.'))}
                                 />
-                                <Form.Text className="text-muted">Prefijado según el detalle (incluye IGV), puedes ajustarlo.</Form.Text>
+                                <Form.Text className="text-muted">Prefijado según el detalle, puedes ajustarlo.</Form.Text>
                             </Form.Group>
                         </Col>
                     </Row>
@@ -167,23 +187,12 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                     setProductosSalida={setProductosSalida}
                 />
                 
-                {/* Resumen de totales */}
+                {/* Resumen de totales (sin IGV) */}
                 {productosSalida.length > 0 && (
                     <div className="mt-3 p-3 bg-light rounded">
                         <Row>
                             <Col md={6}>
-                                <strong>Subtotal:</strong> S/ {productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0).toFixed(2)}
-                            </Col>
-                            <Col md={6}>
-                                <strong>IGV (18%):</strong> S/ {(productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 0.18).toFixed(2)}
-                            </Col>
-                        </Row>
-                        <hr />
-                        <Row>
-                            <Col>
-                                <h5 className="text-primary">
-                                    <strong>Total: S/ {(productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0) * 1.18).toFixed(2)}</strong>
-                                </h5>
+                                <strong>Total:</strong> S/ {productosSalida.reduce((sum, p) => sum + (p.cantidad * p.precioUnitario), 0).toFixed(2)}
                             </Col>
                         </Row>
                     </div>

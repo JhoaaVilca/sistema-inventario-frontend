@@ -1,31 +1,17 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Form, Table, Row, Col } from "react-bootstrap";
-import apiClient from "../../servicios/apiClient";
 import SelectProductos from "../Entradas/SelectProductos";
 
 function TablaProductosSalida({ productosSalida, setProductosSalida }) {
-    const [productos, setProductos] = useState([]);
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
     const [cantidad, setCantidad] = useState("");
     const [precioUnitario, setPrecioUnitario] = useState("");
-
-    useEffect(() => {
-        const obtenerProductos = async () => {
-            try {
-                const { data } = await apiClient.get("/productos", { params: { page: 0, size: 1000 } });
-                setProductos(data?.content || []);
-            } catch (error) {
-                console.error("Error al obtener productos:", error);
-            }
-        };
-        obtenerProductos();
-    }, []);
 
     const agregarProducto = () => {
         if (!productoSeleccionado) return;
         const cantidadNum = parseInt(cantidad, 10);
         const precioNum = parseFloat(
-            precioUnitario === "" || precioUnitario === null ? (productoSeleccionado?.precio ?? 0) : precioUnitario
+            (precioUnitario === "" || precioUnitario === null ? (productoSeleccionado?.precio ?? 0) : String(precioUnitario)).replace(',', '.')
         );
         if (!(cantidadNum > 0) || !(precioNum >= 0)) return;
 
@@ -36,6 +22,7 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
         };
 
         setProductosSalida([...(productosSalida || []), nuevoDetalle]);
+        // limpiar inputs automáticamente
         setProductoSeleccionado(null);
         setCantidad("");
         setPrecioUnitario("");

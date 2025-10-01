@@ -7,6 +7,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import {
     Box, Users, ArrowDownCircle, ArrowUpCircle,
     Menu, LayoutDashboard, Grid3X3, FileText, User, UserCheck
+    , CreditCard
 } from 'lucide-react';
 
 function Layout({ children }) {
@@ -111,6 +112,13 @@ function Layout({ children }) {
                                 onClick={() => setSidebarOpen(false)}>
                                 <User size={20} className="me-3" />
                                 <span>Clientes</span>
+                            </Link>
+                        </li>
+                        <li className="nav-item mb-2">
+                            <Link to="/creditos" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                                onClick={() => setSidebarOpen(false)}>
+                                <CreditCard size={20} className="me-3" />
+                                <span>Créditos</span>
                             </Link>
                         </li>
                     </ul>
