@@ -1,0 +1,240 @@
+/* Olive palette tokens based on Bootstrap variables */
+:root {
+  /* Palette from second image */
+  --olive-deep:  #0F2A1D; /* darkest */
+  --olive-dark:  #375534; /* dark */
+  --olive-main:  #6B9071; /* primary */
+  --olive-soft:  #AEC3B0; /* soft */
+  --olive-cream: #E3EED4; /* light background */
+
+  /* Bootstrap theme tokens */
+  --bs-primary: var(--olive-dark);
+  --bs-primary-rgb: 55, 85, 52;
+  --bs-primary-hover: var(--olive-deep);
+  --bs-link-color: var(--olive-dark);
+  --bs-link-hover-color: var(--olive-deep);
+  --bs-focus-ring-color: rgba(55, 85, 52, 0.25);
+
+  /* Utility scale */
+  --bs-primary-100: #eef3ea;
+  --bs-primary-200: #dbe6d7;
+  --bs-primary-300: #c6d6c3;
+  --bs-primary-400: var(--olive-soft);
+  --bs-primary-500: var(--olive-main);
+  --bs-primary-600: #58755e;
+  --bs-primary-700: var(--olive-dark);
+  --bs-primary-800: #1f3a29;
+  --bs-primary-900: var(--olive-deep);
+
+  --bs-body-bg: var(--olive-cream);
+  --bs-body-color: #1f2328;
+  --bs-border-color: #dfe7d7;
+}
+
+/* Navbar */
+.navbar.bg-primary,
+.navbar.navbar-primary { background-color: var(--bs-primary) !important; }
+.navbar { border-top: 0 !important; }
+
+/* Olive navbar matching sidebar */
+.navbar-olive.navbar.navbar-dark { 
+  background-color: var(--olive-deep) !important; 
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+.navbar-olive .navbar-brand, 
+.navbar-olive .nav-link, 
+.navbar-olive .btn-link { color: rgba(255,255,255,.9) !important; }
+.navbar-olive .btn-link:hover { color: #fff !important; }
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--bs-primary-hover) !important;
+  border-color: var(--bs-primary-hover) !important;
+}
+
+.badge.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
+.table thead th { background-color: var(--bs-primary-100); }
+
+/* Sidebar */
+.sidebar-olive { background: var(--olive-deep); }
+.sidebar-olive .nav-link {
+  color: #f1f5f2;
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.sidebar-olive .nav-link:hover {
+  background: rgba(255,255,255,.06);
+}
+.sidebar-olive .section-title {
+  color: var(--olive-soft);
+}
+/* Active nav link with subtle highlight */
+.sidebar-olive .nav-link.active {
+  color: #ffffff !important;
+  background: rgba(174, 195, 176, 0.20); /* soft olive */
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 6px 14px rgba(0,0,0,0.12);
+  position: relative;
+}
+.sidebar-olive .nav-link.active .lucide {
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+}
+.sidebar-olive .nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 8px; bottom: 8px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--olive-main);
+}
+
+/* Tile cards similar to reference but in olive palette */
+.tile-card {
+  background: #ffffff;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  transition: box-shadow .15s ease, transform .03s ease, border-color .15s ease;
+}
+.tile-card:hover {
+  border-color: var(--bs-primary-300);
+  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+}
+
+/* Generic list container to mimic reference tables inside a card */
+.list-card {
+  background: #ffffff;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+.list-card .list-card-header {
+  background: var(--bs-primary-100);
+  border-bottom: 1px solid var(--bs-border-color);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.list-card .list-card-body { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+
+/* Consistent table alignment and sizing */
+.list-card .table thead th,
+.card .table thead th {
+  vertical-align: middle;
+  text-align: center;
+  padding-top: .875rem;
+  padding-bottom: .875rem;
+}
+.list-card .table tbody td,
+.card .table tbody td {
+  vertical-align: middle;
+  text-align: center;
+}
+/* Excepciones para columnas de texto que deben estar alineadas a la izquierda */
+.list-card .table tbody td.text-start,
+.card .table tbody td.text-start {
+  text-align: left;
+}
+.table .col-actions {
+  width: 160px;
+}
+@media (max-width: 576px) {
+  .list-card .table thead th,
+  .card .table thead th {
+    padding-top: .625rem;
+    padding-bottom: .625rem;
+  }
+  .table .col-actions { width: 130px; }
+}
+
+/* Badge sizing consistency */
+.badge { padding: .35em .6em; font-weight: 600; letter-spacing: .2px; }
+/* === PALETA OLIVE PARA COMERCIAL YOLI === */
+:root {
+  --olive-deep:  #0F2A1D;
+  --olive-dark:  #375534;
+  --olive-main:  #6B9071;
+  --olive-soft:  #AEC3B0;
+  --olive-cream: #E3EED4;
+
+  --bs-primary: var(--olive-dark);
+  --bs-primary-rgb: 55, 85, 52;
+  --bs-primary-hover: var(--olive-deep);
+  --bs-link-color: var(--olive-dark);
+  --bs-link-hover-color: var(--olive-deep);
+  --bs-focus-ring-color: rgba(55, 85, 52, 0.25);
+  --bs-body-bg: var(--olive-cream);
+  --bs-body-color: #1f2328;
+  --bs-border-color: #dfe7d7;
+}
+
+/* === NAVBAR Y SIDEBAR === */
+.navbar.bg-primary,
+.navbar.navbar-primary { background-color: var(--bs-primary) !important; }
+
+.navbar-olive.navbar.navbar-dark { 
+  background-color: var(--olive-deep) !important; 
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+}
+.navbar-olive .navbar-brand, 
+.navbar-olive .nav-link { color: rgba(255,255,255,.9) !important; }
+
+/* === BOTONES === */
+.btn-primary {
+  background-color: var(--bs-primary) !important;
+  border-color: var(--bs-primary) !important;
+}
+.btn-primary:hover {
+  background-color: var(--bs-primary-hover) !important;
+  border-color: var(--bs-primary-hover) !important;
+}
+
+/* === CONTENEDOR PRINCIPAL === */
+.list-card {
+  background: #ffffff;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+}
+.list-card .list-card-header {
+  background: var(--bs-primary-100, #eef3ea);
+  border-bottom: 1px solid var(--bs-border-color);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+/* === TABLA CENTRALIZADA === */
+.list-card .table thead th,
+.list-card .table tbody td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* EXCEPCIÓN: columna descripción también centrada */
+.list-card .table tbody td.text-start {
+  text-align: center !important;
+}
+
+/* COLUMNA DE ACCIONES */
+.table .col-actions {
+  width: 160px;
+  text-align: center;
+}
+
+/* BADGES */
+.badge { font-weight: 600; letter-spacing: .2px; }
+
+/* RESPONSIVO */
+@media (max-width: 576px) {
+  .list-card .table thead th,
+  .list-card .table tbody td {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+  .table .col-actions { width: 130px; }
+}

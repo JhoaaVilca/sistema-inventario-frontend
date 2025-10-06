@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import '../assets/bootstrap-olive.css';
 
 // Íconos Lucide
 import {
@@ -13,6 +12,7 @@ import {
 function Layout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const location = useLocation();
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -28,10 +28,28 @@ function Layout({ children }) {
         setSidebarOpen(!sidebarOpen);
     };
 
+    const routeTitles = {
+        '/': 'Dashboard',
+        '/productos': 'Productos',
+        '/categorias': 'Categorías',
+        '/entradas': 'Entradas',
+        '/salidas': 'Salidas / Ventas',
+        '/kardex': 'Kardex',
+        '/proveedores': 'Proveedores',
+        '/clientes': 'Clientes',
+        '/creditos': 'Créditos'
+    };
+
+    const getModuleTitle = (pathname) => {
+        if (routeTitles[pathname]) return routeTitles[pathname];
+        const match = Object.keys(routeTitles).find(p => p !== '/' && pathname.startsWith(p + '/'));
+        return match ? routeTitles[match] : 'Módulo';
+    };
+
     return (
         <div className="bg-light min-vh-100">
             {/* Sidebar */}
-            <nav className="position-fixed h-100 border-end border-secondary bg-dark text-white"
+            <nav className="position-fixed h-100 border-end sidebar-olive text-white"
                 style={{
                     width: '250px',
                     zIndex: 1040,
@@ -53,73 +71,73 @@ function Layout({ children }) {
 
                         {/* Dashboard */}
                         <li className="nav-item mb-2">
-                            <Link to="/" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/" end className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <LayoutDashboard size={20} className="me-3" />
                                 <span>Dashboard</span>
-                            </Link>
+                            </NavLink>
                         </li>
 
                         {/* Inventario */}
-                        <li className="mt-3 mb-2 text-uppercase small text-secondary fw-bold">Inventario</li>
+                        <li className="mt-3 mb-2 text-uppercase small fw-bold section-title">Inventario</li>
                         <li className="nav-item mb-2">
-                            <Link to="/productos" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/productos" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <Box size={20} className="me-3" />
                                 <span>Productos</span>
-                            </Link>
+                            </NavLink>
                         </li>
                         <li className="nav-item mb-2">
-                            <Link to="/categorias" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/categorias" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <Grid3X3 size={20} className="me-3" />
                                 <span>Categorías</span>
-                            </Link>
+                            </NavLink>
                         </li>
                         <li className="nav-item mb-2">
-                            <Link to="/entradas" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/entradas" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <ArrowDownCircle size={20} className="me-3" />
                                 <span>Entradas</span>
-                            </Link>
+                            </NavLink>
                         </li>
                         <li className="nav-item mb-2">
-                            <Link to="/salidas" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/salidas" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <ArrowUpCircle size={20} className="me-3" />
                                 <span>Salidas / Ventas</span>
-                            </Link>
+                            </NavLink>
                         </li>
                         <li className="nav-item mb-2">
-                            <Link to="/kardex" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/kardex" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <FileText size={20} className="me-3" />
                                 <span>Kardex</span>
-                            </Link>
+                            </NavLink>
                         </li>
 
                         {/* Gestión */}
-                        <li className="mt-3 mb-2 text-uppercase small text-secondary fw-bold">Gestión</li>
+                        <li className="mt-3 mb-2 text-uppercase small fw-bold section-title">Gestión</li>
                         <li className="nav-item mb-2">
-                            <Link to="/proveedores" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/proveedores" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <Users size={20} className="me-3" />
                                 <span>Proveedores</span>
-                            </Link>
+                            </NavLink>
                         </li>
                         <li className="nav-item mb-2">
-                            <Link to="/clientes" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/clientes" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <User size={20} className="me-3" />
                                 <span>Clientes</span>
-                            </Link>
+                            </NavLink>
                         </li>
                         <li className="nav-item mb-2">
-                            <Link to="/creditos" className="nav-link text-white d-flex align-items-center p-3 rounded"
+                            <NavLink to="/creditos" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
                                 onClick={() => setSidebarOpen(false)}>
                                 <CreditCard size={20} className="me-3" />
                                 <span>Créditos</span>
-                            </Link>
+                            </NavLink>
                         </li>
                     </ul>
                 </div>
@@ -143,30 +161,26 @@ function Layout({ children }) {
 
             {/* Contenido principal */}
             <div className="bg-white min-vh-100" style={{ marginLeft: isMobile ? '0' : '250px' }}>
-                {/* Navbar superior */}
-                <nav className="navbar navbar-expand-lg fixed-top shadow-sm bg-white border-bottom" style={{
+                {/* Navbar superior útil (sin título del módulo) */}
+                <nav className="navbar navbar-expand-lg navbar-dark navbar-olive fixed-top" style={{
                     zIndex: 1030,
                     marginLeft: isMobile ? '0' : '250px',
                     width: isMobile ? '100%' : 'calc(100% - 250px)'
                 }}>
                     <div className="container-fluid">
-                        <button
-                            className="btn btn-link d-lg-none me-3 text-muted text-decoration-none"
-                            onClick={toggleSidebar}
-                        >
-                            <Menu size={24} />
+                        <button className="btn btn-link d-lg-none me-2 text-white-75 text-decoration-none" onClick={toggleSidebar}>
+                            <Menu size={22} />
                         </button>
-                        <span className="navbar-brand mb-0 h4 fw-bold text-dark">
-                            Sistema de Inventario
-                        </span>
+                        <span className="navbar-brand mb-0 fw-bold">Inventario</span>
+                        <div className="ms-auto"></div>
                     </div>
                 </nav>
 
-                {/* Espaciador para compensar el navbar fijo */}
-                <div style={{ height: '80px' }}></div>
+                {/* Espaciador bajo la navbar fija */}
+                <div style={{ height: '56px' }}></div>
 
                 {/* Contenido */}
-                <div className="p-4">
+                <div className="container-fluid p-4">
                     {children}
                 </div>
             </div>

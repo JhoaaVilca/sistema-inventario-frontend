@@ -188,7 +188,7 @@ function ListarEntradas() {
     };
 
     return (
-        <div className="container mt-4">
+        <div className="mt-4">
             <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
                 <div className="p-2 bg-warning bg-opacity-10 rounded-3">
                     <Calendar size={24} className="text-warning" />
@@ -347,8 +347,8 @@ function ListarEntradas() {
                     <Card.Body className="text-center text-muted">No hay entradas para mostrar.</Card.Body>
                 </Card>
             ) : (
-                <div className="card shadow-sm border-0">
-                    <div className="card-header bg-white border-0 py-3">
+                <div className="list-card">
+                    <div className="list-card-header py-3 px-3">
                         <h5 className="mb-0 text-dark fw-semibold">
                             Lista de Entradas
                             {entradas.length > 0 && (
@@ -356,7 +356,7 @@ function ListarEntradas() {
                             )}
                         </h5>
                     </div>
-                    <div className="card-body p-0">
+                    <div className="list-card-body p-0">
                         <div className="table-responsive">
                             <Table hover className="mb-0">
                                 <thead className="table-light text-center">
@@ -368,7 +368,7 @@ function ListarEntradas() {
                                         <th className="fw-semibold py-3">Total</th>
                                         <th className="fw-semibold py-3">Factura</th>
                                         <th className="fw-semibold py-3">Detalles</th>
-                                        <th className="fw-semibold py-3" style={{ width: '160px' }}>Acciones</th>
+                                        <th className="fw-semibold py-3 col-actions">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>

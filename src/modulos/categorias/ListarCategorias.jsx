@@ -89,7 +89,7 @@ function ListarCategorias() {
     );
 
     return (
-        <div className="container mt-4">
+        <div className="container-fluid mt-4">
             <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
                 <div className="p-2 bg-primary bg-opacity-10 rounded-3">
                     <Grid3X3 size={24} className="text-primary" />
@@ -114,9 +114,9 @@ function ListarCategorias() {
                 </Alert>
             )}
 
-            {/* Tabla */}
-            <div className="card shadow-sm border-0">
-                <div className="card-header bg-white border-0 py-3">
+            {/* Listado unificado */}
+            <div className="list-card">
+                <div className="list-card-header py-3 px-3">
                     <div className="d-flex justify-content-between align-items-center">
                         <h5 className="mb-0 text-dark fw-semibold">
                             Lista de Categorías
@@ -162,15 +162,15 @@ function ListarCategorias() {
                         </div>
                     </div>
                 </div>
-                <div className="card-body p-0">
+                <div className="list-card-body p-0">
                     <div className="table-responsive">
                         <Table hover className="mb-0">
                             <thead className="table-light text-center">
                                 <tr>
                                     <th className="fw-semibold py-3">Nombre</th>
                                     <th className="fw-semibold py-3">Descripción</th>
-                                    <th className="fw-semibold py-3" style={{ width: '120px' }}>Estado</th>
-                                    <th className="fw-semibold py-3" style={{ width: '180px' }}>Acciones</th>
+                                    <th className="fw-semibold py-3">Estado</th>
+                                    <th className="fw-semibold py-3 col-actions">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="text-center align-middle">

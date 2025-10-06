@@ -74,7 +74,7 @@ const ProductosPorCategoria = () => {
 
     if (loading) {
         return (
-            <div className="container mt-4">
+            <div className="mt-4">
                 <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
                     <div className="text-center">
                         <Spinner animation="border" variant="primary" />
@@ -87,7 +87,7 @@ const ProductosPorCategoria = () => {
 
     if (error) {
         return (
-            <div className="container mt-4">
+            <div className="mt-4">
                 <Alert variant="danger" dismissible onClose={() => setError('')}>
                     {error}
                 </Alert>
@@ -97,7 +97,7 @@ const ProductosPorCategoria = () => {
 
     if (!categoria) {
         return (
-            <div className="container mt-4">
+            <div className="mt-4">
                 <Alert variant="warning">
                     Categoría no encontrada.
                 </Alert>
@@ -106,7 +106,7 @@ const ProductosPorCategoria = () => {
     }
 
     return (
-        <div className="container mt-4">
+        <div className="mt-4">
             {/* Header */}
             <div className="d-flex align-items-center gap-3 mb-4">
                 <Button
