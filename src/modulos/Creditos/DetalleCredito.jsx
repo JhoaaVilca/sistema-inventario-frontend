@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Table, Button, Form, Row, Col, Alert } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Table, Button, Form, Row, Col, Alert, Card, Badge } from 'react-bootstrap';
+import { ArrowLeft, User, Wallet } from 'lucide-react';
 import creditoService from '../../servicios/creditoService';
 
 function DetalleCredito() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [credito, setCredito] = useState(null);
   const [monto, setMonto] = useState('');
   const [fechaPago, setFechaPago] = useState('');
@@ -12,9 +14,15 @@ function DetalleCredito() {
   const [observacion, setObservacion] = useState('');
   const [msg, setMsg] = useState(null);
 
+  const hoyISO = () => new Date().toISOString().slice(0, 10);
+
   const cargar = async () => {
     const resp = await creditoService.obtener(id);
     setCredito(resp);
+    // Prefill: fecha = hoy, monto = saldo pendiente (si > 0)
+    setFechaPago(hoyISO());
+    const saldo = Number(resp?.saldoPendiente || 0);
+    setMonto(saldo > 0 ? saldo.toFixed(2) : '');
   };
 
   useEffect(() => { cargar(); }, [id]);
@@ -30,6 +38,7 @@ function DetalleCredito() {
       });
       setMsg({ type: 'success', text: 'Pago registrado' });
       setMonto(''); setObservacion('');
+      setFechaPago(hoyISO());
       await cargar();
     } catch (err) {
       const text = err?.response?.data || 'Error al registrar pago';
@@ -37,87 +46,141 @@ function DetalleCredito() {
     }
   };
 
+  const formatearMoneda = (v) => new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(v || 0);
+  const badgeEstado = (est) => {
+    const map = { VIGENTE: 'primary', VENCIDO: 'danger', PAGADO: 'success', CANCELADO: 'secondary' };
+    const variant = map[(est || '').toUpperCase()] || 'secondary';
+    return <Badge bg={variant}>{est || '—'}</Badge>;
+  };
+
   if (!credito) return <div className="container mt-3">Cargando...</div>;
 
   return (
     <div className="container mt-3">
-      <h4>Crédito #{credito.idCredito}</h4>
+      <div className="d-flex align-items-center mb-2">
+        <Button variant="outline-secondary" size="sm" className="me-2" onClick={() => navigate(-1)}>
+          <ArrowLeft size={16} className="me-1" /> Volver
+        </Button>
+        <h4 className="mb-0">Crédito #{credito.idCredito}</h4>
+      </div>
       {msg && <Alert variant={msg.type}>{msg.text}</Alert>}
-      <Row className="mb-3">
-        <Col md={6}>
-          <div><strong>Cliente:</strong> {credito.nombreCliente}</div>
-          <div><strong>Monto Total:</strong> {credito.montoTotal?.toFixed(2)}</div>
-          <div><strong>Saldo Pendiente:</strong> {credito.saldoPendiente?.toFixed(2)}</div>
-        </Col>
-        <Col md={6}>
-          <div><strong>Inicio:</strong> {credito.fechaInicio}</div>
-          <div><strong>Vencimiento:</strong> {credito.fechaVencimiento || '-'}</div>
-          <div><strong>Estado:</strong> {credito.estado}</div>
-        </Col>
-      </Row>
 
-      <h6>Pagos</h6>
-      <Table bordered size="sm">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Fecha</th>
-            <th>Monto</th>
-            <th>Medio</th>
-            <th>Obs</th>
-          </tr>
-        </thead>
-        <tbody>
-          {credito.pagos && credito.pagos.length > 0 ? (
-            credito.pagos.map((p, idx) => (
-              <tr key={p.idPago || idx}>
-                <td>{idx + 1}</td>
-                <td>{p.fechaPago}</td>
-                <td>{p.monto?.toFixed(2)}</td>
-                <td>{p.medioPago}</td>
-                <td>{p.observacion}</td>
-              </tr>
-            ))
-          ) : (
-            <tr><td colSpan={5}>Sin pagos</td></tr>
-          )}
-        </tbody>
-      </Table>
+      {/* Resumen */}
+      <Card className="mb-3 border-0 shadow-sm">
+        <Card.Header className="bg-white border-bottom">
+          <div className="d-flex align-items-center gap-3">
+            <div className="p-2 bg-primary bg-opacity-10 rounded-3">
+              <Wallet size={20} className="text-primary" />
+            </div>
+            <div>
+              <div className="d-flex align-items-center gap-2">
+                <h6 className="mb-0">{credito.nombreCliente}</h6>
+                <small className="text-muted">Inicio {credito.fechaInicio}</small>
+              </div>
+              <small className="text-muted">Vence: {credito.fechaVencimiento || '—'}</small>
+            </div>
+            <div className="ms-auto d-flex align-items-center gap-3">
+              <div className="text-end">
+                <small className="text-muted d-block">Total</small>
+                <span className="fw-bold text-success">{formatearMoneda(credito.montoTotal)}</span>
+              </div>
+              <div className="text-end">
+                <small className="text-muted d-block">Saldo</small>
+                <span className={`fw-bold ${Number(credito.saldoPendiente||0) === 0 ? 'text-success' : 'text-danger'}`}>{formatearMoneda(credito.saldoPendiente)}</span>
+              </div>
+              {badgeEstado(credito.estado)}
+            </div>
+          </div>
+        </Card.Header>
+      </Card>
 
-      {credito.saldoPendiente > 0 && (
-        <Form onSubmit={registrarPago} className="mt-3">
-          <Row>
-            <Col md={3}>
-              <Form.Group className="mb-2">
-                <Form.Label>Fecha de pago</Form.Label>
-                <Form.Control type="date" value={fechaPago} onChange={(e) => setFechaPago(e.target.value)} required />
-              </Form.Group>
-            </Col>
-            <Col md={3}>
-              <Form.Group className="mb-2">
-                <Form.Label>Monto</Form.Label>
-                <Form.Control type="number" step="0.01" value={monto} onChange={(e) => setMonto(e.target.value)} required />
-              </Form.Group>
-            </Col>
-            <Col md={3}>
-              <Form.Group className="mb-2">
-                <Form.Label>Medio</Form.Label>
-                <Form.Select value={medioPago} onChange={(e) => setMedioPago(e.target.value)}>
-                  <option>EFECTIVO</option>
-                  <option>TRANSFERENCIA</option>
-                  <option>TARJETA</option>
-                </Form.Select>
-              </Form.Group>
-            </Col>
-            <Col md={3}>
-              <Form.Group className="mb-2">
-                <Form.Label>Obs</Form.Label>
-                <Form.Control value={observacion} onChange={(e) => setObservacion(e.target.value)} />
-              </Form.Group>
-            </Col>
-          </Row>
-          <Button type="submit">Registrar pago</Button>
-        </Form>
+      {/* Pagos */}
+      <Card className="border-0 shadow-sm mb-3">
+        <Card.Header className="bg-white border-bottom">
+          <div className="d-flex align-items-center">
+            <h6 className="mb-0">Pagos</h6>
+            <div className="ms-auto">
+              {Number(credito.saldoPendiente||0) > 0 && (
+                <a href="#form-pago" className="btn btn-sm btn-primary">Pagar</a>
+              )}
+            </div>
+          </div>
+        </Card.Header>
+        <Card.Body className="p-0">
+          <div className="table-responsive">
+            <Table hover size="sm" className="mb-0">
+              <thead className="table-light">
+                <tr>
+                  <th className="py-3">#</th>
+                  <th className="py-3">Fecha</th>
+                  <th className="py-3 text-end">Monto</th>
+                  <th className="py-3">Medio</th>
+                  <th className="py-3">Obs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {credito.pagos && credito.pagos.length > 0 ? (
+                  credito.pagos.map((p, idx) => (
+                    <tr key={p.idPago || idx}>
+                      <td>{idx + 1}</td>
+                      <td>{p.fechaPago}</td>
+                      <td className="text-end fw-medium">{formatearMoneda(p.monto)}</td>
+                      <td>{p.medioPago}</td>
+                      <td>{p.observacion}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan={5} className="text-center text-muted py-3">Sin pagos</td></tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+        </Card.Body>
+      </Card>
+
+      {Number(credito.saldoPendiente||0) > 0 && (
+        <Card className="border-0 shadow-sm" id="form-pago">
+          <Card.Header className="bg-white border-bottom">
+            <h6 className="mb-0">Pagar</h6>
+          </Card.Header>
+          <Card.Body>
+            <Form onSubmit={registrarPago}>
+              <Row className="g-3">
+                <Col md={3}>
+                  <Form.Group>
+                    <Form.Label>Fecha de pago</Form.Label>
+                    <Form.Control type="date" value={fechaPago} onChange={(e) => setFechaPago(e.target.value)} required />
+                  </Form.Group>
+                </Col>
+                <Col md={3}>
+                  <Form.Group>
+                    <Form.Label>Monto</Form.Label>
+                    <Form.Control type="number" step="0.01" value={monto} onChange={(e) => setMonto(e.target.value)} required />
+                  </Form.Group>
+                </Col>
+                <Col md={3}>
+                  <Form.Group>
+                    <Form.Label>Medio</Form.Label>
+                    <Form.Select value={medioPago} onChange={(e) => setMedioPago(e.target.value)}>
+                      <option>EFECTIVO</option>
+                      <option>TRANSFERENCIA</option>
+                      <option>TARJETA</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+                <Col md={3}>
+                  <Form.Group>
+                    <Form.Label>Observación</Form.Label>
+                    <Form.Control value={observacion} onChange={(e) => setObservacion(e.target.value)} />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <div className="mt-3">
+                <Button type="submit" variant="primary">Pagar</Button>
+              </div>
+            </Form>
+          </Card.Body>
+        </Card>
       )}
     </div>
   );
