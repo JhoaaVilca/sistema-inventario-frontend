@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Form, Card, Badge, Collapse, Alert, Modal } from "react-bootstrap";
+import { Table, Button, Form, Card, Badge, Collapse, Alert, Modal, Spinner } from "react-bootstrap";
 import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
 import DetalleSalida from "./DetalleSalida";
@@ -23,6 +23,7 @@ function ListarSalidas() {
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
+    const [cargando, setCargando] = useState(false);
 
     const toggleSalida = async (salidaId) => {
         try {
@@ -41,6 +42,7 @@ function ListarSalidas() {
 
     const obtenerSalidas = async () => {
         try {
+            setCargando(true);
             setErrorListado("");
             const { data } = await apiClient.get("/salidas", { params: { page, size } });
             setSalidas(data?.content || []);
@@ -48,11 +50,14 @@ function ListarSalidas() {
         } catch (error) {
             console.error("Error al obtener salidas:", error);
             setErrorListado("No se pudo cargar el listado de salidas.");
+        } finally {
+            setCargando(false);
         }
     };
 
     const filtrarSalidas = async () => {
         try {
+            setCargando(true);
             let url = `/salidas`;
             if (fechaInicio && fechaFin) {
                 url += `/filtrar/rango?inicio=${fechaInicio}&fin=${fechaFin}`;
@@ -64,6 +69,8 @@ function ListarSalidas() {
             setFiltrosActivos(Boolean(fechaInicio && fechaFin));
         } catch (error) {
             console.error("Error al filtrar salidas:", error);
+        } finally {
+            setCargando(false);
         }
     };
 
@@ -131,6 +138,7 @@ function ListarSalidas() {
                     <h3 className="mb-0 text-dark fw-bold">Gestión de Salidas</h3>
                     <small className="text-muted">Administra las salidas de productos del inventario</small>
                 </div>
+                {cargando && <Spinner animation="border" size="sm" />}
             </div>
 
             {errorListado && (

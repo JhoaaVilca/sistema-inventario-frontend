@@ -61,8 +61,10 @@ function Layout({ children }) {
                 }}>
 
                 {/* Header del sidebar */}
-                <div className="p-3 border-bottom border-secondary">
-                    <h5 className="text-white text-center mb-0">Comercial Yoli</h5>
+                <div className="p-4 border-0">
+                    <div className="text-white text-center mb-0 fw-bold" style={{ fontSize: '1.35rem', letterSpacing: '.3px' }}>
+                        Comercial Yoli
+                    </div>
                 </div>
 
                 {/* Enlaces de navegación */}
@@ -160,24 +162,22 @@ function Layout({ children }) {
             )}
 
             {/* Contenido principal */}
-            <div className="bg-white min-vh-100" style={{ marginLeft: isMobile ? '0' : '250px' }}>
-                {/* Navbar superior útil (sin título del módulo) */}
-                <nav className="navbar navbar-expand-lg navbar-dark navbar-olive fixed-top" style={{
-                    zIndex: 1030,
-                    marginLeft: isMobile ? '0' : '250px',
-                    width: isMobile ? '100%' : 'calc(100% - 250px)'
-                }}>
-                    <div className="container-fluid">
-                        <button className="btn btn-link d-lg-none me-2 text-white-75 text-decoration-none" onClick={toggleSidebar}>
-                            <Menu size={22} />
-                        </button>
-                        <span className="navbar-brand mb-0 fw-bold">Inventario</span>
-                        <div className="ms-auto"></div>
-                    </div>
-                </nav>
+            <div className="bg-white min-vh-100" style={{ marginLeft: isMobile ? '0' : '250px', position: 'relative' }}>
+                {/* Topbar solo en móviles */}
+                {isMobile && (
+                    <nav className="navbar navbar-dark navbar-olive fixed-top border-0" style={{ zIndex: 1030 }}>
+                        <div className="container-fluid">
+                            <button className="btn btn-link me-2 text-white-75 text-decoration-none" onClick={toggleSidebar} aria-label="Abrir menú">
+                                <Menu size={22} />
+                            </button>
+                            <span className="navbar-brand mb-0 fw-bold">Comercial Yoli</span>
+                            <div className="ms-auto"></div>
+                        </div>
+                    </nav>
+                )}
 
-                {/* Espaciador bajo la navbar fija */}
-                <div style={{ height: '56px' }}></div>
+                {/* Espaciador bajo topbar móvil */}
+                {isMobile && (<div style={{ height: '56px' }}></div>)}
 
                 {/* Contenido */}
                 <div className="container-fluid p-4">

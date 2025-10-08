@@ -235,7 +235,7 @@ const DetalleEntrada = ({ entrada, isOpen, onToggle, onVerFactura, onSubirFactur
                 onClick={onToggle}
                 style={{ cursor: 'pointer' }}
             >
-                <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div className="d-flex flex-wrap align-items-center gap-3">
                     {/* Izquierda: proveedor y documento */}
                     <div className="d-flex align-items-center">
                         <Truck size={20} className="me-2 text-primary" />
@@ -249,15 +249,14 @@ const DetalleEntrada = ({ entrada, isOpen, onToggle, onVerFactura, onSubirFactur
                             </small>
                         </div>
                     </div>
-                    {/* Centro: total y estado */}
-                    <div className="d-flex align-items-center gap-3">
+                    {/* Derecha: bloque total + estado alineado y chevron al extremo */}
+                    <div className="ms-auto d-flex align-items-center gap-3">
                         <div className="text-end">
                             <small className="text-muted d-block">Total</small>
                             <span className="fw-bold text-success">{formatearMoneda(totalMostrado)}</span>
                         </div>
                         {getEstadoBadge(entrada.estado)}
                     </div>
-                    {/* Derecha: solo chevron para simplificar */}
                     <div className="d-flex align-items-center">
                         {isOpen ? <ChevronUp size={20} className="ms-1" /> : <ChevronDown size={20} className="ms-1" />}
                     </div>
