@@ -6,6 +6,8 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
     const [cantidad, setCantidad] = useState("");
     const [precioUnitario, setPrecioUnitario] = useState("");
+    // Key para forzar el remount del selector y limpiar visualmente tras agregar
+    const [selectorKey, setSelectorKey] = useState(0);
 
     const agregarProducto = () => {
         if (!productoSeleccionado) return;
@@ -22,10 +24,11 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
         };
 
         setProductosSalida([...(productosSalida || []), nuevoDetalle]);
-        // limpiar inputs automáticamente
+        // limpiar inputs y selector automáticamente
         setProductoSeleccionado(null);
         setCantidad("");
         setPrecioUnitario("");
+        setSelectorKey((k) => k + 1); // fuerza limpiar el SelectProductos
     };
 
     const eliminarDetalle = (index) => {
@@ -40,6 +43,7 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
             <Row className="g-2 mb-3">
                 <Col md={4} sm={6}>
                     <SelectProductos
+                        key={selectorKey}
                         onProductoSeleccionado={(p) => {
                             setProductoSeleccionado(p);
                             // Pre-cargar precio unitario si está vacío
@@ -49,11 +53,6 @@ function TablaProductosSalida({ productosSalida, setProductosSalida }) {
                         }}
                         placeholder="Escribe para buscar productos..."
                     />
-                    {productoSeleccionado && (
-                        <div className="small text-muted mt-1">
-                            Stock: {productoSeleccionado.stock ?? 0} {productoSeleccionado.unidadMedida || ""} · Precio sugerido: S/{(productoSeleccionado.precio ?? 0).toFixed(2)}
-                        </div>
-                    )}
                 </Col>
                 <Col md={2} sm={3}>
                     <Form.Control

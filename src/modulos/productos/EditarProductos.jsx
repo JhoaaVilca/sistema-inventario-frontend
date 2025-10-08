@@ -12,6 +12,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
     const [unidadMedida, setUnidadMedida] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
     const [esPerecible, setEsPerecible] = useState(false);
+    const [fechaVencimientoInicial, setFechaVencimientoInicial] = useState("");
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [categoria, setCategoria] = useState("");
 
@@ -30,6 +31,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             setUnidadMedida(producto.unidadMedida || "");
             setFechaIngreso(producto.fechaIngreso || "");
             setEsPerecible(producto.esPerecible || false);
+            setFechaVencimientoInicial(producto.fechaVencimientoInicial || "");
             setDescripcionCorta(producto.descripcionCorta || "");
             setCategoria(producto.idCategoria || "");
             setError("");
@@ -62,6 +64,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             unidadMedida,
             fechaIngreso,
             esPerecible,
+            fechaVencimientoInicial: (esPerecible && parseInt(stock || 0, 10) > 0) ? (fechaVencimientoInicial || null) : null,
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
         };
@@ -120,7 +123,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                     </Row>
 
                     <Row>
-                        <Col md={12}>
+                        <Col md={6}>
                             <Form.Group controlId="formDescripcion" className="mb-3">
                                 <Form.Label>Descripción Corta</Form.Label>
                                 <Form.Control
@@ -132,7 +135,30 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    
+                    <Col md={6}>
+                            <Form.Group controlId="formUnidadMedida" className="mb-3">
+                                <Form.Label>Unidad de Medida <span className="text-danger">*</span></Form.Label>
+                                <Form.Select
+                                    value={unidadMedida}
+                                    onChange={(e) => setUnidadMedida(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Selecciona unidad</option>
+                                    <option value="unidad">Unidad</option>
+                                    <option value="kg">Kilogramo (kg)</option>
+                                    <option value="g">Gramo (g)</option>
+                                    <option value="litro">Litro (L)</option>
+                                    <option value="ml">Mililitro (ml)</option>
+                                    <option value="caja">Caja</option>
+                                    <option value="paquete">Paquete</option>
+                                    <option value="bolsa">Bolsa</option>
+                                    <option value="botella">Botella</option>
+                                    <option value="lata">Lata</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        </Row>
 
                     {/* Precios */}
                     <Row>
@@ -168,7 +194,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
 
                     {/* Stock e Inventario */}
                     <Row>
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Group controlId="formStock" className="mb-3">
                                 <Form.Label>Stock Actual <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
@@ -181,7 +207,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Group controlId="formStockMinimo" className="mb-3">
                                 <Form.Label>Stock Mínimo <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
@@ -194,31 +220,11 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
-                            <Form.Group controlId="formUnidadMedida" className="mb-3">
-                                <Form.Label>Unidad de Medida <span className="text-danger">*</span></Form.Label>
-                                <Form.Select
-                                    value={unidadMedida}
-                                    onChange={(e) => setUnidadMedida(e.target.value)}
-                                    required
-                                >
-                                    <option value="">Selecciona unidad</option>
-                                    <option value="unidad">Unidad</option>
-                                    <option value="kg">Kilogramo (kg)</option>
-                                    <option value="g">Gramo (g)</option>
-                                    <option value="litro">Litro (L)</option>
-                                    <option value="ml">Mililitro (ml)</option>
-                                    <option value="caja">Caja</option>
-                                    <option value="paquete">Paquete</option>
-                                    <option value="bolsa">Bolsa</option>
-                                    <option value="botella">Botella</option>
-                                    <option value="lata">Lata</option>
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
+                        
                     </Row>
 
-                    {/* Categoría y Proveedor */}
+
+                    {/* Categoría y Fechas */}
                     <Row>
                         <Col md={6}>
                             <Form.Group controlId="formCategoria" className="mb-3">
@@ -237,10 +243,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                    </Row>
-
-                    {/* Fechas */}
-                    <Row>
+                        {/* Fechas */}
                         <Col md={6}>
                             <Form.Group controlId="formFechaIngreso" className="mb-3">
                                 <Form.Label>Fecha de Ingreso <span className="text-danger">*</span></Form.Label>
@@ -252,10 +255,36 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-
                     </Row>
 
-                    {/* Fecha de Vencimiento (condicional) */}
+                    {/* Perecible y vencimiento */}
+                    <Row>
+                        <Col md={6}>
+                            <Form.Group controlId="formEsPerecible" className="mb-3">
+                                <Form.Check
+                                    type="switch"
+                                    label="Producto perecible (requiere vencimiento en stock inicial)"
+                                    checked={esPerecible}
+                                    onChange={(e) => setEsPerecible(e.target.checked)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md={6}>
+                            <Form.Group controlId="formFechaVencimientoInicial" className="mb-3">
+                                <Form.Label>Fecha de Vencimiento (lote inicial)</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    value={fechaVencimientoInicial}
+                                    onChange={(e) => setFechaVencimientoInicial(e.target.value)}
+                                    required={esPerecible && parseInt(stock || 0, 10) > 0}
+                                    disabled={!esPerecible || parseInt(stock || 0, 10) <= 0}
+                                />
+                                <Form.Text muted>
+                                    Obligatorio si el producto es perecible y el stock inicial es mayor a 0.
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
                     <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
                         <Button

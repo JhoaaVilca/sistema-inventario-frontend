@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Form, Card, Badge, Collapse, Alert } from "react-bootstrap";
+import { Table, Button, Form, Card, Badge, Collapse, Alert, Modal } from "react-bootstrap";
 import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
-import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2 } from "lucide-react";
+import DetalleSalida from "./DetalleSalida";
+import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2, ShoppingCart } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 import Paginador from "../common/Paginador";
 
@@ -11,14 +12,32 @@ function ListarSalidas() {
     const [fechaInicio, setFechaInicio] = useState("");
     const [fechaFin, setFechaFin] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [salidaSeleccionada, setSalidaSeleccionada] = useState(null);
+    // Eliminamos el modal clásico; ahora usaremos edición inline dentro del detalle
+    const [salidaExpandida, setSalidaExpandida] = useState(null);
+    const [showDetalleModal, setShowDetalleModal] = useState(false);
+    const [salidaDetalle, setSalidaDetalle] = useState(null);
+    const [editMode, setEditMode] = useState(false);
     const [filtrosActivos, setFiltrosActivos] = useState(false);
     const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
     const [errorListado, setErrorListado] = useState("");
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
+
+    const toggleSalida = async (salidaId) => {
+        try {
+            setEditMode(false);
+            setShowDetalleModal(true);
+            // Intentar obtener el detalle completo (incluye cliente)
+            const { data } = await apiClient.get(`/salidas/${salidaId}`);
+            setSalidaDetalle(data || null);
+        } catch (e) {
+            // Si falla, usa el item de la lista como fallback
+            const s = salidas.find(x => x.idSalida === salidaId) || null;
+            setSalidaDetalle(s);
+            console.error('No se pudo cargar el detalle de la salida, usando datos del listado:', e);
+        }
+    };
 
     const obtenerSalidas = async () => {
         try {
@@ -38,8 +57,10 @@ function ListarSalidas() {
             if (fechaInicio && fechaFin) {
                 url += `/filtrar/rango?inicio=${fechaInicio}&fin=${fechaFin}`;
             }
-            const { data } = await apiClient.get(url);
-            setSalidas(data);
+            const { data } = await apiClient.get(url, { params: { page, size } });
+            const esArray = Array.isArray(data);
+            setSalidas(esArray ? data : (data?.content || []));
+            setTotalPages(esArray ? 1 : (data?.totalPages || 0));
             setFiltrosActivos(Boolean(fechaInicio && fechaFin));
         } catch (error) {
             console.error("Error al filtrar salidas:", error);
@@ -78,19 +99,16 @@ function ListarSalidas() {
         scrollToTop();
     };
 
-    const handleEditar = (salida) => {
-        setSalidaSeleccionada(salida);
-        setShowEditModal(true);
-    };
+    // Edición inline se maneja con editMode
 
-    const handleEliminacion = async (idSalida) => {
-        if (!window.confirm("¿Seguro que quieres eliminar esta salida?")) return;
+    const handleCancelar = async (idSalida) => {
+        if (!window.confirm("¿Seguro que quieres cancelar esta salida? Esto revertirá el stock.")) return;
 
         try {
-            await apiClient.delete(`/salidas/${idSalida}`);
-            obtenerSalidas();
+            await apiClient.put(`/salidas/${idSalida}/cancelar`);
+            await obtenerSalidas();
         } catch (error) {
-            console.error("Error al eliminar salida:", error);
+            console.error("Error al cancelar salida:", error);
         }
     };
 
@@ -212,113 +230,35 @@ function ListarSalidas() {
                 </Button>
             </div>
 
-            <div className="list-card">
-                <div className="list-card-header py-3 px-3">
-                    <h5 className="mb-0 text-dark fw-semibold">
-                        Lista de Salidas
-                        {salidas.length > 0 && (
-                            <span className="badge bg-primary ms-2">{salidas.length}</span>
-                        )}
-                    </h5>
-                </div>
-                <div className="list-card-body p-0">
-                    <div className="table-responsive">
-                        <Table hover className="mb-0">
-                            <thead className="table-light text-center">
-                                <tr>
-                                    <th className="fw-semibold py-3">Fecha</th>
-                                    <th className="fw-semibold py-3">Cliente</th>
-                                    <th className="fw-semibold py-3">Tipo Venta</th>
-                                    <th className="fw-semibold py-3">Total</th>
-                                    <th className="fw-semibold py-3">Detalles</th>
-                                    <th className="fw-semibold py-3 col-actions">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {salidas?.map((salida) => (
-                                    <tr key={salida.idSalida}>
-                                        <td>{salida.fechaSalida}</td>
-                                        <td>
-                                            {salida.nombreCliente ? (
-                                                <div>
-                                                    <strong>{salida.dniCliente}</strong>
-                                                    <br />
-                                                    <small>{salida.nombreCliente}</small>
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    <span className="text-muted">Sin cliente</span>
-                                                    <br />
-                                                    <Button
-                                                        variant="outline-primary"
-                                                        size="sm"
-                                                        className="mt-1"
-                                                        onClick={() => handleAsignarCliente(salida.idSalida)}
-                                                    >
-                                                        Asignar Cliente
-                                                    </Button>
-                                                </div>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <Badge bg={salida.tipoVenta === 'CONTADO' ? 'success' : 'warning'}>
-                                                {salida.tipoVenta || 'CONTADO'}
-                                            </Badge>
-                                        </td>
-                                        <td>S/{salida.totalSalida?.toFixed(2)}</td>
-                                        <td>
-                                            <Table size="sm" bordered>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Producto</th>
-                                                        <th>Cantidad</th>
-                                                        <th>Precio Unitario</th>
-                                                        <th>Subtotal</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {salida.detalles?.map((detalle, idx) => (
-                                                        <tr key={idx}>
-                                                            <td>{detalle.nombreProducto}</td>
-                                                            <td>{detalle.cantidad}</td>
-                                                            <td>S/{detalle.precioUnitario}</td>
-                                                            <td>S/{detalle.subtotal}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </Table>
-                                        </td>
-                                        <td>
-                                            <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                                <Button
-                                                    variant="outline-warning"
-                                                    size="sm"
-                                                    onClick={() => handleEditar(salida)}
-                                                    title="Ver/Editar salida"
-                                                    className="btn-sm shadow-sm"
-                                                    style={{ minWidth: '32px' }}
-                                                >
-                                                    <Edit size={12} />
-                                                    <span className="d-none d-xl-inline ms-1">Ver/Editar</span>
-                                                </Button>
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    onClick={() => handleEliminacion(salida.idSalida)}
-                                                    title="Eliminar salida"
-                                                    className="btn-sm shadow-sm"
-                                                    style={{ minWidth: '32px' }}
-                                                >
-                                                    <Trash2 size={12} />
-                                                    <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
+            <div className="container-fluid p-0">
+                <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
+                    <div className="p-2 bg-primary bg-opacity-10 rounded-3">
+                        <ShoppingCart size={24} className="text-primary" />
                     </div>
+                    <div>
+                        <h5 className="mb-0 text-dark fw-bold">
+                            Lista de Salidas
+                            {salidas.length > 0 && (
+                                <span className="badge bg-primary ms-2">{salidas.length}</span>
+                            )}
+                        </h5>
+                        <small className="text-muted">Gestiona las salidas de inventario</small>
+                    </div>
+                </div>
+                
+                <div className="row">
+                    {salidas?.map((salida) => (
+                        <div key={salida.idSalida} className="col-12 mb-3">
+                            <DetalleSalida 
+                                salida={salida}
+                                isOpen={salidaExpandida === salida.idSalida}
+                                onToggle={() => toggleSalida(salida.idSalida)}
+                            />
+                        </div>
+                    ))}
+                </div>
+                
+                <div className="d-flex justify-content-center mt-4">
                     <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={false} />
                 </div>
             </div>
@@ -329,14 +269,51 @@ function ListarSalidas() {
                 onSalidaAgregada={handleSalidaAgregada}
             />
 
-            {salidaSeleccionada && (
-                <EditarSalida
-                    show={showEditModal}
-                    handleClose={handleCerrarModalEditar}
-                    salida={salidaSeleccionada}
-                    onSalidaEditada={obtenerSalidas}
-                />
-            )}
+            {/* Modal Detalle Salida con edición inline */}
+            <Modal show={showDetalleModal} onHide={() => { setShowDetalleModal(false); setSalidaDetalle(null); setEditMode(false); }} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Detalle de Salida {salidaDetalle ? `#${salidaDetalle.idSalida}` : ''}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {salidaDetalle && (
+                        editMode ? (
+                            <EditarSalida
+                                show={false}
+                                handleClose={() => setEditMode(false)}
+                                salida={salidaDetalle}
+                                onSalidaEditada={() => { obtenerSalidas(); setEditMode(false); }}
+                                inlineMode={true}
+                            />
+                        ) : (
+                            <DetalleSalida
+                                salida={salidaDetalle}
+                                isOpen={true}
+                                onToggle={() => {}}
+                                ocultarHeader={true}
+                            />
+                        )
+                    )}
+                </Modal.Body>
+                {!editMode && (
+                    <Modal.Footer>
+                        <div className="d-flex justify-content-between w-100">
+                            <div>
+                                <Button variant="outline-secondary" onClick={() => { setShowDetalleModal(false); setSalidaDetalle(null); }}>Cerrar</Button>
+                            </div>
+                            <div className="d-flex gap-2">
+                                {salidaDetalle && (
+                                    <>
+                                        {salidaDetalle.estado !== 'Cancelado' && (
+                                            <Button variant="outline-primary" onClick={() => setEditMode(true)}>Editar</Button>
+                                        )}
+                                        <Button variant="outline-danger" onClick={() => { setShowDetalleModal(false); handleCancelar(salidaDetalle.idSalida); }}>Cancelar</Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </Modal.Footer>
+                )}
+            </Modal>
         </div>
     );
 }

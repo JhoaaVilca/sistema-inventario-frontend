@@ -1,44 +1,53 @@
-/* Olive palette tokens based on Bootstrap variables */
+/* Theming Bootstrap only with CSS variables (no extra CSS frameworks)
+   Nueva paleta basada en la imagen enviada:
+   - Cream:    fondo claro
+   - Slate:    #3E3F5B (color principal/acentos)
+   - Teal:     verde-azulado suave (apoyos)
+   - Mint:     verde claro (fondos suaves)
+
+   NOTA: Si luego defines valores exactos para Teal/Mint/Cream, cámbialos aquí.
+*/
 :root {
-  /* Palette from second image */
-  --olive-deep:  #0F2A1D; /* darkest */
-  --olive-dark:  #375534; /* dark */
-  --olive-main:  #6B9071; /* primary */
-  --olive-soft:  #AEC3B0; /* soft */
-  --olive-cream: #E3EED4; /* light background */
+  /* === Palette tokens === */
+  --palette-cream: #F7F3E3;   /* aproxima al cream de la imagen */
+  --palette-slate: #3E3F5B;   /* valor confirmado por el usuario */
+  --palette-teal:  #8FB6AD;   /* estimación del teal suave de la imagen */
+  --palette-mint:  #B9DBB8;   /* estimación del verde claro de la imagen */
 
-  /* Bootstrap theme tokens */
-  --bs-primary: var(--olive-dark);
-  --bs-primary-rgb: 55, 85, 52;
-  --bs-primary-hover: var(--olive-deep);
-  --bs-link-color: var(--olive-dark);
-  --bs-link-hover-color: var(--olive-deep);
-  --bs-focus-ring-color: rgba(55, 85, 52, 0.25);
+  /* === Bootstrap core mappings === */
+  /* Primary será el Slate; los estados secundarios usan la escala */
+  --bs-primary: var(--palette-slate);
+  --bs-primary-rgb: 62, 63, 91;
+  --bs-primary-hover: #34364d; /* slate un poco más oscuro */
+  --bs-link-color: var(--palette-slate);
+  --bs-link-hover-color: var(--bs-primary-hover);
+  --bs-focus-ring-color: rgba(62, 63, 91, 0.25);
 
-  /* Utility scale */
-  --bs-primary-100: #eef3ea;
-  --bs-primary-200: #dbe6d7;
-  --bs-primary-300: #c6d6c3;
-  --bs-primary-400: var(--olive-soft);
-  --bs-primary-500: var(--olive-main);
-  --bs-primary-600: #58755e;
-  --bs-primary-700: var(--olive-dark);
-  --bs-primary-800: #1f3a29;
-  --bs-primary-900: var(--olive-deep);
+  /* Support scale para utilidades y fondos suaves */
+  --bs-primary-100: #efeff4;              /* slate 100 */
+  --bs-primary-200: #e1e1ea;              /* slate 200 */
+  --bs-primary-300: #cfd0db;              /* slate 300 */
+  --bs-primary-400: var(--palette-teal);  /* usamos teal como acento medio */
+  --bs-primary-500: var(--palette-mint);  /* y mint como acento suave */
+  --bs-primary-600: #676a86;              /* slate 600 aproximado */
+  --bs-primary-700: var(--palette-slate); /* slate base */
+  --bs-primary-800: #2d2f45;              /* slate 800 */
+  --bs-primary-900: #232439;              /* slate 900 */
 
-  --bs-body-bg: var(--olive-cream);
+  /* Body y bordes para fondo crema */
+  --bs-body-bg: var(--palette-cream);
   --bs-body-color: #1f2328;
-  --bs-border-color: #dfe7d7;
+  --bs-border-color: #e6e1cf; /* borde acorde al cream */
 }
 
-/* Navbar */
+/* Navbar (solo clases Bootstrap) */
 .navbar.bg-primary,
 .navbar.navbar-primary { background-color: var(--bs-primary) !important; }
 .navbar { border-top: 0 !important; }
 
-/* Olive navbar matching sidebar */
+/* Navbar alterna oscura basada en Slate profundo */
 .navbar-olive.navbar.navbar-dark { 
-  background-color: var(--olive-deep) !important; 
+  background-color: var(--bs-primary-800) !important; 
   border-bottom: 1px solid rgba(255,255,255,0.08) !important;
 }
 .navbar-olive .navbar-brand, 
@@ -57,14 +66,12 @@
   border-color: var(--bs-primary-hover) !important;
 }
 
-.badge.bg-primary {
-  background-color: var(--bs-primary) !important;
-}
+.badge.bg-primary { background-color: var(--bs-primary) !important; }
 
 .table thead th { background-color: var(--bs-primary-100); }
 
 /* Sidebar */
-.sidebar-olive { background: var(--olive-deep); }
+.sidebar-olive { background: var(--bs-primary-800); }
 .sidebar-olive .nav-link {
   color: #f1f5f2;
   transition: background .15s ease, color .15s ease, box-shadow .15s ease;
@@ -72,9 +79,7 @@
 .sidebar-olive .nav-link:hover {
   background: rgba(255,255,255,.06);
 }
-.sidebar-olive .section-title {
-  color: var(--olive-soft);
-}
+.sidebar-olive .section-title { color: var(--bs-primary-500); }
 /* Active nav link with subtle highlight */
 .sidebar-olive .nav-link.active {
   color: #ffffff !important;
@@ -91,10 +96,10 @@
   left: 0; top: 8px; bottom: 8px;
   width: 4px;
   border-radius: 0 4px 4px 0;
-  background: var(--olive-main);
+  background: var(--bs-primary);
 }
 
-/* Tile cards similar to reference but in olive palette */
+/* Tarjetas con sombra suave (solo utilidades compatibles) */
 .tile-card {
   background: #ffffff;
   border: 1px solid var(--bs-border-color);
@@ -107,7 +112,7 @@
   box-shadow: 0 6px 16px rgba(0,0,0,.08);
 }
 
-/* Generic list container to mimic reference tables inside a card */
+/* Contenedor de listas/tabla con encabezado suave */
 .list-card {
   background: #ffffff;
   border: 1px solid var(--bs-border-color);
@@ -125,7 +130,6 @@
 /* Consistent table alignment and sizing */
 .list-card .table thead th,
 .card .table thead th {
-  vertical-align: middle;
   text-align: center;
   padding-top: .875rem;
   padding-bottom: .875rem;

@@ -95,12 +95,12 @@ function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar product
                     disabled={cargando}
                 />
                 <Button
-                    variant={productoSeleccionado ? "outline-danger" : "outline-primary"}
+                    variant="outline-primary"
                     className="rounded-start-0 px-3"
-                    onClick={handleLimpiar}
-                    title={productoSeleccionado ? "Limpiar selección" : "Buscar productos"}
+                    onClick={() => { setMostrarSugerencias(true); inputRef.current?.querySelector('input')?.focus?.(); }}
+                    title="Buscar productos"
                 >
-                    {productoSeleccionado ? <X size={16} /> : <Search size={16} />}
+                    <Search size={16} />
                 </Button>
             </div>
 

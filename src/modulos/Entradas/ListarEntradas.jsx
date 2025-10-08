@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Table, Button, Form, Card, Badge, Collapse, Alert, Spinner, Modal } from "react-bootstrap";
 import AgregarEntrada from "./AgregarEntrada";
 import EditarEntrada from "./EditarEntrada";
+import DetalleEntrada from "./DetalleEntrada";
 import { Plus, Search, X, Filter, Calendar, Building, ChevronDown, ChevronUp, Edit, Trash2, Upload, FileText, Eye } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 import Paginador from "../common/Paginador";
@@ -14,17 +15,29 @@ function ListarEntradas() {
     const [fechaFin, setFechaFin] = useState("");
     const [numeroFactura, setNumeroFactura] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [entradaSeleccionada, setEntradaSeleccionada] = useState(null);
+    // Eliminado modal de edición clásico; ahora editamos inline en el detalle
     const [filtrosActivos, setFiltrosActivos] = useState(false);
     const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
     const [cargando, setCargando] = useState(false);
     const [errorListado, setErrorListado] = useState("");
     const [subiendoFactura, setSubiendoFactura] = useState(false);
     const [entradaFactura, setEntradaFactura] = useState(null);
+    const [entradaExpandida, setEntradaExpandida] = useState(null); // ya no se usa para UI principal
+    const [showDetalleModal, setShowDetalleModal] = useState(false);
+    const [entradaDetalle, setEntradaDetalle] = useState(null);
+    const [editMode, setEditMode] = useState(false);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
+
+    const toggleEntrada = (entradaId) => {
+        const entrada = entradas.find(e => e.idEntrada === entradaId);
+        if (entrada) {
+            setEntradaDetalle(entrada);
+            setShowDetalleModal(true);
+            setEditMode(false);
+        }
+    };
 
     const obtenerEntradas = async () => {
         try {
@@ -67,8 +80,10 @@ function ListarEntradas() {
             }
 
             const { data } = await apiClient.get(url, { params: { page, size } });
-            setEntradas(data?.content || []);
-            setTotalPages(data?.totalPages || 0);
+            // Soporta tanto respuesta paginada como arreglo simple
+            const esArray = Array.isArray(data);
+            setEntradas(esArray ? data : (data?.content || []));
+            setTotalPages(esArray ? 1 : (data?.totalPages || 0));
             setFiltrosActivos(Boolean(idProveedor || numeroFactura || (fechaInicio && fechaFin)));
         } catch (error) {
             console.error("Error al filtrar entradas:", error);
@@ -98,10 +113,7 @@ function ListarEntradas() {
 
     const handleAgregarEntrada = () => setShowAddModal(true);
     const handleCerrarModalAgregar = () => setShowAddModal(false);
-    const handleCerrarModalEditar = () => {
-        setShowEditModal(false);
-        setEntradaSeleccionada(null);
-    };
+    // Sin modal de edición clásico
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -113,10 +125,7 @@ function ListarEntradas() {
         scrollToTop();
     };
 
-    const handleEditar = (entrada) => {
-        setEntradaSeleccionada(entrada);
-        setShowEditModal(true);
-    };
+    // Edición inline: se maneja con editMode en el modal de detalle
 
     const handleEliminacion = async (idEntrada) => {
         if (!window.confirm("¿Seguro que quieres eliminar esta entrada?")) return;
@@ -178,13 +187,20 @@ function ListarEntradas() {
 
     const handleVerFactura = (entrada) => {
         if (entrada.facturaUrl) {
-            const apiBase = apiClient.defaults.baseURL || '';
-            const backendRoot = apiBase.replace(/\/api\/?$/, '');
-            const url = `${backendRoot}${entrada.facturaUrl}`;
+            const url = resolverFacturaUrl(entrada);
             window.open(url, '_blank');
         } else {
             alert('Esta entrada no tiene factura asociada');
         }
+    };
+
+    // Resuelve la URL absoluta para factura (para preview e "abrir")
+    const resolverFacturaUrl = (entrada) => {
+        const apiBase = apiClient.defaults.baseURL || '';
+        const backendRoot = apiBase.replace(/\/api\/?$/, '');
+        // Si ya es absoluta, devolver tal cual
+        if (/^https?:\/\//i.test(entrada.facturaUrl)) return entrada.facturaUrl;
+        return `${backendRoot}${entrada.facturaUrl}`;
     };
 
     return (
@@ -347,137 +363,38 @@ function ListarEntradas() {
                     <Card.Body className="text-center text-muted">No hay entradas para mostrar.</Card.Body>
                 </Card>
             ) : (
-                <div className="list-card">
-                    <div className="list-card-header py-3 px-3">
-                        <h5 className="mb-0 text-dark fw-semibold">
-                            Lista de Entradas
-                            {entradas.length > 0 && (
-                                <span className="badge bg-primary ms-2">{entradas.length}</span>
-                            )}
-                        </h5>
-                    </div>
-                    <div className="list-card-body p-0">
-                        <div className="table-responsive">
-                            <Table hover className="mb-0">
-                                <thead className="table-light text-center">
-                                    <tr>
-                                        <th className="fw-semibold py-3">Proveedor</th>
-                                        <th className="fw-semibold py-3">Fecha</th>
-                                        <th className="fw-semibold py-3">N° Factura</th>
-                                        <th className="fw-semibold py-3">Estado</th>
-                                        <th className="fw-semibold py-3">Total</th>
-                                        <th className="fw-semibold py-3">Factura</th>
-                                        <th className="fw-semibold py-3">Detalles</th>
-                                        <th className="fw-semibold py-3 col-actions">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {entradas?.map((entrada) => (
-                                        <tr key={entrada.idEntrada}>
-                                            <td>{entrada.proveedor?.nombre}</td>
-                                            <td>{entrada.fechaEntrada}</td>
-                                            <td>
-                                                <span className="fw-medium text-primary">
-                                                    {entrada.numeroFactura || 'Sin número'}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <Badge
-                                                    bg={
-                                                        entrada.estado === 'Registrada' ? 'success' :
-                                                            entrada.estado === 'Pendiente de pago' ? 'warning' :
-                                                                'danger'
-                                                    }
-                                                    className="px-2 py-1"
-                                                >
-                                                    {entrada.estado || 'Registrada'}
-                                                </Badge>
-                                            </td>
-                                            <td>S/{entrada.totalEntrada?.toFixed(2)}</td>
-                                            <td>
-                                                <div className="d-flex justify-content-center gap-1">
-                                                    {entrada.facturaUrl ? (
-                                                        <Button
-                                                            variant="success"
-                                                            size="sm"
-                                                            onClick={() => handleVerFactura(entrada)}
-                                                            title="Ver factura"
-                                                            className="d-flex align-items-center"
-                                                        >
-                                                            <Eye size={14} className="me-1" />
-                                                            <span className="d-none d-md-inline">Ver</span>
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
-                                                            variant="outline-primary"
-                                                            size="sm"
-                                                            onClick={() => handleSubirFactura(entrada)}
-                                                            title="Subir factura"
-                                                            className="d-flex align-items-center"
-                                                        >
-                                                            <Upload size={14} className="me-1" />
-                                                            <span className="d-none d-md-inline">Subir</span>
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <Table size="sm" bordered>
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Producto</th>
-                                                            <th>Cantidad</th>
-                                                            <th>Precio Unitario</th>
-                                                            <th>Subtotal</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {entrada.detalles?.map((detalle, idx) => (
-                                                            <tr key={idx}>
-                                                                <td>{detalle.producto?.nombreProducto}</td>
-                                                                <td>{detalle.cantidad}</td>
-                                                                <td>S/{detalle.precioUnitario}</td>
-                                                                <td>S/{detalle.subtotal}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </Table>
-                                            </td>
-                                            <td>
-                                                <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                                    <Button
-                                                        variant="outline-warning"
-                                                        size="sm"
-                                                        onClick={() => handleEditar(entrada)}
-                                                        title="Editar entrada"
-                                                        disabled={cargando}
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                    >
-                                                        <Edit size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Editar</span>
-                                                    </Button>
-
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        size="sm"
-                                                        onClick={() => handleEliminacion(entrada.idEntrada)}
-                                                        title="Eliminar entrada"
-                                                        disabled={cargando}
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                    >
-                                                        <Trash2 size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                                    </Button>
-                                                </div>
-                                            </td>
-
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
+                <div className="container-fluid p-0">
+                    <div className="d-flex align-items-center gap-3 mb-4 p-3 bg-white rounded-3 shadow-sm border">
+                        <div className="p-2 bg-primary bg-opacity-10 rounded-3">
+                            <Building size={24} className="text-primary" />
                         </div>
+                        <div>
+                            <h5 className="mb-0 text-dark fw-bold">
+                                Lista de Entradas
+                                {entradas.length > 0 && (
+                                    <span className="badge bg-primary ms-2">{entradas.length}</span>
+                                )}
+                            </h5>
+                            <small className="text-muted">Gestiona las entradas de inventario</small>
+                        </div>
+                    </div>
+                    
+                    <div className="row">
+                        {entradas?.map((entrada) => (
+                            <div key={entrada.idEntrada} className="col-12 mb-3">
+                                <DetalleEntrada 
+                                    entrada={entrada}
+                                    isOpen={false}
+                                    onToggle={() => toggleEntrada(entrada.idEntrada)}
+                                    onVerFactura={handleVerFactura}
+                                    onSubirFactura={handleSubirFactura}
+                                    resolverFacturaUrl={resolverFacturaUrl}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    
+                    <div className="d-flex justify-content-center mt-4">
                         <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={cargando} />
                     </div>
                 </div>
@@ -490,15 +407,7 @@ function ListarEntradas() {
                 onEntradaAgregada={handleEntradaAgregada}
             />
 
-            {/* Modal Editar */}
-            {entradaSeleccionada && (
-                <EditarEntrada
-                    show={showEditModal}
-                    handleClose={handleCerrarModalEditar}
-                    entrada={entradaSeleccionada}
-                    onEntradaEditada={obtenerEntradas}
-                />
-            )}
+            {/* Modal de edición clásico eliminado en favor de edición inline */}
 
             {/* Modal para subir factura */}
             <Modal show={subiendoFactura} onHide={() => setSubiendoFactura(false)} centered>
@@ -534,7 +443,7 @@ function ListarEntradas() {
                             onChange={handleFileChange}
                         />
                         <Form.Text className="text-muted">
-                            Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 10MB
+                            Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 100MB
                         </Form.Text>
                     </Form.Group>
                 </Modal.Body>
@@ -543,6 +452,55 @@ function ListarEntradas() {
                         Cancelar
                     </Button>
                 </Modal.Footer>
+            </Modal>
+
+            {/* Modal Detalle Entrada */}
+            <Modal show={showDetalleModal} onHide={() => { setShowDetalleModal(false); setEntradaDetalle(null); setEditMode(false); }} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        Detalle de Entrada {entradaDetalle ? `#${entradaDetalle.idEntrada}` : ''}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {entradaDetalle && (
+                        editMode ? (
+                            <EditarEntrada
+                                show={false}
+                                handleClose={() => setEditMode(false)}
+                                entrada={entradaDetalle}
+                                onEntradaEditada={() => { obtenerEntradas(); setEditMode(false); }}
+                                inlineMode={true}
+                            />
+                        ) : (
+                            <DetalleEntrada
+                                entrada={entradaDetalle}
+                                isOpen={true}
+                                onToggle={() => {}}
+                                onVerFactura={handleVerFactura}
+                                onSubirFactura={handleSubirFactura}
+                                resolverFacturaUrl={resolverFacturaUrl}
+                                ocultarHeader={true}
+                            />
+                        )
+                    )}
+                </Modal.Body>
+                {!editMode && (
+                    <Modal.Footer>
+                        <div className="d-flex justify-content-between w-100">
+                            <div>
+                                <Button variant="outline-secondary" onClick={() => { setShowDetalleModal(false); setEntradaDetalle(null); }}>Cerrar</Button>
+                            </div>
+                            <div className="d-flex gap-2">
+                                {entradaDetalle && (
+                                    <>
+                                        <Button variant="outline-primary" onClick={() => setEditMode(true)}>Editar</Button>
+                                        <Button variant="outline-danger" onClick={() => { setShowDetalleModal(false); handleEliminacion(entradaDetalle.idEntrada); }}>Eliminar</Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </Modal.Footer>
+                )}
             </Modal>
 
         </div>

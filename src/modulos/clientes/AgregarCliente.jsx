@@ -31,7 +31,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
                 setTimeout(() => validarDni(), 100);
             }
         }
-    }, [clienteInicial, show, validarDni]);
+    }, [clienteInicial, show]);
 
     // Limpiar cuando se cierre el modal
     useEffect(() => {
@@ -157,11 +157,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
         onHide();
     };
 
-    useEffect(() => {
-        if (show) {
-            resetForm();
-        }
-    }, [show]);
+    // Este useEffect ya no es necesario porque ya tenemos el de limpiar cuando se cierre el modal
 
     return (
         <Modal show={show} onHide={handleClose} size="lg" centered>

@@ -188,40 +188,7 @@ function ListarProveedores() {
                             )}
                         </h5>
                         <div className="d-flex align-items-center gap-2">
-                            {!mostrarInput ? (
-                                <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    onClick={() => setMostrarInput(true)}
-                                >
-                                    <Search size={16} />
-                                </Button>
-                            ) : (
-                                <InputGroup size="sm" style={{ width: "250px" }}>
-                                    <FormControl
-                                        ref={inputRef}
-                                        autoFocus
-                                        placeholder="Buscar proveedores..."
-                                        value={filtro}
-                                        onChange={(e) => setFiltro(e.target.value)}
-                                    />
-                                    {filtro ? (
-                                        <Button variant="outline-secondary" onClick={limpiarBuscador}>
-                                            <X size={16} />
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant="outline-danger"
-                                            onClick={() => {
-                                                setMostrarInput(false);
-                                                setFiltro("");
-                                            }}
-                                        >
-                                            <X size={16} />
-                                        </Button>
-                                    )}
-                                </InputGroup>
-                            )}
+                            {/* El buscador se maneja desde la sección superior */}
                         </div>
                     </div>
                 </div>

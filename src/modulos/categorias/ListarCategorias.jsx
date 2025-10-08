@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import AgregarCategoria from "./AgregarCategoria";
-import EditarCategoria from "./EditarCategoria";
+import FormularioCategoria from "./FormularioCategoria";
 import { Edit, Trash2, Search, X, Grid3X3, Eye, Plus } from "lucide-react";
 import {
     Table,
@@ -21,7 +20,7 @@ function ListarCategorias() {
     const [categorias, setCategorias] = useState([]);
     const [categoriaEditar, setCategoriaEditar] = useState(null);
     const [showAgregar, setShowAgregar] = useState(false);
-    const [showEditar, setShowEditar] = useState(false);
+    const [modoEdicion, setModoEdicion] = useState(false);
     const [mostrarInput, setMostrarInput] = useState(false);
     const [filtro, setFiltro] = useState("");
     const [loading, setLoading] = useState(false);
@@ -67,6 +66,16 @@ function ListarCategorias() {
         }
     };
 
+    const iniciarEdicion = (categoria) => {
+        setCategoriaEditar(categoria);
+        setModoEdicion(true);
+    };
+
+    const cancelarEdicion = () => {
+        setCategoriaEditar(null);
+        setModoEdicion(false);
+    };
+
     const mostrarNotificacion = (mensaje, variante) => {
         setToastMessage(mensaje);
         setToastVariant(variante);
@@ -100,13 +109,6 @@ function ListarCategorias() {
                 </div>
             </div>
 
-            {/* Botón Agregar */}
-            <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
-                <Button variant="success" onClick={() => setShowAgregar(true)} className="mb-3">
-                    <Plus size={16} /> Agregar Categoría
-                </Button>
-            </div>
-
             {/* Mensaje de error */}
             {error && (
                 <Alert variant="danger" dismissible onClose={() => setError("")}>
@@ -114,162 +116,180 @@ function ListarCategorias() {
                 </Alert>
             )}
 
-            {/* Listado unificado */}
-            <div className="list-card">
-                <div className="list-card-header py-3 px-3">
-                    <div className="d-flex justify-content-between align-items-center">
-                        <h5 className="mb-0 text-dark fw-semibold">
-                            Lista de Categorías
-                            {categoriasFiltradas.length > 0 && (
-                                <span className="badge bg-primary ms-2">{categoriasFiltradas.length}</span>
-                            )}
-                        </h5>
-                        <div className="d-flex align-items-center gap-2">
-                            {!mostrarInput ? (
-                                <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    onClick={() => setMostrarInput(true)}
-                                >
-                                    <Search size={16} />
-                                </Button>
-                            ) : (
-                                <InputGroup size="sm" style={{ width: "250px" }}>
-                                    <FormControl
-                                        ref={inputRef}
-                                        autoFocus
-                                        placeholder="Buscar categorías o descripción..."
-                                        value={filtro}
-                                        onChange={(e) => setFiltro(e.target.value)}
-                                    />
-                                    {filtro ? (
-                                        <Button variant="outline-secondary" onClick={limpiarBuscador}>
-                                            <X size={16} />
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant="outline-danger"
-                                            onClick={() => {
-                                                setMostrarInput(false);
-                                                setFiltro("");
-                                            }}
-                                        >
-                                            <X size={16} />
-                                        </Button>
-                                    )}
-                                </InputGroup>
+            {/* Layout mitad y mitad */}
+            <div className="row">
+                {/* Columna izquierda: Formulario de agregar */}
+                <div className="col-lg-6 mb-4">
+                    <div className="card h-100">
+                        <div className={`card-header text-white ${modoEdicion ? 'bg-warning' : 'bg-success'}`}>
+                            <h5 className="mb-0">
+                                {modoEdicion ? (
+                                    <>
+                                        <Edit size={20} className="me-2" />
+                                        Editar Categoría
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus size={20} className="me-2" />
+                                        Agregar Nueva Categoría
+                                    </>
+                                )}
+                            </h5>
+                        </div>
+                        <div className="card-body">
+                            <FormularioCategoria
+                                show={true}
+                                handleClose={() => {}}
+                                onCategoriaAdded={() => {
+                                    obtenerCategorias();
+                                    mostrarNotificacion("Categoría agregada exitosamente", "success");
+                                }}
+                                onCategoriaUpdated={() => {
+                                    obtenerCategorias();
+                                    mostrarNotificacion("Categoría actualizada exitosamente", "success");
+                                    cancelarEdicion();
+                                }}
+                                inlineMode={true}
+                                categoriaEditar={categoriaEditar}
+                                modoEdicion={modoEdicion}
+                            />
+                            {modoEdicion && (
+                                <div className="mt-3">
+                                    <Button 
+                                        variant="outline-secondary" 
+                                        size="sm" 
+                                        onClick={cancelarEdicion}
+                                    >
+                                        Cancelar Edición
+                                    </Button>
+                                </div>
                             )}
                         </div>
                     </div>
                 </div>
-                <div className="list-card-body p-0">
-                    <div className="table-responsive">
-                        <Table hover className="mb-0">
-                            <thead className="table-light text-center">
-                                <tr>
-                                    <th className="fw-semibold py-3">Nombre</th>
-                                    <th className="fw-semibold py-3">Descripción</th>
-                                    <th className="fw-semibold py-3">Estado</th>
-                                    <th className="fw-semibold py-3 col-actions">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-center align-middle">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="4" className="text-center py-4">
-                                            <div className="spinner-border text-primary" role="status">
-                                                <span className="visually-hidden">Cargando...</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ) : categoriasFiltradas.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="4" className="text-center py-4 text-muted">
-                                            {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    categoriasFiltradas.map((categoria) => (
-                                        <tr key={categoria.idCategoria}>
-                                            <td className="fw-medium">{categoria.nombre}</td>
-                                            <td className="text-start">{categoria.descripcion || "-"}</td>
-                                            <td>
-                                                {categoria.activo ? (
-                                                    <Badge bg="success">🟢 Activo</Badge>
-                                                ) : (
-                                                    <Badge bg="secondary">⚪ Inactivo</Badge>
-                                                )}
-                                            </td>
-                                            <td>
-                                                <div className="d-flex justify-content-center gap-1 flex-wrap">
-                                                    <Button
-                                                        variant="outline-primary"
-                                                        size="sm"
-                                                        onClick={() => navigate(`/categoria/${categoria.idCategoria}`)}
-                                                        title="Ver productos de esta categoría"
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                    >
-                                                        <Eye size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Ver</span>
-                                                    </Button>
+
+                {/* Columna derecha: Listado */}
+                <div className="col-lg-6 mb-4">
+                    <div className="card h-100">
+                        <div className="card-header bg-primary text-white">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h5 className="mb-0">
+                                    <Grid3X3 size={20} className="me-2" />
+                                    Lista de Categorías
+                                    {categoriasFiltradas.length > 0 && (
+                                        <span className="badge bg-light text-primary ms-2">{categoriasFiltradas.length}</span>
+                                    )}
+                                </h5>
+                                <div className="d-flex align-items-center gap-2">
+                                    {!mostrarInput ? (
+                                        <Button
+                                            variant="outline-light"
+                                            size="sm"
+                                            onClick={() => setMostrarInput(true)}
+                                        >
+                                            <Search size={16} />
+                                        </Button>
+                                    ) : (
+                                        <InputGroup size="sm" style={{ width: "200px" }}>
+                                            <FormControl
+                                                ref={inputRef}
+                                                autoFocus
+                                                placeholder="Buscar..."
+                                                value={filtro}
+                                                onChange={(e) => setFiltro(e.target.value)}
+                                            />
+                                            {filtro ? (
+                                                <Button variant="outline-secondary" onClick={limpiarBuscador}>
+                                                    <X size={16} />
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    variant="outline-danger"
+                                                    onClick={() => {
+                                                        setMostrarInput(false);
+                                                        setFiltro("");
+                                                    }}
+                                                >
+                                                    <X size={16} />
+                                                </Button>
+                                            )}
+                                        </InputGroup>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="card-body p-0" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                            {loading ? (
+                                <div className="text-center py-4">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            ) : categoriasFiltradas.length === 0 ? (
+                                <div className="text-center py-4 text-muted">
+                                    {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
+                                </div>
+                            ) : (
+                                <div className="list-group list-group-flush">
+                                    {categoriasFiltradas.map((categoria) => (
+                                        <div key={categoria.idCategoria} className="list-group-item">
+                                            <div className="d-flex justify-content-between align-items-start">
+                                                <div className="flex-grow-1">
+                                                    <h6 className="mb-1 fw-bold">{categoria.nombre}</h6>
+                                                    <p className="mb-1 text-muted small">
+                                                        {categoria.descripcion || "Sin descripción"}
+                                                    </p>
+                                                    <div className="d-flex gap-2">
+                                                        {categoria.activo ? (
+                                                            <Badge bg="success" className="small">Activo</Badge>
+                                                        ) : (
+                                                            <Badge bg="secondary" className="small">Inactivo</Badge>
+                                                        )}
+                                                        <Button
+                                                            variant="link"
+                                                            size="sm"
+                                                            className="p-0 text-primary"
+                                                            onClick={() => navigate(`/categoria/${categoria.idCategoria}`)}
+                                                            title="Ver productos"
+                                                        >
+                                                            <Eye size={14} />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                <div className="d-flex gap-1">
                                                     <Button
                                                         variant="outline-warning"
                                                         size="sm"
-                                                        onClick={() => {
-                                                            setCategoriaEditar(categoria);
-                                                            setShowEditar(true);
-                                                        }}
+                                                        onClick={() => iniciarEdicion(categoria)}
                                                         title="Editar categoría"
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
+                                                        className="btn-sm"
                                                     >
                                                         <Edit size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Editar</span>
                                                     </Button>
                                                     <Button
                                                         variant="outline-danger"
                                                         size="sm"
                                                         onClick={() => eliminarCategoria(categoria.idCategoria)}
                                                         title="Eliminar categoría"
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
+                                                        className="btn-sm"
                                                     >
                                                         <Trash2 size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
                                                     </Button>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </Table>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        {totalPages > 1 && (
+                            <div className="card-footer">
+                                <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={loading} />
+                            </div>
+                        )}
                     </div>
-                    <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={loading} />
                 </div>
             </div>
-
-            {/* Modales */}
-            <AgregarCategoria
-                show={showAgregar}
-                handleClose={() => setShowAgregar(false)}
-                onCategoriaAdded={() => {
-                    obtenerCategorias();
-                    mostrarNotificacion("Categoría agregada exitosamente", "success");
-                    scrollToTop();
-                }}
-            />
-            <EditarCategoria
-                show={showEditar}
-                handleClose={() => setShowEditar(false)}
-                categoria={categoriaEditar}
-                onCategoriaEditada={() => {
-                    obtenerCategorias();
-                    mostrarNotificacion("Categoría actualizada exitosamente", "success");
-                    scrollToTop();
-                }}
-            />
 
             {/* Toast de notificaciones */}
             <ToastContainer position="top-end" className="p-3">
