@@ -12,6 +12,7 @@ import ListarCreditos from './modulos/Creditos/ListarCreditos';
 import DetalleCredito from './modulos/Creditos/DetalleCredito';
 import PrivateRoute from './modulos/auth/PrivateRoute';
 import Login from './modulos/auth/Login';
+import Kardex from './modulos/Kardex/Kardex';
 
 function App() {
     const ProtectedApp = () => (
@@ -25,6 +26,7 @@ function App() {
                 <Route path='/clientes' element={<ListarClientes />} />
                 <Route path='/entradas' element={<ListarEntradas />} />
                 <Route path='/salidas' element={<ListarSalidas />} />
+                <Route path='/kardex' element={<Kardex />} />
                 <Route path='/creditos' element={<ListarCreditos />} />
                 <Route path='/creditos/:id' element={<DetalleCredito />} />
             </Routes>

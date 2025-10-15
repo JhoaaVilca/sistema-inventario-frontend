@@ -26,13 +26,15 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (resp) => resp,
   (error) => {
-    if (error?.response?.status === 401) {
+    const status = error?.response?.status;
+    if (status === 401 || status === 403) {
+      // Aviso de sesión expirada y redirección
+      try { localStorage.setItem('sessionExpired', '1'); } catch (_) {}
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       localStorage.removeItem('role');
-      try { localStorage.setItem('sessionExpired', '1'); } catch (_) {}
-      if (typeof window !== 'undefined' && window.location) {
-        // Redirigir al login inmediatamente
+      if (typeof window !== 'undefined') {
+        alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
         window.location.href = '/login';
       }
     }
