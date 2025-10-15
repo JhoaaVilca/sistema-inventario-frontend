@@ -14,17 +14,30 @@ const apiClient = axios.create({
   },
 });
 
-// Puedes agregar interceptores si necesitas manejar tokens/errores globales
-// apiClient.interceptors.request.use((config) => {
-//   // Agrega Authorization si corresponde
-//   return config;
-// });
-// apiClient.interceptors.response.use(
-//   (resp) => resp,
-//   (error) => {
-//     // Manejo global de errores
-//     return Promise.reject(error);
-//   }
-// );
+// Interceptor para adjuntar token JWT si existe
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+// Manejo global de 401 para limpiar sesión si es necesario
+apiClient.interceptors.response.use(
+  (resp) => resp,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('role');
+      try { localStorage.setItem('sessionExpired', '1'); } catch (_) {}
+      if (typeof window !== 'undefined' && window.location) {
+        // Redirigir al login inmediatamente
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default apiClient;

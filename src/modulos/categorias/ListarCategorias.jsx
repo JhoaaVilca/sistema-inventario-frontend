@@ -121,16 +121,16 @@ function ListarCategorias() {
                 {/* Columna izquierda: Formulario de agregar */}
                 <div className="col-lg-6 mb-4">
                     <div className="card h-100">
-                        <div className={`card-header text-white ${modoEdicion ? 'bg-warning' : 'bg-success'}`}>
-                            <h5 className="mb-0">
+                        <div className="card-header bg-white border-bottom">
+                            <h5 className="mb-0 text-dark">
                                 {modoEdicion ? (
                                     <>
-                                        <Edit size={20} className="me-2" />
+                                        <Edit size={20} className="me-2 text-primary" />
                                         Editar Categoría
                                     </>
                                 ) : (
                                     <>
-                                        <Plus size={20} className="me-2" />
+                                        <Plus size={20} className="me-2 text-primary" />
                                         Agregar Nueva Categoría
                                     </>
                                 )}
@@ -171,19 +171,19 @@ function ListarCategorias() {
                 {/* Columna derecha: Listado */}
                 <div className="col-lg-6 mb-4">
                     <div className="card h-100">
-                        <div className="card-header bg-primary text-white">
+                        <div className="card-header bg-white border-bottom">
                             <div className="d-flex justify-content-between align-items-center">
-                                <h5 className="mb-0">
-                                    <Grid3X3 size={20} className="me-2" />
+                                <h5 className="mb-0 text-dark">
+                                    <Grid3X3 size={20} className="me-2 text-primary" />
                                     Lista de Categorías
                                     {categoriasFiltradas.length > 0 && (
-                                        <span className="badge bg-light text-primary ms-2">{categoriasFiltradas.length}</span>
+                                        <span className="badge bg-light text-muted ms-2">{categoriasFiltradas.length}</span>
                                     )}
                                 </h5>
                                 <div className="d-flex align-items-center gap-2">
                                     {!mostrarInput ? (
                                         <Button
-                                            variant="outline-light"
+                                            variant="outline-secondary"
                                             size="sm"
                                             onClick={() => setMostrarInput(true)}
                                         >
@@ -230,56 +230,64 @@ function ListarCategorias() {
                                     {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
                                 </div>
                             ) : (
-                                <div className="list-group list-group-flush">
-                                    {categoriasFiltradas.map((categoria) => (
-                                        <div key={categoria.idCategoria} className="list-group-item">
-                                            <div className="d-flex justify-content-between align-items-start">
-                                                <div className="flex-grow-1">
-                                                    <h6 className="mb-1 fw-bold">{categoria.nombre}</h6>
-                                                    <p className="mb-1 text-muted small">
-                                                        {categoria.descripcion || "Sin descripción"}
-                                                    </p>
-                                                    <div className="d-flex gap-2">
-                                                        {categoria.activo ? (
-                                                            <Badge bg="success" className="small">Activo</Badge>
-                                                        ) : (
-                                                            <Badge bg="secondary" className="small">Inactivo</Badge>
-                                                        )}
+                                <Table striped hover responsive size="sm" className="mb-0 align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th style={{width: '80px'}}>ID</th>
+                                            <th>Nombre</th>
+                                            <th>Descripción</th>
+                                            <th style={{width: '110px'}}>Estado</th>
+                                            <th style={{width: '180px'}}>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {categoriasFiltradas.map((categoria) => (
+                                            <tr key={categoria.idCategoria}>
+                                                <td>{categoria.idCategoria}</td>
+                                                <td className="fw-semibold">{categoria.nombre}</td>
+                                                <td className="text-muted small">{categoria.descripcion || 'Sin descripción'}</td>
+                                                <td>
+                                                    {categoria.activo ? (
+                                                        <Badge bg="success">Activo</Badge>
+                                                    ) : (
+                                                        <Badge bg="secondary">Inactivo</Badge>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    <div className="d-flex justify-content-center gap-2">
                                                         <Button
-                                                            variant="link"
+                                                            variant="outline-secondary"
                                                             size="sm"
-                                                            className="p-0 text-primary"
                                                             onClick={() => navigate(`/categoria/${categoria.idCategoria}`)}
-                                                            title="Ver productos"
+                                                            title="Ver productos de esta categoría"
                                                         >
                                                             <Eye size={14} />
+                                                            <span className="d-none d-md-inline ms-1">Productos</span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-warning"
+                                                            size="sm"
+                                                            onClick={() => iniciarEdicion(categoria)}
+                                                            title="Editar categoría"
+                                                        >
+                                                            <Edit size={14} />
+                                                            <span className="d-none d-md-inline ms-1">Editar</span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => eliminarCategoria(categoria.idCategoria)}
+                                                            title="Eliminar categoría"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                            <span className="d-none d-md-inline ms-1">Eliminar</span>
                                                         </Button>
                                                     </div>
-                                                </div>
-                                                <div className="d-flex gap-1">
-                                                    <Button
-                                                        variant="outline-warning"
-                                                        size="sm"
-                                                        onClick={() => iniciarEdicion(categoria)}
-                                                        title="Editar categoría"
-                                                        className="btn-sm"
-                                                    >
-                                                        <Edit size={12} />
-                                                    </Button>
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        size="sm"
-                                                        onClick={() => eliminarCategoria(categoria.idCategoria)}
-                                                        title="Eliminar categoría"
-                                                        className="btn-sm"
-                                                    >
-                                                        <Trash2 size={12} />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
                             )}
                         </div>
                         {totalPages > 1 && (

@@ -10,24 +10,33 @@ import ListarEntradas from './modulos/Entradas/ListarEntradas';
 import ListarSalidas from './modulos/Salidas/ListarSalidas';
 import ListarCreditos from './modulos/Creditos/ListarCreditos';
 import DetalleCredito from './modulos/Creditos/DetalleCredito';
+import PrivateRoute from './modulos/auth/PrivateRoute';
+import Login from './modulos/auth/Login';
 
 function App() {
+    const ProtectedApp = () => (
+        <Layout>
+            <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/productos" element={<ListarProductos />} />
+                <Route path="/categoria/:categoriaId" element={<ProductosPorCategoria />} />
+                <Route path="/categorias" element={<ListarCategorias />} />
+                <Route path='/proveedores' element={<ListarProveedores />} />
+                <Route path='/clientes' element={<ListarClientes />} />
+                <Route path='/entradas' element={<ListarEntradas />} />
+                <Route path='/salidas' element={<ListarSalidas />} />
+                <Route path='/creditos' element={<ListarCreditos />} />
+                <Route path='/creditos/:id' element={<DetalleCredito />} />
+            </Routes>
+        </Layout>
+    );
+
     return (
         <Router>
-            <Layout>
-                <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/productos" element={<ListarProductos />} />
-                    <Route path="/categoria/:categoriaId" element={<ProductosPorCategoria />} />
-                    <Route path="/categorias" element={<ListarCategorias />} />
-                    <Route path='/proveedores' element={<ListarProveedores />} />
-                    <Route path='/clientes' element={<ListarClientes />} />
-                    <Route path='/entradas' element={<ListarEntradas />} />
-                    <Route path='/salidas' element={<ListarSalidas />} />
-                    <Route path='/creditos' element={<ListarCreditos />} />
-                    <Route path='/creditos/:id' element={<DetalleCredito />} />
-                </Routes>
-            </Layout>
+            <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/*" element={<PrivateRoute><ProtectedApp /></PrivateRoute>} />
+            </Routes>
         </Router>
     );
 }

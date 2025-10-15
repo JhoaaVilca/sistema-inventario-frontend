@@ -211,22 +211,21 @@ const ListarProductos = () => {
     };
 
     const verLotes = async (producto) => {
+        // Abrir de inmediato el modal (percepción rápida)
+        setProductoSeleccionado(producto);
+        setLotesProducto(null); // null = cargando
+        setShowLotesModal(true);
         try {
             const lotes = await loteService.obtenerLotesPorProducto(producto.idProducto);
-
-            if (lotes.length === 0) {
+            const arr = Array.isArray(lotes) ? lotes : [];
+            setLotesProducto(arr);
+            if (arr.length === 0) {
                 mostrarNotificacion(`No hay lotes registrados para ${producto.nombreProducto}`, 'info');
-                return;
             }
-
-            // Guardar los lotes y producto seleccionado
-            setLotesProducto(lotes);
-            setProductoSeleccionado(producto);
-            setShowLotesModal(true);
-
         } catch (error) {
             console.error('Error al cargar lotes:', error);
             mostrarNotificacion('Error al cargar los lotes del producto', 'danger');
+            setLotesProducto([]);
         }
     };
 
@@ -593,7 +592,7 @@ const ListarProductos = () => {
             {/* Modal de Lotes */}
             <LotesModal
                 show={showLotesModal}
-                onHide={() => { setShowLotesModal(false); cargarProductos(); cargarAlertas(); }}
+                onHide={() => { setShowLotesModal(false); }}
                 producto={productoSeleccionado}
                 lotes={lotesProducto}
                 onChanged={() => { cargarProductos(); cargarAlertas(); }}

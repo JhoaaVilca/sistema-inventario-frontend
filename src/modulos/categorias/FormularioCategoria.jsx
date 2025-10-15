@@ -178,7 +178,7 @@ function FormularioCategoria({
             <div className="d-flex justify-content-end gap-2 mt-4">
                 {!inlineMode && (
                     <Button
-                        variant="secondary"
+                        variant="outline-secondary"
                         onClick={handleCloseModal}
                         disabled={loading}
                     >
@@ -186,7 +186,7 @@ function FormularioCategoria({
                     </Button>
                 )}
                 <Button
-                    variant={modoEdicion ? "warning" : "success"}
+                    variant="primary"
                     type="submit"
                     disabled={loading || !nombre.trim()}
                 >

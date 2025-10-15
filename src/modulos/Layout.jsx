@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../assets/bootstrap-olive.css';
 
@@ -13,6 +13,7 @@ function Layout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -26,6 +27,13 @@ function Layout({ children }) {
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+        navigate('/login', { replace: true });
     };
 
     const routeTitles = {
@@ -140,6 +148,14 @@ function Layout({ children }) {
                                 <CreditCard size={20} className="me-3" />
                                 <span>Créditos</span>
                             </NavLink>
+                        </li>
+                        {/* Salir */}
+                        <li className="nav-item mt-3">
+                            <button type="button" className="nav-link d-flex align-items-center p-3 rounded text-white w-100 text-start"
+                                onClick={handleLogout}>
+                                <UserCheck size={20} className="me-3" />
+                                <span>Salir</span>
+                            </button>
                         </li>
                     </ul>
                 </div>

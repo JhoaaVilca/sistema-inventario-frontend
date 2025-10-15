@@ -8,36 +8,38 @@
    NOTA: Si luego defines valores exactos para Teal/Mint/Cream, cámbialos aquí.
 */
 :root {
-  /* === Palette tokens === */
-  --palette-cream: #F7F3E3;   /* aproxima al cream de la imagen */
-  --palette-slate: #3E3F5B;   /* valor confirmado por el usuario */
-  --palette-teal:  #8FB6AD;   /* estimación del teal suave de la imagen */
-  --palette-mint:  #B9DBB8;   /* estimación del verde claro de la imagen */
+  /* === Palette tokens (blue palette from image) === */
+  --palette-blue-900: #021024; /* top (muy oscuro) */
+  --palette-blue-800: #052659; /* navy base */
+  --palette-blue-600: #3F628A; /* aproximado intermedio */
+  --palette-blue-400: #5A82A3; /* aproximado medio-claro */
+  --palette-blue-300: #7DACCA; /* visto en imagen */
+  --palette-blue-100: #C1EBFF; /* más claro (bottom) */
 
   /* === Bootstrap core mappings === */
-  /* Primary será el Slate; los estados secundarios usan la escala */
-  --bs-primary: var(--palette-slate);
-  --bs-primary-rgb: 62, 63, 91;
-  --bs-primary-hover: #34364d; /* slate un poco más oscuro */
-  --bs-link-color: var(--palette-slate);
+  /* Primary = navy base; enlaces y focus a juego */
+  --bs-primary: var(--palette-blue-800);
+  --bs-primary-rgb: 5, 38, 89;
+  --bs-primary-hover: #041e46;
+  --bs-link-color: var(--palette-blue-800);
   --bs-link-hover-color: var(--bs-primary-hover);
-  --bs-focus-ring-color: rgba(62, 63, 91, 0.25);
+  --bs-focus-ring-color: rgba(5, 38, 89, 0.25);
 
   /* Support scale para utilidades y fondos suaves */
-  --bs-primary-100: #efeff4;              /* slate 100 */
-  --bs-primary-200: #e1e1ea;              /* slate 200 */
-  --bs-primary-300: #cfd0db;              /* slate 300 */
-  --bs-primary-400: var(--palette-teal);  /* usamos teal como acento medio */
-  --bs-primary-500: var(--palette-mint);  /* y mint como acento suave */
-  --bs-primary-600: #676a86;              /* slate 600 aproximado */
-  --bs-primary-700: var(--palette-slate); /* slate base */
-  --bs-primary-800: #2d2f45;              /* slate 800 */
-  --bs-primary-900: #232439;              /* slate 900 */
+  --bs-primary-100: var(--palette-blue-100);
+  --bs-primary-200: #A6D9F3;
+  --bs-primary-300: var(--palette-blue-300);
+  --bs-primary-400: var(--palette-blue-400);
+  --bs-primary-500: #5076A0;
+  --bs-primary-600: var(--palette-blue-600);
+  --bs-primary-700: var(--palette-blue-800);
+  --bs-primary-800: #041e46; /* hover/darker */
+  --bs-primary-900: var(--palette-blue-900);
 
-  /* Body y bordes para fondo crema */
-  --bs-body-bg: var(--palette-cream);
-  --bs-body-color: #1f2328;
-  --bs-border-color: #e6e1cf; /* borde acorde al cream */
+  /* Body y bordes: fondo azul muy claro para coherencia */
+  --bs-body-bg: var(--palette-blue-100);
+  --bs-body-color: #0f1b2b;
+  --bs-border-color: #d6eaf6;
 }
 
 /* Navbar (solo clases Bootstrap) */
@@ -68,7 +70,6 @@
 
 .badge.bg-primary { background-color: var(--bs-primary) !important; }
 
-.table thead th { background-color: var(--bs-primary-100); }
 
 /* Sidebar */
 .sidebar-olive { background: var(--bs-primary-800); }
@@ -128,11 +129,12 @@
 .list-card .list-card-body { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
 
 /* Consistent table alignment and sizing */
-.list-card .table thead th,
-.card .table thead th {
+.list-card .table thead:not(.table-dark):not(.table-primary):not(.table-secondary) th,
+.card .table thead:not(.table-dark):not(.table-primary):not(.table-secondary) th {
   text-align: center;
   padding-top: .875rem;
   padding-bottom: .875rem;
+  background-color: var(--bs-primary-100);
 }
 .list-card .table tbody td,
 .card .table tbody td {

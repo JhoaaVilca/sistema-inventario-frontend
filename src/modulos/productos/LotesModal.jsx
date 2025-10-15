@@ -1,4 +1,4 @@
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Spinner } from "react-bootstrap";
 import { useMemo, useEffect, useState } from "react";
 import { loteService } from "../../servicios/loteService";
 
@@ -7,8 +7,13 @@ function LotesModal({ show, onHide, producto, lotes, onChanged }) {
   const [bajandoId, setBajandoId] = useState(null);
 
   useEffect(() => {
-    setLotesLocal(lotes || []);
-  }, [lotes]);
+    // Al abrir/cambiar producto o estado de carga, sincronizar
+    if (lotes === null) {
+      setLotesLocal([]); // estado "cargando"
+    } else {
+      setLotesLocal(lotes || []);
+    }
+  }, [lotes, producto, show]);
 
   const formatearFechaLocalDate = (str) => {
     if (!str) return "N/A";
@@ -93,7 +98,11 @@ function LotesModal({ show, onHide, producto, lotes, onChanged }) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {(lotesLocal && lotesLocal.length > 0) ? (
+        {lotes === null ? (
+          <div className="d-flex justify-content-center align-items-center py-5">
+            <Spinner animation="border" role="status" className="me-2" /> Cargando lotes...
+          </div>
+        ) : (lotesLocal && lotesLocal.length > 0) ? (
           <div>
             <div className="row mb-3">
               <div className="col-md-4">
