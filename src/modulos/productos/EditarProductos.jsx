@@ -59,12 +59,12 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             nombreProducto,
             precio: parseFloat(precio), // Precio de venta
             precioCompra: parseFloat(precioCompra), // Precio de compra
-            stock: parseInt(stock, 10),
+            // stock no se envía en edición; es de solo lectura y se deriva de lotes
             stockMinimo: parseInt(stockMinimo, 10),
             unidadMedida,
             fechaIngreso,
             esPerecible,
-            fechaVencimientoInicial: (esPerecible && parseInt(stock || 0, 10) > 0) ? (fechaVencimientoInicial || null) : null,
+            // fechaVencimientoInicial no aplica en edición; solo en creación/entradas
             descripcionCorta: descripcionCorta || null,
             idCategoria: parseInt(categoria, 10),
         };
@@ -196,15 +196,18 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                     <Row>
                         <Col md={6}>
                             <Form.Group controlId="formStock" className="mb-3">
-                                <Form.Label>Stock Actual <span className="text-danger">*</span></Form.Label>
+                                <Form.Label>Stock Actual</Form.Label>
                                 <Form.Control
                                     type="number"
                                     min="0"
                                     value={stock}
-                                    onChange={(e) => setStock(e.target.value)}
+                                    readOnly
+                                    disabled
                                     placeholder="0"
-                                    required
                                 />
+                                <Form.Text muted>
+                                    El stock se actualiza mediante Entradas/Salidas. No es editable aquí.
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                         <Col md={6}>
@@ -269,21 +272,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={6}>
-                            <Form.Group controlId="formFechaVencimientoInicial" className="mb-3">
-                                <Form.Label>Fecha de Vencimiento (lote inicial)</Form.Label>
-                                <Form.Control
-                                    type="date"
-                                    value={fechaVencimientoInicial}
-                                    onChange={(e) => setFechaVencimientoInicial(e.target.value)}
-                                    required={esPerecible && parseInt(stock || 0, 10) > 0}
-                                    disabled={!esPerecible || parseInt(stock || 0, 10) <= 0}
-                                />
-                                <Form.Text muted>
-                                    Obligatorio si el producto es perecible y el stock inicial es mayor a 0.
-                                </Form.Text>
-                            </Form.Group>
-                        </Col>
+                        {/* En edición no se maneja fecha de vencimiento; se gestiona por lotes/entradas */}
                     </Row>
 
                     <div className="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">

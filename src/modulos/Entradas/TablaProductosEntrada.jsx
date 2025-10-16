@@ -1,6 +1,6 @@
 // src/modulos/Entradas/TablaProductosEntrada.jsx
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Form, Table, Row, Col } from "react-bootstrap";
 import BuscadorProductos from "./BuscadorProductos";
 import SelectProductos from "./SelectProductos";
@@ -22,6 +22,25 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
         if (!y || !m || !d) return str;
         return `${d}/${m}/${y}`;
     };
+
+    // Si el producto es perecible, obligar fecha de vencimiento
+    useEffect(() => {
+        if (productoSeleccionado && productoSeleccionado.esPerecible) {
+            setRequiereVencimiento(true);
+        } else {
+            setRequiereVencimiento(false);
+            setFechaVencimiento("");
+        }
+    }, [productoSeleccionado]);
+
+    // Prefijar precio unitario con el precio de compra cuando se selecciona un producto
+    useEffect(() => {
+        if (productoSeleccionado && typeof productoSeleccionado.precioCompra !== 'undefined' && productoSeleccionado.precioCompra !== null) {
+            setPrecioUnitario(String(productoSeleccionado.precioCompra));
+        } else if (!productoSeleccionado) {
+            setPrecioUnitario("");
+        }
+    }, [productoSeleccionado]);
 
     const agregarProducto = () => {
         setErrorInline("");
@@ -127,6 +146,9 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
                         step="0.01"
                         required
                     />
+                    <Form.Text muted>
+                        Sugerido: precio de compra del producto.
+                    </Form.Text>
                 </Col>
                 <Col md={2} sm={6}>
                     <Form.Label className="form-label small text-muted">¿Vence?</Form.Label>
@@ -137,6 +159,7 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
                             setRequiereVencimiento(val);
                             if (!val) setFechaVencimiento("");
                         }}
+                        disabled={!!(productoSeleccionado && productoSeleccionado.esPerecible)}
                     >
                         <option value="no">No</option>
                         <option value="si">Sí</option>

@@ -143,8 +143,8 @@ function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar product
                                                 </small>
                                             </div>
                                             <div className="text-end">
-                                                <div className="fw-bold text-success">S/. {producto.precio?.toFixed(2)}</div>
-                                                <small className="text-muted">Compra: S/. {producto.precioCompra?.toFixed(2)}</small>
+                                                <div className="fw-bold text-primary">Compra: S/. {producto.precioCompra?.toFixed(2)}</div>
+                                                <small className="text-muted">Venta: S/. {producto.precio?.toFixed(2)}</small>
                                             </div>
                                         </div>
                                     </ListGroup.Item>
@@ -168,8 +168,9 @@ function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar product
                                 <div className="col-6">
                                     <strong>Stock:</strong> {productoSeleccionado.stock} {productoSeleccionado.unidadMedida}
                                 </div>
-                                <div className="col-6">
-                                    <strong>Precio:</strong> S/. {productoSeleccionado.precio?.toFixed(2)}
+                                <div className="col-6 text-end">
+                                    <div className="fw-bold text-primary">Compra: S/. {productoSeleccionado.precioCompra?.toFixed(2)}</div>
+                                    <small className="text-muted">Venta: S/. {productoSeleccionado.precio?.toFixed(2)}</small>
                                 </div>
                             </div>
                         </div>
