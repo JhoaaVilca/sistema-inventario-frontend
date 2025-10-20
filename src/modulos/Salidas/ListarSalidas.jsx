@@ -24,6 +24,34 @@ function ListarSalidas() {
     const [size, setSize] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
     const [cargando, setCargando] = useState(false);
+    const [showTicketModal, setShowTicketModal] = useState(false);
+    const [ticketSalidaId, setTicketSalidaId] = useState(null);
+    const [ticketPdfUrl, setTicketPdfUrl] = useState("");
+    const [cargandoTicket, setCargandoTicket] = useState(false);
+
+    useEffect(() => {
+        const loadPdf = async () => {
+            if (!showTicketModal || !ticketSalidaId) return;
+            setCargandoTicket(true);
+            try {
+                const resp = await apiClient.get(`/salidas/${ticketSalidaId}/ticket-pdf`, { responseType: 'blob' });
+                const blob = new Blob([resp.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                setTicketPdfUrl(url);
+            } catch (e) {
+                console.error('No se pudo cargar el ticket PDF', e);
+            } finally {
+                setCargandoTicket(false);
+            }
+        };
+        loadPdf();
+        return () => {
+            if (ticketPdfUrl) {
+                URL.revokeObjectURL(ticketPdfUrl);
+                setTicketPdfUrl("");
+            }
+        };
+    }, [showTicketModal, ticketSalidaId]);
 
     const toggleSalida = async (salidaId) => {
         try {
@@ -311,6 +339,15 @@ function ListarSalidas() {
                             <div className="d-flex gap-2">
                                 {salidaDetalle && (
                                     <>
+                                        <Button
+                                            variant="outline-success"
+                                            onClick={() => {
+                                                setTicketSalidaId(salidaDetalle.idSalida);
+                                                setShowTicketModal(true);
+                                            }}
+                                        >
+                                            Imprimir Ticket
+                                        </Button>
                                         {salidaDetalle.estado !== 'Cancelado' && (
                                             <Button variant="outline-primary" onClick={() => setEditMode(true)}>Editar</Button>
                                         )}
@@ -321,6 +358,28 @@ function ListarSalidas() {
                         </div>
                     </Modal.Footer>
                 )}
+            </Modal>
+
+            {/* Modal Ticket 80mm - Vista previa PDF con toolbar */}
+            <Modal show={showTicketModal} onHide={() => setShowTicketModal(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Ticket</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {cargandoTicket && (
+                        <div className="text-center py-4"><Spinner animation="border" size="sm" /> Cargando ticket...</div>
+                    )}
+                    {!cargandoTicket && ticketPdfUrl && (
+                        <iframe
+                            title="ticket-pdf"
+                            src={`${ticketPdfUrl}#zoom=page-width`}
+                            style={{ width: '100%', height: '70vh', border: 'none' }}
+                        />
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowTicketModal(false)}>Cerrar</Button>
+                </Modal.Footer>
             </Modal>
         </div>
     );
