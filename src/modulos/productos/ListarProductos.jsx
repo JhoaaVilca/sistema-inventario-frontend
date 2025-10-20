@@ -445,8 +445,10 @@ const ListarProductos = () => {
                                     productosFiltrados.map((producto) => {
                                         const alerta = obtenerTipoAlerta(producto);
                                         const stockActual = (producto.stock ?? stockMap[producto.idProducto] ?? 0);
-                                        const stockTdClass = stockActual === 0 ? 'table-danger' : '';
-                                        const alertTdClass = alerta ? (alerta.tipo === 'vencido' ? 'table-danger' : 'table-warning') : '';
+                                        const stockTdClass = stockActual === 0
+                                            ? 'td-soft-danger'
+                                            : (producto.stockBajo ? 'td-soft-warning' : '');
+                                        const alertTdClass = alerta ? (alerta.tipo === 'vencido' ? 'td-soft-danger' : 'td-soft-warning') : '';
 
                                         return (
                                             <tr key={producto.idProducto}>
@@ -474,7 +476,7 @@ const ListarProductos = () => {
                                                     </div>
                                                 </td>
                                                 <td className={stockTdClass}>
-                                                    <div className={`fw-bold ${producto.stockBajo ? 'text-danger' : ''}`}>
+                                                    <div className={`fw-bold`}>
                                                         {stockActual}
                                                     </div>
                                                 </td>
@@ -499,8 +501,8 @@ const ListarProductos = () => {
                                                             if (alerta) {
                                                                 return (
                                                                     <div>
-                                                                        <span className={`badge bg-${alerta.color} d-flex align-items-center mb-1`}>
-                                                                            <AlertTriangle size={12} className="me-1" />
+                                                                        <span className={`badge badge-alert ${alerta.tipo === 'vencido' ? 'is-danger' : 'is-warning'} d-flex align-items-center mb-1`}>
+                                                                            <span className={`indicator-dot ${alerta.tipo === 'vencido' ? 'danger' : 'warning'}`}></span>
                                                                             {alerta.tipo === 'vencido'
                                                                                 ? `Vencido (${alerta.vencidos})`
                                                                                 : `Próximo a Vencer (${alerta.proximos})`}

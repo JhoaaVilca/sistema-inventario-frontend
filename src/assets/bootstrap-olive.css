@@ -160,3 +160,41 @@
 
 /* Badge sizing consistency */
 .badge { padding: .35em .6em; font-weight: 600; letter-spacing: .2px; }
+
+/* Subtle alert badges (replaces strong bg-danger/bg-warning where needed) */
+.badge-alert {
+  background: rgba(5, 38, 89, 0.06);
+  color: var(--bs-body-color);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 8px;
+}
+.badge-alert.is-warning {
+  background: rgba(255, 193, 7, 0.10); /* warning soft */
+  border-color: rgba(255, 193, 7, 0.25);
+  color: #5a4a16;
+}
+.badge-alert.is-danger {
+  background: rgba(220, 53, 69, 0.10); /* danger soft */
+  border-color: rgba(220, 53, 69, 0.25);
+  color: #5c2b30;
+}
+
+/* Soft table cell backgrounds for alert emphasis without strong colors */
+.td-soft-warning {
+  background: rgba(255, 193, 7, 0.08) !important;
+}
+.td-soft-danger {
+  background: rgba(220, 53, 69, 0.08) !important;
+}
+
+/* Optional small indicator dot to signal status subtly */
+.indicator-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: .35rem;
+  background: var(--bs-border-color);
+}
+.indicator-dot.warning { background: rgba(255, 193, 7, 0.8); }
+.indicator-dot.danger { background: rgba(220, 53, 69, 0.8); }

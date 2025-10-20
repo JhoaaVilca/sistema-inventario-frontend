@@ -6,7 +6,7 @@ import '../assets/bootstrap-olive.css';
 import {
     Box, Users, ArrowDownCircle, ArrowUpCircle,
     Menu, LayoutDashboard, Grid3X3, FileText, User, UserCheck
-    , CreditCard
+    , CreditCard, Building2, Settings
 } from 'lucide-react';
 
 function Layout({ children }) {
@@ -45,7 +45,8 @@ function Layout({ children }) {
         '/kardex': 'Kardex',
         '/proveedores': 'Proveedores',
         '/clientes': 'Clientes',
-        '/creditos': 'Créditos'
+        '/creditos': 'Créditos',
+        '/empresa': 'Configuración de Empresa'
     };
 
     const getModuleTitle = (pathname) => {
@@ -149,6 +150,17 @@ function Layout({ children }) {
                                 <span>Créditos</span>
                             </NavLink>
                         </li>
+
+                        {/* Configuración */}
+                        <li className="mt-3 mb-2 text-uppercase small fw-bold section-title">Configuración</li>
+                        <li className="nav-item mb-2">
+                            <NavLink to="/empresa" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
+                                onClick={() => setSidebarOpen(false)}>
+                                <Building2 size={20} className="me-3" />
+                                <span>Empresa</span>
+                            </NavLink>
+                        </li>
+
                         {/* Salir */}
                         <li className="nav-item mt-3">
                             <button type="button" className="nav-link d-flex align-items-center p-3 rounded text-white w-100 text-start"

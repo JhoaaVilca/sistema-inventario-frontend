@@ -10,6 +10,7 @@ import ListarEntradas from './modulos/Entradas/ListarEntradas';
 import ListarSalidas from './modulos/Salidas/ListarSalidas';
 import ListarCreditos from './modulos/Creditos/ListarCreditos';
 import DetalleCredito from './modulos/Creditos/DetalleCredito';
+import ConfiguracionEmpresa from './modulos/empresa/ConfiguracionEmpresa';
 import PrivateRoute from './modulos/auth/PrivateRoute';
 import Login from './modulos/auth/Login';
 import Kardex from './modulos/Kardex/Kardex';
@@ -29,6 +30,7 @@ function App() {
                 <Route path='/kardex' element={<Kardex />} />
                 <Route path='/creditos' element={<ListarCreditos />} />
                 <Route path='/creditos/:id' element={<DetalleCredito />} />
+                <Route path='/empresa' element={<ConfiguracionEmpresa />} />
             </Routes>
         </Layout>
     );
