@@ -1,23 +1,21 @@
 /* Theming Bootstrap only with CSS variables (no extra CSS frameworks)
    Nueva paleta basada en la imagen enviada:
-   - Cream:    fondo claro
-   - Slate:    #3E3F5B (color principal/acentos)
-   - Teal:     verde-azulado suave (apoyos)
-   - Mint:     verde claro (fondos suaves)
-
-   NOTA: Si luego defines valores exactos para Teal/Mint/Cream, cámbialos aquí.
+   - Cream: fondo claro
+   - Slate: #3E3F5B (color principal/acentos)
+   - Teal: verde-azulado suave (apoyos)
+   - Mint: verde claro (fondos suaves)
 */
+
 :root {
   /* === Palette tokens (blue palette from image) === */
-  --palette-blue-900: #021024; /* top (muy oscuro) */
-  --palette-blue-800: #052659; /* navy base */
-  --palette-blue-600: #3F628A; /* aproximado intermedio */
-  --palette-blue-400: #5A82A3; /* aproximado medio-claro */
-  --palette-blue-300: #7DACCA; /* visto en imagen */
-  --palette-blue-100: #C1EBFF; /* más claro (bottom) */
+  --palette-blue-900: #021024;
+  --palette-blue-800: #052659;
+  --palette-blue-600: #3F628A;
+  --palette-blue-400: #5A82A3;
+  --palette-blue-300: #7DACCA;
+  --palette-blue-100: #C1EBFF;
 
   /* === Bootstrap core mappings === */
-  /* Primary = navy base; enlaces y focus a juego */
   --bs-primary: var(--palette-blue-800);
   --bs-primary-rgb: 5, 38, 89;
   --bs-primary-hover: #041e46;
@@ -25,7 +23,7 @@
   --bs-link-hover-color: var(--bs-primary-hover);
   --bs-focus-ring-color: rgba(5, 38, 89, 0.25);
 
-  /* Support scale para utilidades y fondos suaves */
+  /* Escala de soporte */
   --bs-primary-100: var(--palette-blue-100);
   --bs-primary-200: #A6D9F3;
   --bs-primary-300: var(--palette-blue-300);
@@ -33,102 +31,166 @@
   --bs-primary-500: #5076A0;
   --bs-primary-600: var(--palette-blue-600);
   --bs-primary-700: var(--palette-blue-800);
-  --bs-primary-800: #041e46; /* hover/darker */
+  --bs-primary-800: #041e46;
   --bs-primary-900: var(--palette-blue-900);
 
-  /* Body y bordes: fondo azul muy claro para coherencia */
+  /* Colores base */
   --bs-body-bg: var(--palette-blue-100);
   --bs-body-color: #0f1b2b;
   --bs-border-color: #d6eaf6;
 }
 
-/* Navbar (solo clases Bootstrap) */
+/* === NAVBAR === */
 .navbar.bg-primary,
-.navbar.navbar-primary { background-color: var(--bs-primary) !important; }
-.navbar { border-top: 0 !important; }
-
-/* Navbar alterna oscura basada en Slate profundo */
-.navbar-olive.navbar.navbar-dark { 
-  background-color: var(--bs-primary-800) !important; 
-  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+.navbar.navbar-primary {
+  background-color: var(--bs-primary) !important;
 }
-.navbar-olive .navbar-brand, 
-.navbar-olive .nav-link, 
-.navbar-olive .btn-link { color: rgba(255,255,255,.9) !important; }
-.navbar-olive .btn-link:hover { color: #fff !important; }
 
-/* Buttons */
+.navbar {
+  border-top: 0 !important;
+}
+
+/* Navbar alterna oscura */
+.navbar-olive.navbar.navbar-dark {
+  background-color: var(--bs-primary-800) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.navbar-olive .navbar-brand,
+.navbar-olive .nav-link,
+.navbar-olive .btn-link {
+  color: rgba(255, 255, 255, .9) !important;
+}
+
+.navbar-olive .btn-link:hover {
+  color: #fff !important;
+}
+
+/* === BUTTONS === */
 .btn-primary {
   background-color: var(--bs-primary) !important;
   border-color: var(--bs-primary) !important;
 }
+
 .btn-primary:hover,
 .btn-primary:focus {
   background-color: var(--bs-primary-hover) !important;
   border-color: var(--bs-primary-hover) !important;
 }
 
-.badge.bg-primary { background-color: var(--bs-primary) !important; }
+.badge.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
 
+/* === SIDEBAR === */
+.sidebar-olive {
+  background: var(--bs-primary-800);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto; /* ✅ scroll interno */
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
 
-/* Sidebar */
-.sidebar-olive { background: var(--bs-primary-800); }
+/* Scrollbar suave */
+.sidebar-olive::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-olive::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+.sidebar-olive::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
 .sidebar-olive .nav-link {
   color: #f1f5f2;
   transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+  padding: 0.55rem 1rem !important;
+  font-size: 0.92rem;
 }
+
 .sidebar-olive .nav-link:hover {
-  background: rgba(255,255,255,.06);
+  background: rgba(255, 255, 255, .06);
 }
-.sidebar-olive .section-title { color: var(--bs-primary-500); }
-/* Active nav link with subtle highlight */
+
+/* Títulos de sección */
+.sidebar-olive .section-title {
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Activo */
 .sidebar-olive .nav-link.active {
   color: #ffffff !important;
-  background: rgba(174, 195, 176, 0.20); /* soft olive */
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 6px 14px rgba(0,0,0,0.12);
+  background: rgba(174, 195, 176, 0.20);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+              0 6px 14px rgba(0, 0, 0, 0.12);
   position: relative;
 }
+
 .sidebar-olive .nav-link.active .lucide {
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
+
 .sidebar-olive .nav-link.active::before {
   content: '';
   position: absolute;
-  left: 0; top: 8px; bottom: 8px;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
   width: 4px;
   border-radius: 0 4px 4px 0;
   background: var(--bs-primary);
 }
 
-/* Tarjetas con sombra suave (solo utilidades compatibles) */
+/* Submenú */
+.sidebar-olive ul ul .nav-link {
+  padding-left: 2.25rem !important;
+  font-size: 0.85rem;
+}
+
+/* === TARJETAS === */
 .tile-card {
   background: #ffffff;
   border: 1px solid var(--bs-border-color);
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .04);
   transition: box-shadow .15s ease, transform .03s ease, border-color .15s ease;
 }
+
 .tile-card:hover {
   border-color: var(--bs-primary-300);
-  box-shadow: 0 6px 16px rgba(0,0,0,.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
 }
 
-/* Contenedor de listas/tabla con encabezado suave */
+/* === LISTAS Y TABLAS === */
 .list-card {
   background: #ffffff;
   border: 1px solid var(--bs-border-color);
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .04);
 }
+
 .list-card .list-card-header {
   background: var(--bs-primary-100);
   border-bottom: 1px solid var(--bs-border-color);
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
 }
-.list-card .list-card-body { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
 
-/* Consistent table alignment and sizing */
+.list-card .list-card-body {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
 .list-card .table thead:not(.table-dark):not(.table-primary):not(.table-secondary) th,
 .card .table thead:not(.table-dark):not(.table-primary):not(.table-secondary) th {
   text-align: center;
@@ -136,58 +198,69 @@
   padding-bottom: .875rem;
   background-color: var(--bs-primary-100);
 }
+
 .list-card .table tbody td,
 .card .table tbody td {
   vertical-align: middle;
   text-align: center;
 }
-/* Excepciones para columnas de texto que deben estar alineadas a la izquierda */
+
 .list-card .table tbody td.text-start,
 .card .table tbody td.text-start {
   text-align: left;
 }
+
 .table .col-actions {
   width: 160px;
 }
+
 @media (max-width: 576px) {
   .list-card .table thead th,
   .card .table thead th {
     padding-top: .625rem;
     padding-bottom: .625rem;
   }
-  .table .col-actions { width: 130px; }
+  .table .col-actions {
+    width: 130px;
+  }
 }
 
-/* Badge sizing consistency */
-.badge { padding: .35em .6em; font-weight: 600; letter-spacing: .2px; }
+/* === BADGES === */
+.badge {
+  padding: .35em .6em;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
 
-/* Subtle alert badges (replaces strong bg-danger/bg-warning where needed) */
 .badge-alert {
   background: rgba(5, 38, 89, 0.06);
   color: var(--bs-body-color);
   border: 1px solid var(--bs-border-color);
   border-radius: 8px;
 }
+
 .badge-alert.is-warning {
-  background: rgba(255, 193, 7, 0.10); /* warning soft */
+  background: rgba(255, 193, 7, 0.10);
   border-color: rgba(255, 193, 7, 0.25);
   color: #5a4a16;
 }
+
 .badge-alert.is-danger {
-  background: rgba(220, 53, 69, 0.10); /* danger soft */
+  background: rgba(220, 53, 69, 0.10);
   border-color: rgba(220, 53, 69, 0.25);
   color: #5c2b30;
 }
 
-/* Soft table cell backgrounds for alert emphasis without strong colors */
+/* === ALERTA CELDAS === */
 .td-soft-warning {
   background: rgba(255, 193, 7, 0.08) !important;
 }
+
 .td-soft-danger {
   background: rgba(220, 53, 69, 0.08) !important;
 }
 
-/* Optional small indicator dot to signal status subtly */
+/* === DOTS INDICADORES === */
 .indicator-dot {
   display: inline-block;
   width: 8px;
@@ -196,5 +269,19 @@
   margin-right: .35rem;
   background: var(--bs-border-color);
 }
-.indicator-dot.warning { background: rgba(255, 193, 7, 0.8); }
-.indicator-dot.danger { background: rgba(220, 53, 69, 0.8); }
+
+.indicator-dot.warning {
+  background: rgba(255, 193, 7, 0.8);
+}
+
+.indicator-dot.danger {
+  background: rgba(220, 53, 69, 0.8);
+}
+
+/* === RESPONSIVE EXTRA === */
+@media (max-height: 700px) {
+  .sidebar-olive {
+    height: 100vh;
+    overflow-y: scroll;
+  }
+}

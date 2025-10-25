@@ -6,7 +6,7 @@ import {
     TrendingUp,
     AlertTriangle,
     Users,
-    DollarSign,
+    Banknote,
     BarChart3,
     Activity
 } from 'lucide-react';
@@ -173,7 +173,7 @@ function Dashboard() {
 
                                 <div className="d-flex align-items-center justify-content-between p-3 rounded bg-light">
                                     <div className="d-flex align-items-center">
-                                        <DollarSign size={20} className="me-3 text-warning" />
+                                        <Banknote size={20} className="me-3 text-warning" />
                                         <div>
                                             <h6 className="mb-0 small fw-medium text-dark">
                                                 Entradas del Mes

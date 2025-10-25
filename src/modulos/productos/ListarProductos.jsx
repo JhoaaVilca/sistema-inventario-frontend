@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer } from "react-bootstrap";
-import { Edit, Trash2, Search, X, Package, Plus, AlertTriangle, Clock, DollarSign, Filter, Eye } from "lucide-react";
+import { Edit, Trash2, Search, X, Package, Plus, AlertTriangle, Clock, Filter, Eye } from "lucide-react";
 import Paginador from "../common/Paginador";
 import LotesModal from "./LotesModal";
 import AgregarProducto from "./AgregarProductos";

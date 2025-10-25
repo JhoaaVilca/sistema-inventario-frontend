@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Table, Badge, Alert, Modal, Form, Row, Col, Spinner, Toast, ToastContainer } from 'react-bootstrap';
 import { 
-    DollarSign, 
+    Banknote, 
     Plus, 
     Minus, 
     Eye, 
@@ -320,7 +320,7 @@ const CajaDelDia = () => {
                                 <Row>
                                     <Col md={3}>
                                         <div className="text-center p-3 rounded bg-light">
-                                            <DollarSign size={24} className="text-primary mb-2" />
+                                            <Banknote size={24} className="text-primary mb-2" />
                                             <h6 className="mb-1 small text-muted">Apertura</h6>
                                             <h5 className="mb-0 fw-bold">{formatearMonto(caja.montoApertura)}</h5>
                                         </div>
@@ -341,7 +341,7 @@ const CajaDelDia = () => {
                                     </Col>
                                     <Col md={3}>
                                         <div className="text-center p-3 rounded bg-light">
-                                            <DollarSign size={24} className="text-primary mb-2" />
+                                            <Banknote size={24} className="text-primary mb-2" />
                                             <h6 className="mb-1 small text-muted">Saldo Actual</h6>
                                             <h5 className="mb-0 fw-bold text-primary">{formatearMonto(caja.saldoActual)}</h5>
                                         </div>

@@ -3,7 +3,7 @@ import { Table, Button, Form, Card, Badge, Collapse, Alert, Modal, Spinner } fro
 import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
 import DetalleSalida from "./DetalleSalida";
-import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2, ShoppingCart, DollarSign, AlertCircle, CheckCircle } from "lucide-react";
+import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2, ShoppingCart, Banknote, AlertCircle, CheckCircle } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 import cajaService from "../../servicios/cajaService";
 import Paginador from "../common/Paginador";
@@ -31,6 +31,7 @@ function ListarSalidas() {
     const [cargandoTicket, setCargandoTicket] = useState(false);
     const [estadoCaja, setEstadoCaja] = useState(null);
     const [cargandoCaja, setCargandoCaja] = useState(false);
+    const [mensajeCaja, setMensajeCaja] = useState("");
 
     useEffect(() => {
         const loadPdf = async () => {
@@ -133,7 +134,13 @@ function ListarSalidas() {
         cargarEstadoCaja();
     }, [page, size]);
 
-    const handleAgregarSalida = () => setShowAddModal(true);
+    const handleAgregarSalida = () => {
+        if (!estadoCaja?.existeCaja) {
+            setMensajeCaja('No hay una caja abierta. Debe abrir una caja del día antes de registrar ventas o salidas.');
+            return;
+        }
+        setShowAddModal(true);
+    };
     const handleCerrarModalAgregar = () => setShowAddModal(false);
     const handleCerrarModalEditar = () => {
         setShowEditModal(false);
@@ -192,7 +199,7 @@ function ListarSalidas() {
                         <div className="d-flex align-items-center justify-content-between">
                             <div className="d-flex align-items-center">
                                 <div className="p-2 bg-white bg-opacity-20 rounded-3 me-3">
-                                    <DollarSign size={24} className="text-white" />
+                                    <Banknote size={24} className="text-white" />
                                 </div>
                                 <div>
                                     <h5 className="mb-1 fw-bold">
@@ -218,7 +225,7 @@ function ListarSalidas() {
                                             size="sm"
                                             onClick={() => window.location.href = '/salidas/caja'}
                                         >
-                                            <DollarSign size={16} className="me-1" />
+                                            <Banknote size={16} className="me-1" />
                                             Ver Caja
                                         </Button>
                                     </>
@@ -233,7 +240,7 @@ function ListarSalidas() {
                                             size="sm"
                                             onClick={() => window.location.href = '/salidas/caja'}
                                         >
-                                            <DollarSign size={16} className="me-1" />
+                                            <Banknote size={16} className="me-1" />
                                             Abrir Caja
                                         </Button>
                                     </>
@@ -335,8 +342,14 @@ function ListarSalidas() {
                 </Collapse>
             </Card>
 
+            {mensajeCaja && (
+                <Alert variant="warning" dismissible onClose={() => setMensajeCaja("")} className="mb-2">
+                    <strong>Atención:</strong> {mensajeCaja}
+                </Alert>
+            )}
+
             <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
-                <Button variant="success" onClick={handleAgregarSalida} className="mb-3">
+                <Button variant="success" onClick={handleAgregarSalida} className="mb-3" disabled={!estadoCaja?.existeCaja} title={!estadoCaja?.existeCaja ? 'Abra la caja del día para registrar una salida' : ''}>
                     <Plus size={16} /> Nueva Salida
                 </Button>
             </div>
