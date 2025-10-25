@@ -10,8 +10,12 @@ export const creditoService = {
     const resp = await apiClient.get(`/creditos/${id}`);
     return resp.data;
   },
-  registrarPago: async (idCredito, payload) => {
-    const resp = await apiClient.post(`/creditos/${idCredito}/pagos`, payload);
+  registrarPago: async (idCredito, payload, idCaja = null) => {
+    const params = {};
+    if (idCaja) {
+      params.idCaja = idCaja;
+    }
+    const resp = await apiClient.post(`/creditos/${idCredito}/pagos`, payload, { params });
     return resp.data;
   },
 };

@@ -3,8 +3,9 @@ import { Table, Button, Form, Card, Badge, Collapse, Alert, Modal, Spinner } fro
 import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
 import DetalleSalida from "./DetalleSalida";
-import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2, ShoppingCart } from "lucide-react";
+import { Plus, Search, X, Filter, Calendar, ChevronDown, ChevronUp, Edit, Trash2, ShoppingCart, DollarSign, AlertCircle, CheckCircle } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
+import cajaService from "../../servicios/cajaService";
 import Paginador from "../common/Paginador";
 
 function ListarSalidas() {
@@ -28,6 +29,8 @@ function ListarSalidas() {
     const [ticketSalidaId, setTicketSalidaId] = useState(null);
     const [ticketPdfUrl, setTicketPdfUrl] = useState("");
     const [cargandoTicket, setCargandoTicket] = useState(false);
+    const [estadoCaja, setEstadoCaja] = useState(null);
+    const [cargandoCaja, setCargandoCaja] = useState(false);
 
     useEffect(() => {
         const loadPdf = async () => {
@@ -83,6 +86,18 @@ function ListarSalidas() {
         }
     };
 
+    const cargarEstadoCaja = async () => {
+        setCargandoCaja(true);
+        try {
+            const response = await cajaService.obtenerEstado();
+            setEstadoCaja(response);
+        } catch (error) {
+            console.error('Error al cargar estado de caja:', error);
+        } finally {
+            setCargandoCaja(false);
+        }
+    };
+
     const filtrarSalidas = async () => {
         try {
             setCargando(true);
@@ -115,6 +130,7 @@ function ListarSalidas() {
 
     useEffect(() => {
         obtenerSalidas();
+        cargarEstadoCaja();
     }, [page, size]);
 
     const handleAgregarSalida = () => setShowAddModal(true);
@@ -168,6 +184,65 @@ function ListarSalidas() {
                 </div>
                 {cargando && <Spinner animation="border" size="sm" />}
             </div>
+
+            {/* Estado de Caja */}
+            {estadoCaja && (
+                <Card className="mb-4 shadow-sm border-0" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                    <Card.Body className="text-white">
+                        <div className="d-flex align-items-center justify-content-between">
+                            <div className="d-flex align-items-center">
+                                <div className="p-2 bg-white bg-opacity-20 rounded-3 me-3">
+                                    <DollarSign size={24} className="text-white" />
+                                </div>
+                                <div>
+                                    <h5 className="mb-1 fw-bold">
+                                        {estadoCaja.existeCaja ? 'Caja Abierta' : 'Caja Cerrada'}
+                                    </h5>
+                                    <small className="opacity-75">
+                                        {estadoCaja.existeCaja ? 
+                                            `Saldo actual: ${new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(estadoCaja.caja.saldoActual)}` :
+                                            'No hay caja abierta para el día de hoy'
+                                        }
+                                    </small>
+                                </div>
+                            </div>
+                            <div className="d-flex align-items-center">
+                                {estadoCaja.existeCaja ? (
+                                    <>
+                                        <Badge bg="success" className="me-2">
+                                            <CheckCircle size={14} className="me-1" />
+                                            Abierta
+                                        </Badge>
+                                        <Button 
+                                            variant="outline-light" 
+                                            size="sm"
+                                            onClick={() => window.location.href = '/salidas/caja'}
+                                        >
+                                            <DollarSign size={16} className="me-1" />
+                                            Ver Caja
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Badge bg="secondary" className="me-2">
+                                            <AlertCircle size={14} className="me-1" />
+                                            Cerrada
+                                        </Badge>
+                                        <Button 
+                                            variant="outline-light" 
+                                            size="sm"
+                                            onClick={() => window.location.href = '/salidas/caja'}
+                                        >
+                                            <DollarSign size={16} className="me-1" />
+                                            Abrir Caja
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </Card.Body>
+                </Card>
+            )}
 
             {errorListado && (
                 <Alert variant="danger" className="mb-3">{errorListado}</Alert>

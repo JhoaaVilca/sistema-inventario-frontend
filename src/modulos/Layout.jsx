@@ -6,12 +6,13 @@ import '../assets/bootstrap-olive.css';
 import {
     Box, Users, ArrowDownCircle, ArrowUpCircle,
     Menu, LayoutDashboard, Grid3X3, FileText, User, UserCheck
-    , CreditCard, Building2, Settings
+    , CreditCard, Building2, Settings, DollarSign, ChevronDown, ChevronRight
 } from 'lucide-react';
 
 function Layout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [salidasSubmenuOpen, setSalidasSubmenuOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -112,12 +113,44 @@ function Layout({ children }) {
                                 <span>Entradas</span>
                             </NavLink>
                         </li>
+                        {/* Salidas con submenú */}
                         <li className="nav-item mb-2">
-                            <NavLink to="/salidas" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}
-                                onClick={() => setSidebarOpen(false)}>
+                            <button 
+                                className="nav-link d-flex align-items-center p-3 rounded w-100 border-0 bg-transparent text-white"
+                                onClick={() => setSalidasSubmenuOpen(!salidasSubmenuOpen)}
+                                style={{ textAlign: 'left' }}
+                            >
                                 <ArrowUpCircle size={20} className="me-3" />
                                 <span>Salidas / Ventas</span>
-                            </NavLink>
+                                {salidasSubmenuOpen ? 
+                                    <ChevronDown size={16} className="ms-auto" /> : 
+                                    <ChevronRight size={16} className="ms-auto" />
+                                }
+                            </button>
+                            {salidasSubmenuOpen && (
+                                <ul className="nav flex-column ms-4 mt-2">
+                                    <li className="nav-item mb-1">
+                                        <NavLink 
+                                            to="/salidas" 
+                                            className={({ isActive }) => `nav-link d-flex align-items-center p-2 rounded small ${isActive ? 'active' : 'text-white'}`}
+                                            onClick={() => setSidebarOpen(false)}
+                                        >
+                                            <ArrowUpCircle size={16} className="me-2" />
+                                            <span>Registrar Venta</span>
+                                        </NavLink>
+                                    </li>
+                                    <li className="nav-item mb-1">
+                                        <NavLink 
+                                            to="/salidas/caja" 
+                                            className={({ isActive }) => `nav-link d-flex align-items-center p-2 rounded small ${isActive ? 'active' : 'text-white'}`}
+                                            onClick={() => setSidebarOpen(false)}
+                                        >
+                                            <DollarSign size={16} className="me-2" />
+                                            <span>Caja del Día</span>
+                                        </NavLink>
+                                    </li>
+                                </ul>
+                            )}
                         </li>
                         <li className="nav-item mb-2">
                             <NavLink to="/kardex" className={({ isActive }) => `nav-link d-flex align-items-center p-3 rounded ${isActive ? 'active' : 'text-white'}`}

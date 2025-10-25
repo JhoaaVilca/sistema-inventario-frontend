@@ -8,6 +8,7 @@ import ListarProveedores from './modulos/proveedores/ListarProveedores';
 import ListarClientes from './modulos/clientes/ListarClientes';
 import ListarEntradas from './modulos/Entradas/ListarEntradas';
 import ListarSalidas from './modulos/Salidas/ListarSalidas';
+import CajaDelDia from './modulos/Salidas/CajaDelDia';
 import ListarCreditos from './modulos/Creditos/ListarCreditos';
 import DetalleCredito from './modulos/Creditos/DetalleCredito';
 import ConfiguracionEmpresa from './modulos/empresa/ConfiguracionEmpresa';
@@ -27,6 +28,7 @@ function App() {
                 <Route path='/clientes' element={<ListarClientes />} />
                 <Route path='/entradas' element={<ListarEntradas />} />
                 <Route path='/salidas' element={<ListarSalidas />} />
+                <Route path='/salidas/caja' element={<CajaDelDia />} />
                 <Route path='/kardex' element={<Kardex />} />
                 <Route path='/creditos' element={<ListarCreditos />} />
                 <Route path='/creditos/:id' element={<DetalleCredito />} />

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Form, Row, Col, Alert, Card, Badge } from 'react-bootstrap';
 import { ArrowLeft, User, Wallet } from 'lucide-react';
 import creditoService from '../../servicios/creditoService';
+import cajaService from '../../servicios/cajaService';
 
 function DetalleCredito() {
   const { id } = useParams();
@@ -30,18 +31,40 @@ function DetalleCredito() {
   const registrarPago = async (e) => {
     e.preventDefault();
     try {
-      await creditoService.registrarPago(id, {
-        fechaPago,
-        monto: parseFloat(monto),
-        medioPago,
-        observacion,
+      // Obtener la caja abierta actual
+      const estadoCaja = await cajaService.obtenerEstado();
+      const idCaja = estadoCaja.caja?.idCaja || estadoCaja.caja?.id;
+      
+      if (!idCaja && medioPago === 'EFECTIVO') {
+        setMsg({ 
+          type: 'warning', 
+          text: 'No hay una caja abierta. El pago se registrará pero no se reflejará en caja.' 
+        });
+      }
+
+      await creditoService.registrarPago(
+        id, 
+        {
+          fechaPago,
+          monto: parseFloat(monto),
+          medioPago,
+          observacion,
+        },
+        idCaja // Pasar el ID de la caja al servicio
+      );
+      
+      setMsg({ 
+        type: 'success', 
+        text: 'Pago registrado' + (idCaja ? ' y registrado en caja' : '') 
       });
-      setMsg({ type: 'success', text: 'Pago registrado' });
-      setMonto(''); setObservacion('');
+      
+      setMonto(''); 
+      setObservacion('');
       setFechaPago(hoyISO());
       await cargar();
     } catch (err) {
-      const text = err?.response?.data || 'Error al registrar pago';
+      console.error('Error al registrar pago:', err);
+      const text = err?.response?.data?.message || 'Error al registrar pago';
       setMsg({ type: 'danger', text });
     }
   };
