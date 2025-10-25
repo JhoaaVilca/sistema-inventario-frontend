@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Card, Button, Table, Badge, Alert, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
+import { Card, Button, Table, Badge, Alert, Modal, Form, Row, Col, Spinner, Toast, ToastContainer } from 'react-bootstrap';
 import { 
     DollarSign, 
     Plus, 
@@ -31,6 +31,12 @@ const CajaDelDia = () => {
         descripcion: '',
         observacionesEgreso: ''
     });
+    const [showHistorial, setShowHistorial] = useState(false);
+    const [historial, setHistorial] = useState([]);
+    const [loadingHistorial, setLoadingHistorial] = useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMsg, setToastMsg] = useState('');
+    const [toastVariant, setToastVariant] = useState('success');
 
     // Cargar estado de caja al montar el componente
     useEffect(() => {
@@ -109,6 +115,16 @@ const CajaDelDia = () => {
             setMovimientos([]);
         }
     };
+
+    // Polling cada 10s para actualizar movimientos si hay caja abierta
+    useEffect(() => {
+        if (!caja?.id && !caja?.idCaja) return;
+        const idC = caja.id || caja.idCaja;
+        const interval = setInterval(() => {
+            cargarMovimientos(idC);
+        }, 10000);
+        return () => clearInterval(interval);
+    }, [caja?.id, caja?.idCaja]);
 
     const abrirCaja = async () => {
         // Validar que el monto sea un número válido
@@ -231,8 +247,14 @@ const CajaDelDia = () => {
             document.body.appendChild(link);
             link.click();
             link.remove();
+            setToastVariant('success');
+            setToastMsg('Reporte generado correctamente');
+            setShowToast(true);
         } catch (err) {
             setError('Error al generar reporte: ' + err.message);
+            setToastVariant('danger');
+            setToastMsg('Error al generar reporte');
+            setShowToast(true);
         }
     };
 
@@ -325,6 +347,16 @@ const CajaDelDia = () => {
                                         </div>
                                     </Col>
                                 </Row>
+                                {/* Resumen automático */}
+                                <div className="mt-2">
+                                    {(() => {
+                                        const ingresos = movimientos.filter(m => m.tipoMovimiento === 'INGRESO').length;
+                                        const egresos = movimientos.filter(m => m.tipoMovimiento === 'EGRESO').length;
+                                        return (
+                                            <small className="text-muted">Hoy se registraron {ingresos} ingresos y {egresos} egresos.</small>
+                                        );
+                                    })()}
+                                </div>
                             </Card.Body>
                         </Card>
                     </Col>
@@ -362,6 +394,30 @@ const CajaDelDia = () => {
                                             Abrir Nueva Caja
                                         </Button>
                                     )}
+                                    <Button 
+                                        variant="outline-secondary"
+                                        onClick={async () => {
+                                            setShowHistorial(true);
+                                            setLoadingHistorial(true);
+                                            try {
+                                                const data = await cajaService.obtenerHistorial(30);
+                                                const raw = Array.isArray(data) ? data : (Array.isArray(data?.cajas) ? data.cajas : []);
+                                                const items = raw.map(h => ({
+                                                    ...h,
+                                                    saldoFinal: h.saldoFinal != null ? h.saldoFinal : (h.saldoActual != null ? h.saldoActual : ((h.montoApertura || 0) + (h.totalIngresos || 0) - (h.totalEgresos || 0)))
+                                                }));
+                                                setHistorial(items);
+                                            } catch (e) {
+                                                setToastVariant('danger');
+                                                setToastMsg('Error al cargar historial');
+                                                setShowToast(true);
+                                            } finally {
+                                                setLoadingHistorial(false);
+                                            }
+                                        }}
+                                    >
+                                        <Eye size={16} className="me-2" /> Ver cajas anteriores
+                                    </Button>
                                     <Button 
                                         variant="outline-primary" 
                                         onClick={generarReporte}
@@ -497,7 +553,7 @@ const CajaDelDia = () => {
                 <Modal.Body>
                     <Alert variant="warning">
                         <AlertCircle size={16} className="me-2" />
-                        ¿Estás seguro de cerrar la caja? Esta acción no se puede deshacer.
+                        ¿Deseas cerrar la caja del día? No podrás registrar más movimientos.
                     </Alert>
                     <Form>
                         <Form.Group>
@@ -565,11 +621,76 @@ const CajaDelDia = () => {
                     <Button variant="secondary" onClick={() => setShowEgresoModal(false)}>
                         Cancelar
                     </Button>
-                    <Button variant="warning" onClick={registrarEgreso} disabled={loading}>
+                    <Button variant="warning" onClick={async () => {
+                            if (!formData.monto || formData.monto <= 0 || !formData.descripcion.trim()) {
+                                setToastVariant('danger');
+                                setToastMsg('Complete los campos requeridos');
+                                setShowToast(true);
+                                return;
+                            }
+                            await registrarEgreso();
+                            setToastVariant('success');
+                            setToastMsg('Egreso registrado');
+                            setShowToast(true);
+                        }} disabled={loading}>
                         {loading ? <Spinner size="sm" /> : 'Registrar Egreso'}
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            {/* Modal Historial de Cajas */}
+            <Modal show={showHistorial} onHide={() => setShowHistorial(false)} size="lg">
+                <Modal.Header closeButton>
+                    <Modal.Title>Historial de Cajas (últimos 30 días)</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {loadingHistorial ? (
+                        <div className="text-center py-4"><Spinner /></div>
+                    ) : (
+                        <div className="table-responsive">
+                            <Table hover size="sm">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fecha Apertura</th>
+                                        <th>Fecha Cierre</th>
+                                        <th>Apertura</th>
+                                        <th>Ingresos</th>
+                                        <th>Egresos</th>
+                                        <th>Saldo Final</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {Array.isArray(historial) && historial.length > 0 ? historial.map((h, idx) => (
+                                        <tr key={h.id || idx}>
+                                            <td>{idx + 1}</td>
+                                            <td>{h.fechaApertura ? new Date(h.fechaApertura).toLocaleString('es-ES') : '—'}</td>
+                                            <td>{h.fechaCierre ? new Date(h.fechaCierre).toLocaleString('es-ES') : '—'}</td>
+                                            <td>{formatearMonto(h.montoApertura)}</td>
+                                            <td className="text-success">{formatearMonto(h.totalIngresos)}</td>
+                                            <td className="text-danger">{formatearMonto(h.totalEgresos)}</td>
+                                            <td className="fw-bold">{formatearMonto(h.saldoFinal ?? h.saldoActual)}</td>
+                                            <td>
+                                                <Badge bg={h.estado === 'ABIERTA' ? 'success' : 'secondary'}>{h.estado}</Badge>
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr><td colSpan={8} className="text-center text-muted">Sin registros</td></tr>
+                                    )}
+                                </tbody>
+                            </Table>
+                        </div>
+                    )}
+                </Modal.Body>
+            </Modal>
+
+            {/* Toasts */}
+            <ToastContainer position="bottom-end" className="p-3">
+                <Toast bg={toastVariant} onClose={() => setShowToast(false)} show={showToast} delay={2500} autohide>
+                    <Toast.Body className="text-white">{toastMsg}</Toast.Body>
+                </Toast>
+            </ToastContainer>
         </div>
     );
 };
