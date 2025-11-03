@@ -140,7 +140,7 @@ const ConfiguracionEmpresa = () => {
                                             name="nombreEmpresa"
                                             value={empresa.nombreEmpresa}
                                             onChange={handleInputChange}
-                                            placeholder="Ej: Comercial Yoli"
+                                            placeholder="Ej: COMERCIAL YAMISA"
                                             required
                                         />
                                     </Form.Group>
