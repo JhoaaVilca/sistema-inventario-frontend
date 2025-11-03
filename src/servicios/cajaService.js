@@ -6,7 +6,7 @@ const cajaService = {
         try {
             // Primero verificamos si hay una caja abierta
             const verificarResponse = await apiClient.get('/caja/verificar');
-            
+
             if (verificarResponse.data.existeCajaAbierta) {
                 // Si hay caja abierta, obtenemos sus detalles
                 const estadoResponse = await apiClient.get('/caja/estado');
@@ -18,19 +18,19 @@ const cajaService = {
                     };
                 }
             }
-            
+
             // Si no hay caja abierta o hubo un error al obtener los detalles
-            return { 
-                existeCaja: false, 
-                message: 'No hay caja abierta actualmente' 
+            return {
+                existeCaja: false,
+                message: 'No hay caja abierta actualmente'
             };
-            
+
         } catch (error) {
             console.error('Error al obtener estado de caja:', error);
             // En caso de error, asumir que no hay caja abierta
-            return { 
-                existeCaja: false, 
-                message: 'Error al verificar el estado de la caja' 
+            return {
+                existeCaja: false,
+                message: 'Error al verificar el estado de la caja'
             };
         }
     },
@@ -156,4 +156,5 @@ const cajaService = {
 };
 
 export default cajaService;
+
 

@@ -206,7 +206,7 @@ function ListarSalidas() {
                                         {estadoCaja.existeCaja ? 'Caja Abierta' : 'Caja Cerrada'}
                                     </h5>
                                     <small className="opacity-75">
-                                        {estadoCaja.existeCaja ? 
+                                        {estadoCaja.existeCaja ?
                                             `Saldo actual: ${new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(estadoCaja.caja.saldoActual)}` :
                                             'No hay caja abierta para el día de hoy'
                                         }
@@ -220,8 +220,8 @@ function ListarSalidas() {
                                             <CheckCircle size={14} className="me-1" />
                                             Abierta
                                         </Badge>
-                                        <Button 
-                                            variant="outline-light" 
+                                        <Button
+                                            variant="outline-light"
                                             size="sm"
                                             onClick={() => window.location.href = '/salidas/caja'}
                                         >
@@ -235,8 +235,8 @@ function ListarSalidas() {
                                             <AlertCircle size={14} className="me-1" />
                                             Cerrada
                                         </Badge>
-                                        <Button 
-                                            variant="outline-light" 
+                                        <Button
+                                            variant="outline-light"
                                             size="sm"
                                             onClick={() => window.location.href = '/salidas/caja'}
                                         >
@@ -369,11 +369,11 @@ function ListarSalidas() {
                         <small className="text-muted">Gestiona las salidas de inventario</small>
                     </div>
                 </div>
-                
+
                 <div className="row">
                     {salidas?.map((salida) => (
                         <div key={salida.idSalida} className="col-12 mb-3">
-                            <DetalleSalida 
+                            <DetalleSalida
                                 salida={salida}
                                 isOpen={salidaExpandida === salida.idSalida}
                                 onToggle={() => toggleSalida(salida.idSalida)}
@@ -381,7 +381,7 @@ function ListarSalidas() {
                         </div>
                     ))}
                 </div>
-                
+
                 <div className="d-flex justify-content-center mt-4">
                     <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={false} />
                 </div>
@@ -412,7 +412,7 @@ function ListarSalidas() {
                             <DetalleSalida
                                 salida={salidaDetalle}
                                 isOpen={true}
-                                onToggle={() => {}}
+                                onToggle={() => { }}
                                 ocultarHeader={true}
                             />
                         )

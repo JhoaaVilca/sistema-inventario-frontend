@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Table, Badge, Alert, Modal, Form, Row, Col, Spinner, Toast, ToastContainer } from 'react-bootstrap';
-import { 
-    Banknote, 
-    Plus, 
-    Minus, 
-    Eye, 
-    Download, 
-    Clock, 
+import {
+    Banknote,
+    Plus,
+    Minus,
+    Eye,
+    Download,
+    Clock,
     AlertCircle,
     CheckCircle,
     XCircle,
@@ -49,7 +49,7 @@ const CajaDelDia = () => {
         try {
             // Usamos el servicio de caja que ya maneja la lógica de verificación
             const estadoCaja = await cajaService.obtenerEstado();
-            
+
             if (estadoCaja.existeCaja && estadoCaja.caja) {
                 // Si hay una caja abierta, la establecemos y cargamos sus movimientos
                 setCaja(estadoCaja.caja);
@@ -69,11 +69,11 @@ const CajaDelDia = () => {
                 // No hay caja abierta
                 setCaja(null);
                 setMovimientos([]);
-                
+
                 // Mostramos el mensaje del servicio o uno por defecto
                 const mensaje = estadoCaja.message || 'No hay caja abierta actualmente';
                 console.log('Estado de caja:', mensaje);
-                
+
                 // Solo mostramos el error si es un mensaje de error real
                 if (mensaje !== 'No hay caja abierta actualmente') {
                     setError(mensaje);
@@ -96,17 +96,17 @@ const CajaDelDia = () => {
             setMovimientos([]);
             return;
         }
-        
+
         try {
             console.log(`Solicitando movimientos para caja con ID: ${idCaja}`);
             const response = await apiClient.get(`/caja/${idCaja}/movimientos`);
             console.log('Respuesta de movimientos:', response.data);
-            
+
             // Asegurarse de que siempre sea un array, incluso si la respuesta no es la esperada
-            const movimientosData = Array.isArray(response.data) 
-                ? response.data 
+            const movimientosData = Array.isArray(response.data)
+                ? response.data
                 : (Array.isArray(response.data?.movimientos) ? response.data.movimientos : []);
-                
+
             console.log('Movimientos cargados:', movimientosData);
             setMovimientos(movimientosData);
         } catch (err) {
@@ -143,7 +143,7 @@ const CajaDelDia = () => {
 
         setLoading(true);
         setError('');
-        
+
         try {
             console.log('Enviando solicitud para abrir caja con:', {
                 montoApertura: monto,
@@ -171,9 +171,9 @@ const CajaDelDia = () => {
             }
         } catch (err) {
             console.error('Error al abrir caja:', err);
-            const errorMessage = err.response?.data?.message || 
-                               (err.response?.status === 403 ? 'No tiene permisos para abrir la caja. Se requiere rol de ADMIN.' : 
-                               'Error al abrir la caja. Verifique los datos e intente nuevamente.');
+            const errorMessage = err.response?.data?.message ||
+                (err.response?.status === 403 ? 'No tiene permisos para abrir la caja. Se requiere rol de ADMIN.' :
+                    'Error al abrir la caja. Verifique los datos e intente nuevamente.');
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -239,7 +239,7 @@ const CajaDelDia = () => {
             const response = await apiClient.get(`/caja/${caja.id}/reporte`, {
                 responseType: 'blob'
             });
-            
+
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
@@ -367,16 +367,16 @@ const CajaDelDia = () => {
                                 <div className="d-grid gap-2">
                                     {caja.estado === 'ABIERTA' ? (
                                         <>
-                                            <Button 
-                                                variant="outline-danger" 
+                                            <Button
+                                                variant="outline-danger"
                                                 onClick={() => setShowCerrarModal(true)}
                                                 disabled={loading}
                                             >
                                                 <XCircle size={16} className="me-2" />
                                                 Cerrar Caja
                                             </Button>
-                                            <Button 
-                                                variant="outline-warning" 
+                                            <Button
+                                                variant="outline-warning"
                                                 onClick={() => setShowEgresoModal(true)}
                                                 disabled={loading}
                                             >
@@ -385,8 +385,8 @@ const CajaDelDia = () => {
                                             </Button>
                                         </>
                                     ) : (
-                                        <Button 
-                                            variant="success" 
+                                        <Button
+                                            variant="success"
                                             onClick={() => setShowAbrirModal(true)}
                                             disabled={loading}
                                         >
@@ -394,7 +394,7 @@ const CajaDelDia = () => {
                                             Abrir Nueva Caja
                                         </Button>
                                     )}
-                                    <Button 
+                                    <Button
                                         variant="outline-secondary"
                                         onClick={async () => {
                                             setShowHistorial(true);
@@ -418,8 +418,8 @@ const CajaDelDia = () => {
                                     >
                                         <Eye size={16} className="me-2" /> Ver cajas anteriores
                                     </Button>
-                                    <Button 
-                                        variant="outline-primary" 
+                                    <Button
+                                        variant="outline-primary"
                                         onClick={generarReporte}
                                         disabled={loading}
                                     >
@@ -441,8 +441,8 @@ const CajaDelDia = () => {
                                 Actualmente no hay una caja abierta. Para comenzar a registrar movimientos,
                                 por favor abre una nueva caja.
                             </p>
-                            <Button 
-                                variant="primary" 
+                            <Button
+                                variant="primary"
                                 onClick={() => setShowAbrirModal(true)}
                                 disabled={loading}
                                 className="px-4"
@@ -519,7 +519,7 @@ const CajaDelDia = () => {
                                 step="0.01"
                                 min="0"
                                 value={formData.montoApertura}
-                                onChange={(e) => setFormData({...formData, montoApertura: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, montoApertura: e.target.value })}
                                 placeholder="0.00"
                             />
                         </Form.Group>
@@ -529,7 +529,7 @@ const CajaDelDia = () => {
                                 as="textarea"
                                 rows={3}
                                 value={formData.observaciones}
-                                onChange={(e) => setFormData({...formData, observaciones: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
                                 placeholder="Observaciones opcionales..."
                             />
                         </Form.Group>
@@ -562,7 +562,7 @@ const CajaDelDia = () => {
                                 as="textarea"
                                 rows={3}
                                 value={formData.observaciones}
-                                onChange={(e) => setFormData({...formData, observaciones: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
                                 placeholder="Observaciones opcionales..."
                             />
                         </Form.Group>
@@ -592,7 +592,7 @@ const CajaDelDia = () => {
                                 step="0.01"
                                 min="0.01"
                                 value={formData.monto}
-                                onChange={(e) => setFormData({...formData, monto: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
                                 placeholder="0.00"
                             />
                         </Form.Group>
@@ -601,7 +601,7 @@ const CajaDelDia = () => {
                             <Form.Control
                                 type="text"
                                 value={formData.descripcion}
-                                onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                                 placeholder="Ej: Compra de bolsas, mantenimiento..."
                             />
                         </Form.Group>
@@ -611,7 +611,7 @@ const CajaDelDia = () => {
                                 as="textarea"
                                 rows={2}
                                 value={formData.observacionesEgreso}
-                                onChange={(e) => setFormData({...formData, observacionesEgreso: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, observacionesEgreso: e.target.value })}
                                 placeholder="Observaciones opcionales..."
                             />
                         </Form.Group>
@@ -622,17 +622,17 @@ const CajaDelDia = () => {
                         Cancelar
                     </Button>
                     <Button variant="warning" onClick={async () => {
-                            if (!formData.monto || formData.monto <= 0 || !formData.descripcion.trim()) {
-                                setToastVariant('danger');
-                                setToastMsg('Complete los campos requeridos');
-                                setShowToast(true);
-                                return;
-                            }
-                            await registrarEgreso();
-                            setToastVariant('success');
-                            setToastMsg('Egreso registrado');
+                        if (!formData.monto || formData.monto <= 0 || !formData.descripcion.trim()) {
+                            setToastVariant('danger');
+                            setToastMsg('Complete los campos requeridos');
                             setShowToast(true);
-                        }} disabled={loading}>
+                            return;
+                        }
+                        await registrarEgreso();
+                        setToastVariant('success');
+                        setToastMsg('Egreso registrado');
+                        setShowToast(true);
+                    }} disabled={loading}>
                         {loading ? <Spinner size="sm" /> : 'Registrar Egreso'}
                     </Button>
                 </Modal.Footer>
@@ -696,3 +696,4 @@ const CajaDelDia = () => {
 };
 
 export default CajaDelDia;
+
