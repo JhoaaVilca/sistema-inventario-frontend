@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Table, Button, Form, Card, Badge, Collapse, Alert, Spinner, Modal } from "react-bootstrap";
 import AgregarEntrada from "./AgregarEntrada";
 import EditarEntrada from "./EditarEntrada";
@@ -22,12 +22,12 @@ function ListarEntradas() {
     const [errorListado, setErrorListado] = useState("");
     const [subiendoFactura, setSubiendoFactura] = useState(false);
     const [entradaFactura, setEntradaFactura] = useState(null);
-    const [entradaExpandida, setEntradaExpandida] = useState(null); // ya no se usa para UI principal
+    // Eliminado: entradaExpandida ya no se usa
     const [showDetalleModal, setShowDetalleModal] = useState(false);
     const [entradaDetalle, setEntradaDetalle] = useState(null);
     const [editMode, setEditMode] = useState(false);
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10); // Tamaño normal
+    const [size] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
 
     const toggleEntrada = (entradaId) => {
@@ -39,7 +39,7 @@ function ListarEntradas() {
         }
     };
 
-    const obtenerEntradas = async () => {
+    const obtenerEntradas = useCallback(async () => {
         try {
             setErrorListado("");
             setCargando(true);
@@ -52,7 +52,7 @@ function ListarEntradas() {
         } finally {
             setCargando(false);
         }
-    };
+    }, [page, size]);
 
     const obtenerProveedores = async () => {
         try {
@@ -109,7 +109,7 @@ function ListarEntradas() {
     useEffect(() => {
         obtenerEntradas();
         obtenerProveedores();
-    }, [page, size]);
+    }, [obtenerEntradas]);
 
     const handleAgregarEntrada = () => setShowAddModal(true);
     const handleCerrarModalAgregar = () => setShowAddModal(false);

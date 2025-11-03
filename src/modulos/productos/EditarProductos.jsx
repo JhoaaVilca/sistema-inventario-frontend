@@ -12,7 +12,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
     const [unidadMedida, setUnidadMedida] = useState("");
     const [fechaIngreso, setFechaIngreso] = useState("");
     const [esPerecible, setEsPerecible] = useState(false);
-    const [fechaVencimientoInicial, setFechaVencimientoInicial] = useState("");
+    // eliminado: fechaVencimientoInicial no se usa en edición
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [categoria, setCategoria] = useState("");
 
@@ -31,7 +31,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             setUnidadMedida(producto.unidadMedida || "");
             setFechaIngreso(producto.fechaIngreso || "");
             setEsPerecible(producto.esPerecible || false);
-            setFechaVencimientoInicial(producto.fechaVencimientoInicial || "");
+            // fechaVencimientoInicial no aplica en edición
             setDescripcionCorta(producto.descripcionCorta || "");
             setCategoria(producto.idCategoria || "");
             setError("");

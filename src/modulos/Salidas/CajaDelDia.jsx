@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Table, Badge, Alert, Modal, Form, Row, Col, Spinner, Toast, ToastContainer } from 'react-bootstrap';
 import {
     Banknote,
@@ -38,12 +38,7 @@ const CajaDelDia = () => {
     const [toastMsg, setToastMsg] = useState('');
     const [toastVariant, setToastVariant] = useState('success');
 
-    // Cargar estado de caja al montar el componente
-    useEffect(() => {
-        cargarEstadoCaja();
-    }, []);
-
-    const cargarEstadoCaja = async () => {
+    const cargarEstadoCaja = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
@@ -88,7 +83,12 @@ const CajaDelDia = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    // Cargar estado de caja al montar el componente
+    useEffect(() => {
+        cargarEstadoCaja();
+    }, [cargarEstadoCaja]);
 
     const cargarMovimientos = async (idCaja) => {
         if (!idCaja) {
@@ -407,7 +407,7 @@ const CajaDelDia = () => {
                                                     saldoFinal: h.saldoFinal != null ? h.saldoFinal : (h.saldoActual != null ? h.saldoActual : ((h.montoApertura || 0) + (h.totalIngresos || 0) - (h.totalEgresos || 0)))
                                                 }));
                                                 setHistorial(items);
-                                            } catch (e) {
+                                            } catch {
                                                 setToastVariant('danger');
                                                 setToastMsg('Error al cargar historial');
                                                 setShowToast(true);

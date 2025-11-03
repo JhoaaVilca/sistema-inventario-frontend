@@ -3,7 +3,7 @@ import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
 import { User, Search, CheckCircle, AlertCircle } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 
-const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null }) => {
+const AgregarCliente = ({ show, onHide = () => {}, onClienteAgregado = () => {}, clienteInicial = null }) => {
     const [formData, setFormData] = useState({
         dni: "",
         nombres: "",
@@ -19,6 +19,51 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
     const [dniValidation, setDniValidation] = useState(null); // null, 'valid', 'invalid', 'found'
     const [clienteEncontrado, setClienteEncontrado] = useState(null);
 
+    const validarDni = useCallback(async () => {
+        if (!formData.dni || formData.dni.length !== 8) {
+            setDniValidation('invalid');
+            setClienteEncontrado(null);
+            return;
+        }
+
+        setValidatingDni(true);
+        setError("");
+
+        try {
+            const { data } = await apiClient.get(`/clientes/buscar-dni/${formData.dni}`);
+
+            if (data.existeEnBD) {
+                setDniValidation('found');
+                setClienteEncontrado(data);
+                setFormData(prev => ({
+                    ...prev,
+                    nombres: data.nombres,
+                    apellidos: data.apellidos,
+                    direccion: data.direccion || ""
+                }));
+            } else if (data.nombres) {
+                setDniValidation('valid');
+                setClienteEncontrado(data);
+                setFormData(prev => ({
+                    ...prev,
+                    nombres: data.nombres,
+                    apellidos: data.apellidos,
+                    direccion: data.direccion || ""
+                }));
+            } else {
+                setDniValidation('invalid');
+                setClienteEncontrado(null);
+            }
+        } catch (err) {
+            console.error("Error al validar DNI:", err);
+            setDniValidation('invalid');
+            setClienteEncontrado(null);
+            setError("Error al validar el DNI. Intente nuevamente.");
+        } finally {
+            setValidatingDni(false);
+        }
+    }, [formData.dni]);
+
     // Inicializar con clienteInicial si se proporciona
     useEffect(() => {
         if (clienteInicial && show) {
@@ -31,7 +76,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
                 setTimeout(() => validarDni(), 100);
             }
         }
-    }, [clienteInicial, show]);
+    }, [clienteInicial, show, validarDni]);
 
     // Limpiar cuando se cierre el modal
     useEffect(() => {
@@ -58,53 +103,7 @@ const AgregarCliente = ({ show, onHide, onClienteAgregado, clienteInicial = null
         }));
     };
 
-    const validarDni = useCallback(async () => {
-        if (!formData.dni || formData.dni.length !== 8) {
-            setDniValidation('invalid');
-            setClienteEncontrado(null);
-            return;
-        }
-
-        setValidatingDni(true);
-        setError("");
-
-        try {
-            const { data } = await apiClient.get(`/clientes/buscar-dni/${formData.dni}`);
-
-            if (data.existeEnBD) {
-                // Cliente ya existe en BD
-                setDniValidation('found');
-                setClienteEncontrado(data);
-                setFormData(prev => ({
-                    ...prev,
-                    nombres: data.nombres,
-                    apellidos: data.apellidos,
-                    direccion: data.direccion || ""
-                }));
-            } else if (data.nombres) {
-                // Cliente encontrado en RENIEC
-                setDniValidation('valid');
-                setClienteEncontrado(data);
-                setFormData(prev => ({
-                    ...prev,
-                    nombres: data.nombres,
-                    apellidos: data.apellidos,
-                    direccion: data.direccion || ""
-                }));
-            } else {
-                // DNI no encontrado
-                setDniValidation('invalid');
-                setClienteEncontrado(null);
-            }
-        } catch (err) {
-            console.error("Error al validar DNI:", err);
-            setDniValidation('invalid');
-            setClienteEncontrado(null);
-            setError("Error al validar el DNI. Intente nuevamente.");
-        } finally {
-            setValidatingDni(false);
-        }
-    }, [formData.dni]);
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();

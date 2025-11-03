@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Table, Button, Form, Card, Badge, Collapse, Alert, Modal, Spinner } from "react-bootstrap";
 import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
@@ -14,7 +14,7 @@ function ListarSalidas() {
     const [fechaFin, setFechaFin] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
     // Eliminamos el modal clásico; ahora usaremos edición inline dentro del detalle
-    const [salidaExpandida, setSalidaExpandida] = useState(null);
+    // eliminado estado expandido sin uso
     const [showDetalleModal, setShowDetalleModal] = useState(false);
     const [salidaDetalle, setSalidaDetalle] = useState(null);
     const [editMode, setEditMode] = useState(false);
@@ -22,7 +22,7 @@ function ListarSalidas() {
     const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
     const [errorListado, setErrorListado] = useState("");
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10); // Tamaño normal
+    const [size] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
     const [cargando, setCargando] = useState(false);
     const [showTicketModal, setShowTicketModal] = useState(false);
@@ -30,7 +30,7 @@ function ListarSalidas() {
     const [ticketPdfUrl, setTicketPdfUrl] = useState("");
     const [cargandoTicket, setCargandoTicket] = useState(false);
     const [estadoCaja, setEstadoCaja] = useState(null);
-    const [cargandoCaja, setCargandoCaja] = useState(false);
+    // eliminado cargandoCaja sin uso
     const [mensajeCaja, setMensajeCaja] = useState("");
 
     useEffect(() => {
@@ -72,7 +72,7 @@ function ListarSalidas() {
         }
     };
 
-    const obtenerSalidas = async () => {
+    const obtenerSalidas = useCallback(async () => {
         try {
             setCargando(true);
             setErrorListado("");
@@ -85,17 +85,14 @@ function ListarSalidas() {
         } finally {
             setCargando(false);
         }
-    };
+    }, [page, size]);
 
     const cargarEstadoCaja = async () => {
-        setCargandoCaja(true);
         try {
             const response = await cajaService.obtenerEstado();
             setEstadoCaja(response);
         } catch (error) {
             console.error('Error al cargar estado de caja:', error);
-        } finally {
-            setCargandoCaja(false);
         }
     };
 
@@ -132,7 +129,7 @@ function ListarSalidas() {
     useEffect(() => {
         obtenerSalidas();
         cargarEstadoCaja();
-    }, [page, size]);
+    }, [obtenerSalidas]);
 
     const handleAgregarSalida = () => {
         if (!estadoCaja?.existeCaja) {
@@ -142,10 +139,7 @@ function ListarSalidas() {
         setShowAddModal(true);
     };
     const handleCerrarModalAgregar = () => setShowAddModal(false);
-    const handleCerrarModalEditar = () => {
-        setShowEditModal(false);
-        setSalidaSeleccionada(null);
-    };
+    // eliminado handler de edición clásico sin uso
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -170,14 +164,7 @@ function ListarSalidas() {
         }
     };
 
-    const handleAsignarCliente = (idSalida) => {
-        // Por ahora, redirigir a editar la salida para asignar cliente
-        const salida = salidas.find(s => s.idSalida === idSalida);
-        if (salida) {
-            setSalidaSeleccionada(salida);
-            setShowEditModal(true);
-        }
-    };
+    // eliminado asignación de cliente sin estados definidos
 
     return (
         <div className="mt-4">
@@ -375,7 +362,7 @@ function ListarSalidas() {
                         <div key={salida.idSalida} className="col-12 mb-3">
                             <DetalleSalida
                                 salida={salida}
-                                isOpen={salidaExpandida === salida.idSalida}
+                                isOpen={false}
                                 onToggle={() => toggleSalida(salida.idSalida)}
                             />
                         </div>

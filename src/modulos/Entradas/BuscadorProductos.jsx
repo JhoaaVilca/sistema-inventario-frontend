@@ -7,7 +7,7 @@ function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar produ
     const [query, setQuery] = useState("");
     const [productos, setProductos] = useState([]);
     const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
-    const [cargando, setCargando] = useState(false);
+    // removido loading no utilizado
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
     const [todosProductos, setTodosProductos] = useState([]);
 
@@ -27,21 +27,7 @@ function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar produ
         cargarProductos();
     }, []);
 
-    // Función para buscar productos
-    const buscarProductos = (searchQuery) => {
-        if (searchQuery.length < 1) {
-            setProductos([]);
-            setMostrarSugerencias(false);
-            return;
-        }
-
-        const productosFiltrados = todosProductos.filter(producto =>
-            producto.nombreProducto.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-
-        setProductos(productosFiltrados.slice(0, 10)); // Limitar a 10 resultados
-        setMostrarSugerencias(true);
-    };
+    // Buscar productos (inline en efecto para evitar deps faltantes)
 
     // Búsqueda en tiempo real
     useEffect(() => {
@@ -50,7 +36,18 @@ function BuscadorProductos({ onProductoSeleccionado, placeholder = "Buscar produ
         }
 
         timeoutRef.current = setTimeout(() => {
-            buscarProductos(query);
+            if (query.length < 1) {
+                setProductos([]);
+                setMostrarSugerencias(false);
+                return;
+            }
+
+            const filtrados = todosProductos.filter(producto =>
+                producto.nombreProducto.toLowerCase().includes(query.toLowerCase())
+            );
+
+            setProductos(filtrados.slice(0, 10));
+            setMostrarSugerencias(true);
         }, 200);
 
         return () => {

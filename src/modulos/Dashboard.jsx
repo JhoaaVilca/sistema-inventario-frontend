@@ -39,7 +39,7 @@ function Dashboard() {
         cargarEstadisticas();
     }, []);
 
-    const StatCard = ({ title, value, icon: Icon, bgColor, info }) => (
+    const StatCard = ({ title, value, icon, bgColor, info }) => (
         <Card className="h-100 shadow-sm border-0">
             <Card.Body className="p-4">
                 <div className="d-flex justify-content-between align-items-start">
@@ -52,7 +52,7 @@ function Dashboard() {
                         </h3>
                     </div>
                     <div className={`d-flex align-items-center justify-content-center rounded-circle ${bgColor}`} style={{ width: '48px', height: '48px' }}>
-                        <Icon size={24} className="text-white" />
+                        {icon}
                     </div>
                 </div>
                 {info && (
@@ -85,7 +85,7 @@ function Dashboard() {
                     <StatCard
                         title="Total Productos"
                         value={stats.totalProductos}
-                        icon={Package}
+                        icon={<Package size={24} className="text-white" />}
                         bgColor="bg-success"
                     />
                 </Col>
@@ -93,7 +93,7 @@ function Dashboard() {
                     <StatCard
                         title="Total Proveedores"
                         value={stats.totalProveedores}
-                        icon={Users}
+                        icon={<Users size={24} className="text-white" />}
                         bgColor="bg-primary"
                     />
                 </Col>
@@ -101,7 +101,7 @@ function Dashboard() {
                     <StatCard
                         title="Total Entradas"
                         value={stats.totalEntradas}
-                        icon={ShoppingCart}
+                        icon={<ShoppingCart size={24} className="text-white" />}
                         bgColor="bg-warning"
                     />
                 </Col>
@@ -109,7 +109,7 @@ function Dashboard() {
                     <StatCard
                         title="Sin Stock"
                         value={stats.productosSinStock}
-                        icon={AlertTriangle}
+                        icon={<AlertTriangle size={24} className="text-white" />}
                         bgColor="bg-danger"
                         info="Requieren atención"
                     />

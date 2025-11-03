@@ -14,13 +14,11 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    try {
-      const expired = localStorage.getItem('sessionExpired');
-      if (expired === '1') {
-        setError('Tu sesión expiró. Vuelve a iniciar sesión.');
-        localStorage.removeItem('sessionExpired');
-      }
-    } catch (_) {}
+    const expired = localStorage.getItem('sessionExpired');
+    if (expired === '1') {
+      setError('Tu sesión expiró. Vuelve a iniciar sesión.');
+      localStorage.removeItem('sessionExpired');
+    }
   }, []);
 
   const handleSubmit = async (e) => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Button, Form, Row, Col, Card, Badge, Collapse, Alert, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Filter, Calendar, User, Wallet } from 'lucide-react';
@@ -20,7 +20,7 @@ function ListarCreditos() {
 
   const filtrosActivos = Boolean(clienteQ || estado || soloVencidos || (fechaIni && fechaFin));
 
-  const cargar = async () => {
+  const cargar = useCallback(async () => {
     setLoading(true);
     try {
       const resp = await creditoService.listar({ page, size });
@@ -28,9 +28,9 @@ function ListarCreditos() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, size]);
 
-  useEffect(() => { cargar(); }, [page]);
+  useEffect(() => { cargar(); }, [cargar]);
 
   const aplicarFiltros = (arr) => {
     let list = arr || [];

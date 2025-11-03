@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import AgregarProveedor from "./AgregarProveedor";
 import EditarProveedor from "./EditarProveedor";
 import { Edit, Power, PowerOff, Search, X, Building2, Plus } from "lucide-react";
@@ -27,16 +27,12 @@ function ListarProveedores() {
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10); // Tamaño normal
+    const [size] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        obtenerProveedores();
-    }, [page, size]);
-
-    const obtenerProveedores = async () => {
+    const obtenerProveedores = useCallback(async () => {
         setLoading(true);
         try {
             const { data } = await apiClient.get("/proveedores", { params: { page, size } });
@@ -49,7 +45,11 @@ function ListarProveedores() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, size]);
+
+    useEffect(() => {
+        obtenerProveedores();
+    }, [obtenerProveedores]);
 
     // 🔴 Desactivar proveedor
     const desactivarProveedor = async (id) => {

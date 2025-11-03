@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Form, Row, Col, Alert, Card, Badge } from 'react-bootstrap';
 import { ArrowLeft, User, Wallet } from 'lucide-react';
@@ -17,16 +17,16 @@ function DetalleCredito() {
 
   const hoyISO = () => new Date().toISOString().slice(0, 10);
 
-  const cargar = async () => {
+  const cargar = useCallback(async () => {
     const resp = await creditoService.obtener(id);
     setCredito(resp);
     // Prefill: fecha = hoy, monto = saldo pendiente (si > 0)
     setFechaPago(hoyISO());
     const saldo = Number(resp?.saldoPendiente || 0);
     setMonto(saldo > 0 ? saldo.toFixed(2) : '');
-  };
+  }, [id]);
 
-  useEffect(() => { cargar(); }, [id]);
+  useEffect(() => { cargar(); }, [cargar]);
 
   const registrarPago = async (e) => {
     e.preventDefault();

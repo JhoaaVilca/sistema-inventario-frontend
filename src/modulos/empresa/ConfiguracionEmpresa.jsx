@@ -22,7 +22,15 @@ const ConfiguracionEmpresa = () => {
         setError('');
         try {
             const data = await empresaService.obtenerConfiguracion();
-            setEmpresa(data);
+            const saneada = {
+                nombreEmpresa: data?.nombreEmpresa ?? '',
+                ruc: data?.ruc ?? '',
+                direccion: data?.direccion ?? '',
+                telefono: data?.telefono ?? '',
+                email: data?.email ?? '',
+                descripcion: data?.descripcion ?? ''
+            };
+            setEmpresa(saneada);
         } catch (err) {
             console.error('Error:', err);
             if (err.response?.status === 401 || err.response?.status === 403) {

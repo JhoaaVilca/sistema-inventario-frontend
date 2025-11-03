@@ -51,7 +51,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                 mostrarNotificacion("No se encontraron datos para el documento.", "warning");
                 setProveedor((prev) => ({ ...prev, nombre: "", direccion: "", estado: "" }));
             }
-        } catch (error) {
+        } catch {
             mostrarNotificacion("Error al consultar el documento.", "danger");
             setProveedor((prev) => ({ ...prev, nombre: "", direccion: "", estado: "" }));
         }
@@ -59,7 +59,8 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { estado, ...proveedorSinEstado } = proveedor;
+        const proveedorSinEstado = { ...proveedor };
+        delete proveedorSinEstado.estado;
 
         try {
             const response = await apiClient.post("/proveedores", proveedorSinEstado);
@@ -78,7 +79,7 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                     estado: "",
                 });
             }
-        } catch (error) {
+        } catch {
             mostrarNotificacion("Error al guardar proveedor. Verifique la conexión.", "danger");
         }
     };

@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import '../assets/bootstrap-olive.css';
 
@@ -14,7 +14,7 @@ function Layout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [salidasSubmenuOpen, setSalidasSubmenuOpen] = useState(false);
-    const location = useLocation();
+    // eliminado useLocation sin uso
     const navigate = useNavigate();
 
     // Detectar pantallas pequeñas

@@ -1,5 +1,5 @@
 import { Modal, Button, Spinner } from "react-bootstrap";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import { loteService } from "../../servicios/loteService";
 
 function LotesModal({ show, onHide, producto, lotes, onChanged }) {
@@ -36,14 +36,14 @@ function LotesModal({ show, onHide, producto, lotes, onChanged }) {
 
   const umbralDiasProximo = 15; // ventana para considerar "próximo a vencer"
 
-  const esVencido = (lote) => {
+  const esVencido = useCallback((lote) => {
     if (lote?.estaVencido === true) return true; // respetar flag si viene del backend
     const fv = parseLocalDate(lote?.fechaVencimiento);
     // Considerar vencido si la fecha de vencimiento es ANTES o IGUAL a hoy
     return fv ? fv <= hoy : false;
-  };
+  }, [hoy]);
 
-  const esProximo = (lote) => {
+  const esProximo = useCallback((lote) => {
     if (lote?.estaProximoAVencer === true) return true; // respetar flag si viene del backend
     const fv = parseLocalDate(lote?.fechaVencimiento);
     if (!fv) return false;
@@ -51,14 +51,14 @@ function LotesModal({ show, onHide, producto, lotes, onChanged }) {
     const limite = new Date(hoy);
     limite.setDate(limite.getDate() + umbralDiasProximo);
     return fv <= limite;
-  };
+  }, [hoy, umbralDiasProximo]);
 
   const resumen = useMemo(() => {
     const total = lotesLocal?.length || 0;
     const vencidos = (lotesLocal || []).filter((l) => esVencido(l)).length;
     const proximos = (lotesLocal || []).filter((l) => esProximo(l)).length;
     return { total, vencidos, proximos };
-  }, [lotesLocal, hoy]);
+  }, [lotesLocal, esVencido, esProximo]);
 
   const refrescarLotes = async () => {
     if (!producto?.idProducto) return;
@@ -79,7 +79,7 @@ function LotesModal({ show, onHide, producto, lotes, onChanged }) {
       await refrescarLotes();
       // Notificar al componente padre para refrescar panel de alertas
       if (typeof onChanged === 'function') {
-        try { onChanged(); } catch (_) {}
+        onChanged();
       }
       window.alert("Lote dado de baja correctamente.");
     } catch (e) {

@@ -3,7 +3,7 @@ import { Form, ListGroup, Button } from "react-bootstrap";
 import { Search, X, ChevronDown } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 
-function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar producto...", limpiar = false }) {
+function SelectProductos({ onProductoSeleccionado, limpiar = false }) {
     const [query, setQuery] = useState("");
     const [productos, setProductos] = useState([]);
     const [productosFiltrados, setProductosFiltrados] = useState([]);
@@ -12,7 +12,7 @@ function SelectProductos({ onProductoSeleccionado, placeholder = "Buscar product
     const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
     const inputRef = useRef(null);
-    const timeoutRef = useRef(null);
+    // eliminado timeoutRef no usado
 
     // Cargar todos los productos al montar el componente
     useEffect(() => {

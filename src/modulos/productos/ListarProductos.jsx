@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer } from "react-bootstrap";
 import { Edit, Trash2, Search, X, Package, Plus, AlertTriangle, Clock, Filter, Eye } from "lucide-react";
 import Paginador from "../common/Paginador";
@@ -11,7 +11,7 @@ import { loteService } from "../../servicios/loteService";
 const ListarProductos = () => {
     const [productos, setProductos] = useState([]);
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10); // Tamaño normal
+    const [size] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
     const [productoEditar, setProductoEditar] = useState(null);
     const [showAgregar, setShowAgregar] = useState(false);
@@ -35,26 +35,7 @@ const ListarProductos = () => {
 
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        cargarProductos();
-        cargarAlertas();
-    }, [page, size]);
-
-    // Utilidades para manejar fechas 'YYYY-MM-DD' sin desfases de zona horaria
-    const parseLocalDate = (str) => {
-        if (!str) return null;
-        const [y, m, d] = str.split('-').map(Number);
-        return new Date(y, (m || 1) - 1, d || 1);
-    };
-
-    const formatearFechaLocalDate = (str) => {
-        if (!str) return 'N/A';
-        const [y, m, d] = str.split('-');
-        if (!y || !m || !d) return str;
-        return `${d}/${m}/${y}`;
-    };
-
-    const cargarAlertas = async () => {
+    const cargarAlertas = useCallback(async () => {
         try {
             const [lotesVencidos, lotesProximos] = await Promise.all([
                 loteService.obtenerLotesVencidos(),
@@ -143,9 +124,9 @@ const ListarProductos = () => {
         } catch (error) {
             console.error('Error al cargar alertas:', error);
         }
-    };
+    }, []);
 
-    const cargarProductos = async () => {
+    const cargarProductos = useCallback(async () => {
         setLoading(true);
         try {
             const { data } = await apiClient.get(`/productos`, { params: { page, size } });
@@ -176,7 +157,28 @@ const ListarProductos = () => {
         } finally {
             setLoading(false);
         }
+    }, [page, size]);
+
+    useEffect(() => {
+        cargarProductos();
+        cargarAlertas();
+    }, [cargarProductos, cargarAlertas]);
+
+    // Utilidades para manejar fechas 'YYYY-MM-DD' sin desfases de zona horaria
+    const parseLocalDate = (str) => {
+        if (!str) return null;
+        const [y, m, d] = str.split('-').map(Number);
+        return new Date(y, (m || 1) - 1, d || 1);
     };
+
+    const formatearFechaLocalDate = (str) => {
+        if (!str) return 'N/A';
+        const [y, m, d] = str.split('-');
+        if (!y || !m || !d) return str;
+        return `${d}/${m}/${y}`;
+    };
+
+    
 
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este producto?")) {

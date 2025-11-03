@@ -18,7 +18,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
     const [guardando, setGuardando] = useState(false);
     const [archivoFactura, setArchivoFactura] = useState(null);
     const [previewFactura, setPreviewFactura] = useState(null);
-    const [entradaCreada, setEntradaCreada] = useState(null);
+    // Eliminado: entradaCreada no se usa
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
@@ -43,7 +43,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
             setErrorMsg("");
             setArchivoFactura(null);
             setPreviewFactura(null);
-            setEntradaCreada(null);
+            // limpio referencia a entrada creada (eliminada)
         }
     }, [show]);
 
@@ -68,8 +68,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                 detalles: productosEntrada
             });
 
-            // Guardar la entrada creada para subir factura después
-            setEntradaCreada(data);
+            // Entrada creada disponible en 'data'
 
             // Si hay archivo de factura, subirlo
             if (archivoFactura) {

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer, Badge } from "react-bootstrap";
 import { Edit, Trash2, Search, X, User, Plus } from "lucide-react";
 import AgregarCliente from "./AgregarCliente";
@@ -19,16 +19,12 @@ const ListarClientes = () => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10); // Tamaño normal
+    const [size] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        cargarClientes();
-    }, [page, size]);
-
-    const cargarClientes = async () => {
+    const cargarClientes = useCallback(async () => {
         setLoading(true);
         try {
             const { data } = await apiClient.get("/clientes", { params: { page, size } });
@@ -41,7 +37,11 @@ const ListarClientes = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, size]);
+
+    useEffect(() => {
+        cargarClientes();
+    }, [cargarClientes]);
 
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este cliente?")) {

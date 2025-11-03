@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import FormularioCategoria from "./FormularioCategoria";
 import { Edit, Trash2, Search, X, Grid3X3, Eye, Plus } from "lucide-react";
@@ -19,7 +19,7 @@ function ListarCategorias() {
     const navigate = useNavigate();
     const [categorias, setCategorias] = useState([]);
     const [categoriaEditar, setCategoriaEditar] = useState(null);
-    const [showAgregar, setShowAgregar] = useState(false);
+    // eliminado showAgregar sin uso
     const [modoEdicion, setModoEdicion] = useState(false);
     const [mostrarInput, setMostrarInput] = useState(false);
     const [filtro, setFiltro] = useState("");
@@ -29,16 +29,12 @@ function ListarCategorias() {
     const [toastMessage, setToastMessage] = useState("");
     const [toastVariant, setToastVariant] = useState("success");
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10); // Tamaño normal
+    const [size] = useState(10); // Tamaño normal
     const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
 
-    useEffect(() => {
-        obtenerCategorias();
-    }, [page, size]);
-
-    const obtenerCategorias = async () => {
+    const obtenerCategorias = useCallback(async () => {
         setLoading(true);
         try {
             const { data } = await apiClient.get("/categorias", { params: { page, size } });
@@ -51,7 +47,11 @@ function ListarCategorias() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page, size]);
+
+    useEffect(() => {
+        obtenerCategorias();
+    }, [obtenerCategorias]);
 
     const eliminarCategoria = async (id) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
@@ -82,9 +82,7 @@ function ListarCategorias() {
         setShowToast(true);
     };
 
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    // eliminado scrollToTop sin uso
 
     const limpiarBuscador = () => {
         setFiltro("");

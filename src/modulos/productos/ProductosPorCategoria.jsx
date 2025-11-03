@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Alert, Toast, ToastContainer, Spinner } from 'react-bootstrap';
 import { ArrowLeft, Package, Edit, Trash2 } from 'lucide-react';
@@ -19,11 +19,7 @@ const ProductosPorCategoria = () => {
     const [toastMessage, setToastMessage] = useState('');
     const [toastVariant, setToastVariant] = useState('success');
 
-    useEffect(() => {
-        cargarDatos();
-    }, [categoriaId]);
-
-    const cargarDatos = async () => {
+    const cargarDatos = useCallback(async () => {
         setLoading(true);
         try {
             // Cargar todos los productos y categorías
@@ -51,7 +47,13 @@ const ProductosPorCategoria = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [categoriaId]);
+
+    useEffect(() => {
+        cargarDatos();
+    }, [cargarDatos]);
+
+    
 
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este producto?")) {

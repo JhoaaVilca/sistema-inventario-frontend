@@ -29,7 +29,9 @@ apiClient.interceptors.response.use(
     const status = error?.response?.status;
     if (status === 401 || status === 403) {
       // Aviso de sesión expirada y redirección
-      try { localStorage.setItem('sessionExpired', '1'); } catch (_) { }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('sessionExpired', '1');
+      }
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       localStorage.removeItem('role');
