@@ -27,17 +27,23 @@ apiClient.interceptors.response.use(
   (resp) => resp,
   (error) => {
     const status = error?.response?.status;
+    const url = error?.config?.url || '';
+    const skipRedirectHeader = error?.config?.headers?.['X-Skip-Auth-Redirect'] === '1';
+    const skipByUrl = typeof url === 'string' && url.includes('/productos/alertas/sin-stock');
+    const skipRedirect = skipRedirectHeader || skipByUrl;
     if (status === 401 || status === 403) {
-      // Aviso de sesión expirada y redirección
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('sessionExpired', '1');
-      }
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.removeItem('role');
-      if (typeof window !== 'undefined') {
-        alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
-        window.location.href = '/login';
+      if (!skipRedirect) {
+        // Aviso de sesión expirada y redirección
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('sessionExpired', '1');
+        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+        if (typeof window !== 'undefined') {
+          alert('Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

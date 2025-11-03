@@ -697,3 +697,4 @@ const CajaDelDia = () => {
 
 export default CajaDelDia;
 
+
