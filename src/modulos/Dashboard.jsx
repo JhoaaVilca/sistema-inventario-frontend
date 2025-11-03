@@ -11,7 +11,7 @@ import {
     BarChart3,
     Activity
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import dashboardService from '../servicios/dashboardService';
 import cajaService from '../servicios/cajaService';
 
@@ -110,6 +110,14 @@ function Dashboard() {
 
     const fechaActual = new Date().toLocaleDateString('es-PE');
 
+    // Donut data: Ventas vs Compras del mes actual
+    const currentMonth = mensual && mensual.length ? mensual[mensual.length - 1] : { ventas: 0, compras: 0 };
+    const donutData = [
+        { name: 'Ventas', value: currentMonth.ventas || 0 },
+        { name: 'Compras', value: currentMonth.compras || 0 }
+    ];
+    const donutColors = ['#3b82f6', '#f59e0b'];
+
     return (
         <div className="container-fluid">
             {/* Header del Dashboard */}
@@ -135,7 +143,7 @@ function Dashboard() {
                         value={stats.ventasTotales}
                         icon={<TrendingUp size={24} className="text-white" />}
                         bgColor="bg-success"
-                        onClick={() => setModal('ventas')}
+                        onClick={() => navigate('/salidas')}
                     />
                 </Col>
                 <Col xs={12} md={6} lg={3}>
@@ -144,7 +152,7 @@ function Dashboard() {
                         value={stats.totalProductos}
                         icon={<Package size={24} className="text-white" />}
                         bgColor="bg-primary"
-                        onClick={() => setModal('productos')}
+                        onClick={() => navigate('/productos')}
                     />
                 </Col>
                 <Col xs={12} md={6} lg={3}>
@@ -153,6 +161,7 @@ function Dashboard() {
                         value={stats.categoriasTotales}
                         icon={<Activity size={24} className="text-white" />}
                         bgColor="bg-info"
+                        onClick={() => navigate('/categorias')}
                     />
                 </Col>
                 <Col xs={12} md={6} lg={3}>
@@ -172,42 +181,55 @@ function Dashboard() {
                 <Col xs={12} lg={8}>
                     <Card className="shadow-sm border-0">
                         <Card.Header className="bg-transparent border-0 pb-0">
-                            <h5 className="mb-0 fw-bold text-dark">
-                                Actividad Reciente
-                            </h5>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <h5 className="mb-0 fw-bold text-dark">Dinámica de ventas</h5>
+                                <small className="text-muted">{new Date().getFullYear()}</small>
+                            </div>
                         </Card.Header>
                         <Card.Body className="p-4">
-                            <Table hover responsive className="mb-4 table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Tipo</th>
-                                        <th>Detalle</th>
-                                        <th>Monto</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {actividad.map((a, idx) => (
-                                        <tr key={idx}>
-                                            <td>{a.fecha}</td>
-                                            <td>{a.tipo}</td>
-                                            <td style={{maxWidth: 300}} className="text-truncate">{a.detalle}</td>
-                                            <td>{a.monto?.toFixed ? a.monto.toFixed(2) : a.monto}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
                             <div style={{ height: chartHeight }}>
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={mensual}>
-                                        <XAxis dataKey="mes" />
-                                        <YAxis />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Bar dataKey="ventas" fill="#22c55e" name="Ventas" />
-                                        <Bar dataKey="compras" fill="#ef4444" name="Compras" />
+                                    <BarChart data={mensual} margin={{ top: 16, right: 12, left: 8, bottom: 0 }}>
+                                        <defs>
+                                            <linearGradient id="barBlue" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.95} />
+                                                <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.75} />
+                                            </linearGradient>
+                                            <linearGradient id="barOrange" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.95} />
+                                                <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.75} />
+                                            </linearGradient>
+                                        </defs>
+                                        <XAxis dataKey="mes" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={{ stroke: '#e5e7eb' }} tickLine={false} />
+                                        <YAxis tick={{ fill: '#9ca3af', fontSize: 12 }} axisLine={false} tickLine={false} width={40} />
+                                        <Tooltip cursor={{ fill: 'rgba(59,130,246,0.08)' }} contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb' }} />
+                                        <Legend verticalAlign="top" height={24} wrapperStyle={{ fontSize: 12 }} />
+                                        <Bar dataKey="ventas" fill="url(#barBlue)" radius={[6,6,0,0]} barSize={20} name="Ventas" />
+                                        <Bar dataKey="compras" fill="url(#barOrange)" radius={[6,6,0,0]} barSize={20} name="Compras" />
                                     </BarChart>
                                 </ResponsiveContainer>
+                            </div>
+                            <div className="mt-4">
+                                <Table hover responsive className="mb-0 table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Tipo</th>
+                                            <th>Detalle</th>
+                                            <th>Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {actividad.map((a, idx) => (
+                                            <tr key={idx}>
+                                                <td>{a.fecha}</td>
+                                                <td>{a.tipo}</td>
+                                                <td style={{maxWidth: 300}} className="text-truncate">{a.detalle}</td>
+                                                <td>{a.monto?.toFixed ? a.monto.toFixed(2) : a.monto}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
                             </div>
                         </Card.Body>
                     </Card>
@@ -221,6 +243,24 @@ function Dashboard() {
                         </Card.Header>
                         <Card.Body className="p-4">
                             <div className="d-flex flex-column gap-3">
+                                <div className="p-3 rounded bg-light d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <h6 className="mb-1 small fw-medium text-dark">Ventas vs Compras (mes)</h6>
+                                        <small className="text-muted">Distribución</small>
+                                    </div>
+                                    <div style={{ width: 120, height: 120 }}>
+                                        <ResponsiveContainer width={120} height={120}>
+                                            <PieChart>
+                                                <Pie data={donutData} innerRadius={40} outerRadius={55} dataKey="value">
+                                                    {donutData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={donutColors[index % donutColors.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
                                 <div className="d-flex align-items-center justify-content-between p-3 rounded bg-light">
                                     <div className="d-flex align-items-center">
                                         <ShoppingCart size={20} className="me-3 text-success" />
@@ -260,22 +300,32 @@ function Dashboard() {
                                     <Badge bg="warning" text="dark">{stats.totalEntradas}</Badge>
                                 </div>
 
-                                <div className="d-flex flex-column gap-2 p-3 rounded bg-light">
-                                    <div className="d-flex align-items-center mb-1">
+                                <div className="p-3 rounded bg-light">
+                                    <div className="d-flex align-items-center mb-2">
                                         <Banknote size={18} className="me-2 text-danger" />
                                         <h6 className="mb-0 small fw-medium text-dark">Top deudores</h6>
                                     </div>
-                                    <div className="list-group list-group-flush">
-                                        {deudores.map((d, i) => (
-                                            <div key={i} className="d-flex justify-content-between small py-1 border-bottom">
-                                                <span className="text-truncate" style={{maxWidth: 180}}>{d.nombreCompleto || 'Cliente'}</span>
-                                                <span className="fw-semibold">S/ {Number(d.saldoPendiente || 0).toFixed(2)}</span>
-                                            </div>
-                                        ))}
-                                        {deudores.length === 0 && (
-                                            <span className="text-muted small">Sin deudas pendientes</span>
-                                        )}
-                                    </div>
+                                    <Table responsive hover size="sm" className="mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Cliente</th>
+                                                <th className="text-end">Saldo</th>
+                                                <th className="text-end">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {deudores.map((d, i) => (
+                                                <tr key={i}>
+                                                    <td className="text-truncate" style={{maxWidth: 200}}>{d.nombreCompleto || 'Cliente'}</td>
+                                                    <td className="text-end">S/ {Number(d.saldoPendiente || 0).toFixed(2)}</td>
+                                                    <td className="text-end"><Badge bg="warning" text="dark">Pendiente</Badge></td>
+                                                </tr>
+                                            ))}
+                                            {deudores.length === 0 && (
+                                                <tr><td colSpan={3} className="text-muted small">Sin deudas pendientes</td></tr>
+                                            )}
+                                        </tbody>
+                                    </Table>
                                 </div>
 
                                 <div className="d-flex align-items-center justify-content-between p-3 rounded bg-light">
