@@ -26,6 +26,8 @@ const Kardex = () => {
         usuarioRegistro: localStorage.getItem('username') || 'admin' // Asume el usuario logueado
     });
     const [ajusteErrors, setAjusteErrors] = useState({});
+    const [resumen, setResumen] = useState(null);
+    const [tipoMovimiento, setTipoMovimiento] = useState("");
 
     const cargarMovimientos = useCallback(async () => {
         setLoading(true);
@@ -35,6 +37,7 @@ const Kardex = () => {
             if (productoSeleccionado) params.idProducto = productoSeleccionado.value;
             if (fechaInicio) params.fechaInicio = fechaInicio;
             if (fechaFin) params.fechaFin = fechaFin;
+            if (tipoMovimiento) params.tipoMovimiento = tipoMovimiento;
             console.log("[Kardex] GET /kardex params=", params);
             const { data } = await apiClient.get("/kardex", { params });
             console.log("[Kardex] respuesta movimientos=", data);
@@ -49,7 +52,23 @@ const Kardex = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, size, productoSeleccionado, fechaInicio, fechaFin]);
+    }, [page, size, productoSeleccionado, fechaInicio, fechaFin, tipoMovimiento]);
+
+    const cargarResumen = useCallback(async () => {
+        try {
+            const params = {};
+            if (productoSeleccionado) params.idProducto = productoSeleccionado.value;
+            if (fechaInicio) params.fechaInicio = fechaInicio;
+            if (fechaFin) params.fechaFin = fechaFin;
+            if (tipoMovimiento) params.tipoMovimiento = tipoMovimiento;
+            console.log("[Kardex] GET /kardex/resumen params=", params);
+            const { data } = await apiClient.get("/kardex/resumen", { params });
+            setResumen(data);
+        } catch (e) {
+            console.warn("[Kardex] No se pudo cargar resumen", e?.response || e);
+            setResumen(null);
+        }
+    }, [productoSeleccionado, fechaInicio, fechaFin, tipoMovimiento]);
 
     // Cargar productos solo una vez al montar (evita sobrecarga en cada paginación)
     useEffect(() => {
@@ -59,7 +78,8 @@ const Kardex = () => {
     // Cargar movimientos cuando cambia la paginación
     useEffect(() => {
         cargarMovimientos();
-    }, [cargarMovimientos]);
+        cargarResumen();
+    }, [cargarMovimientos, cargarResumen]);
 
     // (Declarado arriba con useCallback)
 
@@ -100,14 +120,17 @@ const Kardex = () => {
         }
         setPage(0); // Resetear a la primera página al aplicar filtros
         cargarMovimientos();
+        cargarResumen();
     };
 
     const handleLimpiarFiltros = () => {
         setProductoSeleccionado(null);
         setFechaInicio("");
         setFechaFin("");
+        setTipoMovimiento("");
         setPage(0);
         cargarMovimientos();
+        cargarResumen();
     };
 
     const handleExportarPdf = async () => {
@@ -116,6 +139,7 @@ const Kardex = () => {
             if (productoSeleccionado) params.idProducto = productoSeleccionado.value;
             if (fechaInicio) params.fechaInicio = fechaInicio;
             if (fechaFin) params.fechaFin = fechaFin;
+            if (tipoMovimiento) params.tipoMovimiento = tipoMovimiento;
             console.log("[Kardex] GET /kardex/exportar-pdf params=", params);
             const response = await apiClient.get("/kardex/exportar-pdf", {
                 params,
@@ -172,8 +196,23 @@ const Kardex = () => {
                 return;
             }
 
-            console.log("[Kardex] POST /kardex/ajuste body=", ajusteData);
-            await apiClient.post("/kardex/ajuste", ajusteData);
+            // Preparar datos para enviar al backend (convertir a tipos correctos)
+            const datosAjuste = {
+                idProducto: Number(ajusteData.idProducto), // Asegurar que sea número
+                tipoMovimiento: ajusteData.tipoMovimiento,
+                cantidad: Number(ajusteData.cantidad), // Asegurar que sea número
+                precioUnitario: ajusteData.precioUnitario ? Number(ajusteData.precioUnitario) : null,
+                observaciones: ajusteData.observaciones || null,
+                usuarioRegistro: ajusteData.usuarioRegistro || localStorage.getItem('username') || 'admin'
+            };
+
+            console.log("[Kardex] POST /kardex/ajuste body=", datosAjuste);
+            const response = await apiClient.post("/kardex/ajuste", datosAjuste);
+            console.log("[Kardex] Ajuste creado exitosamente:", response.data);
+            
+            // Mostrar mensaje de éxito
+            setError(""); // Limpiar cualquier error previo
+            
             setShowAjusteModal(false);
             setAjusteData({
                 idProducto: '',
@@ -183,23 +222,34 @@ const Kardex = () => {
                 observaciones: '',
                 usuarioRegistro: localStorage.getItem('username') || 'admin'
             });
-            cargarMovimientos();
+            // Recargar movimientos y resumen después de guardar el ajuste
+            await cargarMovimientos();
+            await cargarResumen();
         } catch (err) {
             console.error("[Kardex] Error al guardar ajuste:", err?.response || err);
-            setError("Error al guardar el ajuste de Kardex.");
+            let errorMessage = "Error al guardar el ajuste de Kardex.";
+            
             if (err.response && err.response.data) {
-                // Asumiendo que el backend devuelve errores de validación
                 const backendErrors = err.response.data;
                 const newErrors = {};
+                
                 if (backendErrors.errors) { // Spring Boot @Valid errors
                     backendErrors.errors.forEach(e => {
                         newErrors[e.field] = e.defaultMessage;
                     });
                 } else if (backendErrors.error) { // Custom error message
-                    setError(backendErrors.error);
+                    errorMessage = backendErrors.error;
                 }
+                
                 setAjusteErrors(newErrors);
             }
+            
+            setError(errorMessage);
+            console.error("[Kardex] Detalles del error:", {
+                status: err.response?.status,
+                statusText: err.response?.statusText,
+                data: err.response?.data
+            });
         } finally {
             setLoading(false);
         }
@@ -238,8 +288,8 @@ const Kardex = () => {
                     </h6>
                 </Card.Header>
                 <Card.Body>
-                    <Form className="row g-3">
-                        <Form.Group as={Col} md="4">
+                    <Form className="row g-3 align-items-end">
+                        <Form.Group as={Col} md="3">
                             <Form.Label>Producto</Form.Label>
                             <Select
                                 options={productos}
@@ -250,7 +300,7 @@ const Kardex = () => {
                                 isSearchable
                             />
                         </Form.Group>
-                        <Form.Group as={Col} md="3">
+                        <Form.Group as={Col} md="2">
                             <Form.Label>Fecha Inicio</Form.Label>
                             <Form.Control
                                 type="date"
@@ -258,7 +308,7 @@ const Kardex = () => {
                                 onChange={(e) => setFechaInicio(e.target.value)}
                             />
                         </Form.Group>
-                        <Form.Group as={Col} md="3">
+                        <Form.Group as={Col} md="2">
                             <Form.Label>Fecha Fin</Form.Label>
                             <Form.Control
                                 type="date"
@@ -266,7 +316,16 @@ const Kardex = () => {
                                 onChange={(e) => setFechaFin(e.target.value)}
                             />
                         </Form.Group>
-                        <Col md="2" className="d-flex align-items-end gap-2">
+                        <Form.Group as={Col} md="2">
+                            <Form.Label>Tipo de Movimiento</Form.Label>
+                            <Form.Select value={tipoMovimiento} onChange={(e) => setTipoMovimiento(e.target.value)}>
+                                <option value="">Todos</option>
+                                <option value="ENTRADA">Entrada</option>
+                                <option value="SALIDA">Salida</option>
+                                <option value="AJUSTE">Ajuste</option>
+                            </Form.Select>
+                        </Form.Group>
+                        <Col md="3" className="d-flex align-items-end gap-2">
                             <Button variant="primary" onClick={handleFiltrar} className="w-100">
                                 <Search size={16} /> Buscar
                             </Button>
@@ -278,12 +337,72 @@ const Kardex = () => {
                 </Card.Body>
             </Card>
 
+            {resumen && (
+                <Card className="mb-3 shadow-sm">
+                    <Card.Body>
+                        <div className="d-flex flex-wrap gap-3 align-items-center">
+                            <div>
+                                <div className="text-muted small">Saldo inicial</div>
+                                <div className="fw-semibold">{resumen.saldoInicial ?? 0}</div>
+                            </div>
+                            <div className="vr" />
+                            <div>
+                                <div className="text-muted small">Entradas (cant / valor)</div>
+                                <div className="fw-semibold">{resumen.totalEntradasCantidad ?? 0} / S/. {(resumen.totalEntradasValor || 0).toFixed ? resumen.totalEntradasValor.toFixed(2) : Number(resumen.totalEntradasValor || 0).toFixed(2)}</div>
+                            </div>
+                            <div className="vr" />
+                            <div>
+                                <div className="text-muted small">Salidas (cant / valor)</div>
+                                <div className="fw-semibold">{resumen.totalSalidasCantidad ?? 0} / S/. {(resumen.totalSalidasValor || 0).toFixed ? resumen.totalSalidasValor.toFixed(2) : Number(resumen.totalSalidasValor || 0).toFixed(2)}</div>
+                            </div>
+                            <div className="vr" />
+                            <div>
+                                <div className="text-muted small">Stock final</div>
+                                <div className={`fw-bold ${resumen.stockFinal < 0 ? 'text-danger' : ''}`}>{resumen.stockFinal ?? 0}</div>
+                            </div>
+                            <div className="vr" />
+                            <div>
+                                <div className="text-muted small">Costo prom. final</div>
+                                <div className="fw-semibold">S/. {(resumen.costoPromedioFinal || 0).toFixed ? resumen.costoPromedioFinal.toFixed(2) : Number(resumen.costoPromedioFinal || 0).toFixed(2)}</div>
+                            </div>
+                            <div className="vr" />
+                            <div>
+                                <div className="text-muted small">Costo total final</div>
+                                <div className="fw-semibold">S/. {(resumen.costoTotalFinal || 0).toFixed ? resumen.costoTotalFinal.toFixed(2) : Number(resumen.costoTotalFinal || 0).toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </Card.Body>
+                </Card>
+            )}
+
             <div className="d-flex justify-content-end gap-2 mb-3">
                 <Button variant="info" onClick={() => setShowAjusteModal(true)}>
                     <Plus size={16} /> Ajuste Manual
                 </Button>
                 <Button variant="danger" onClick={handleExportarPdf}>
                     <Download size={16} /> Exportar PDF
+                </Button>
+                <Button variant="success" onClick={async () => {
+                    try {
+                        const params = {};
+                        if (productoSeleccionado) params.idProducto = productoSeleccionado.value;
+                        if (fechaInicio) params.fechaInicio = fechaInicio;
+                        if (fechaFin) params.fechaFin = fechaFin;
+                        if (tipoMovimiento) params.tipoMovimiento = tipoMovimiento;
+                        const response = await apiClient.get("/kardex/exportar-excel", { params, responseType: 'blob' });
+                        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv;charset=utf-8' }));
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', `kardex_${new Date().toISOString().slice(0,10)}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                        window.URL.revokeObjectURL(url);
+                    } catch (e) {
+                        setError("Error al exportar Excel del Kardex.");
+                    }
+                }}>
+                    <Download size={16} /> Exportar Excel
                 </Button>
             </div>
 
@@ -301,18 +420,18 @@ const Kardex = () => {
                         <Table hover className="mb-0">
                             <thead className="table-light text-center">
                                 <tr>
-                                    <th className="fw-semibold py-3">Fecha</th>
-                                    <th className="fw-semibold py-3">Producto</th>
-                                    <th className="fw-semibold py-3">Tipo</th>
-                                    <th className="fw-semibold py-3">Cantidad</th>
-                                    <th className="fw-semibold py-3">P. Unit.</th>
-                                    <th className="fw-semibold py-3">V. Total</th>
-                                    <th className="fw-semibold py-3">Stock Ant.</th>
-                                    <th className="fw-semibold py-3">Stock Act.</th>
-                                    <th className="fw-semibold py-3">Costo Prom. Ant.</th>
-                                    <th className="fw-semibold py-3">Costo Prom. Act.</th>
-                                    <th className="fw-semibold py-3">Referencia</th>
-                                    <th className="fw-semibold py-3">Usuario</th>
+                                    <th className="fw-semibold py-3">Fecha y Hora</th>
+                                    <th className="fw-semibold py-3">Nombre del Producto</th>
+                                    <th className="fw-semibold py-3">Tipo de Movimiento</th>
+                                    <th className="fw-semibold py-3 text-end">Cantidad</th>
+                                    <th className="fw-semibold py-3 text-end">Precio Unitario</th>
+                                    <th className="fw-semibold py-3 text-end">Valor Total</th>
+                                    <th className="fw-semibold py-3 text-end">Stock Anterior</th>
+                                    <th className="fw-semibold py-3 text-end">Stock Actual</th>
+                                    <th className="fw-semibold py-3 text-end">Costo Promedio Anterior</th>
+                                    <th className="fw-semibold py-3 text-end">Costo Promedio Actual</th>
+                                    <th className="fw-semibold py-3">Referencia del Documento</th>
+                                    <th className="fw-semibold py-3">Usuario que Registró</th>
                                     <th className="fw-semibold py-3">Observaciones</th>
                                 </tr>
                             </thead>
@@ -337,17 +456,21 @@ const Kardex = () => {
                                             <td>{formatDateTime(mov.fechaMovimiento)}</td>
                                             <td className="text-start">{mov.nombreProducto}</td>
                                             <td>
-                                                <Badge bg={mov.tipoMovimiento === 'ENTRADA' ? 'success' : mov.tipoMovimiento === 'SALIDA' ? 'danger' : 'info'}>
+                                                <Badge bg={
+                                                    mov.tipoMovimiento === 'ENTRADA' ? 'success' 
+                                                    : mov.tipoMovimiento === 'SALIDA' ? 'danger' 
+                                                    : 'info'
+                                                }>
                                                     {mov.tipoMovimiento}
                                                 </Badge>
                                             </td>
-                                            <td>{mov.cantidad}</td>
-                                            <td>S/. {mov.precioUnitario?.toFixed(2)}</td>
-                                            <td>S/. {mov.valorTotal?.toFixed(2)}</td>
-                                            <td>{mov.stockAnterior}</td>
-                                            <td>{mov.stockActual}</td>
-                                            <td>S/. {mov.costoPromedioAnterior?.toFixed(2)}</td>
-                                            <td>S/. {mov.costoPromedioActual?.toFixed(2)}</td>
+                                            <td className="text-end">{mov.cantidad}</td>
+                                            <td className="text-end">S/. {mov.precioUnitario?.toFixed(2)}</td>
+                                            <td className="text-end">S/. {mov.valorTotal?.toFixed(2)}</td>
+                                            <td className="text-end">{mov.stockAnterior}</td>
+                                            <td className={`text-end ${mov.stockActual < 0 ? 'text-danger fw-bold' : ''}`}>{mov.stockActual}</td>
+                                            <td className="text-end">S/. {mov.costoPromedioAnterior?.toFixed(2)}</td>
+                                            <td className="text-end">S/. {mov.costoPromedioActual?.toFixed(2)}</td>
                                             <td>{mov.referenciaDocumento}</td>
                                             <td>{mov.usuarioRegistro}</td>
                                             <td className="text-start">{mov.observaciones}</td>
