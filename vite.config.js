@@ -6,4 +6,7 @@ export default defineConfig({
   server: {
     port: 3001, // aquí cambias el puerto
   },
+  optimizeDeps: {
+    exclude: ['datatables.net-bs5'], // Excluir datatables si no se usa
+  },
 })

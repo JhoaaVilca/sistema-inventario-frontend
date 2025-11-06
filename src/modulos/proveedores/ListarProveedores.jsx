@@ -13,6 +13,7 @@ import {
 } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
 import Paginador from "../common/Paginador";
+import ExportButtons from "../common/ExportButtons";
 
 function ListarProveedores() {
     const [proveedores, setProveedores] = useState([]);
@@ -31,6 +32,7 @@ function ListarProveedores() {
     const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
+    const tableRef = useRef(null);
 
     const obtenerProveedores = useCallback(async () => {
         setLoading(true);
@@ -188,13 +190,13 @@ function ListarProveedores() {
                             )}
                         </h5>
                         <div className="d-flex align-items-center gap-2">
-                            {/* El buscador se maneja desde la sección superior */}
+                            <ExportButtons tableRef={tableRef} fileName="Proveedores" />
                         </div>
                     </div>
                 </div>
                 <div className="list-card-body p-0">
                     <div className="table-responsive">
-                        <Table hover className="mb-0">
+                        <Table hover className="mb-0" ref={tableRef}>
                             <thead className="table-light text-center">
                                 <tr>
                                     <th className="fw-semibold py-3">Nombre</th>

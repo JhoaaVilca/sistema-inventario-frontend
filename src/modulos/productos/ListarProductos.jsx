@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer } from "react-bootstrap";
 import { Edit, Trash2, Search, X, Package, Plus, AlertTriangle, Clock, Filter, Eye } from "lucide-react";
 import Paginador from "../common/Paginador";
+import ExportButtons from "../common/ExportButtons";
 import LotesModal from "./LotesModal";
 import AgregarProducto from "./AgregarProductos";
 import EditarProducto from "./EditarProductos";
@@ -34,6 +35,7 @@ const ListarProductos = () => {
     const [stockMap, setStockMap] = useState({}); // Stock calculado desde lotes activos por producto
 
     const inputRef = useRef(null);
+    const tableRef = useRef(null);
 
     const cargarAlertas = useCallback(async () => {
         try {
@@ -375,6 +377,7 @@ const ListarProductos = () => {
                             )}
                         </h5>
                         <div className="d-flex align-items-center gap-2">
+                            <ExportButtons tableRef={tableRef} fileName="Productos" />
                             {!mostrarInput ? (
                                 <Button
                                     variant="outline-primary"
@@ -414,7 +417,7 @@ const ListarProductos = () => {
                 </div>
                 <div className="list-card-body p-0">
                     <div className="table-responsive">
-                        <Table hover className="mb-0">
+                        <Table hover className="mb-0" ref={tableRef}>
                             <thead className="table-light text-center">
                                 <tr>
                                     <th className="fw-semibold py-3">Nombre</th>

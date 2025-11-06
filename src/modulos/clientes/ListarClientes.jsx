@@ -5,6 +5,7 @@ import AgregarCliente from "./AgregarCliente";
 import EditarCliente from "./EditarCliente";
 import apiClient from "../../servicios/apiClient";
 import Paginador from "../common/Paginador";
+import ExportButtons from "../common/ExportButtons";
 
 const ListarClientes = () => {
     const [clientes, setClientes] = useState([]);
@@ -23,6 +24,7 @@ const ListarClientes = () => {
     const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
+    const tableRef = useRef(null);
 
     const cargarClientes = useCallback(async () => {
         setLoading(true);
@@ -120,6 +122,7 @@ const ListarClientes = () => {
                             )}
                         </h5>
                         <div className="d-flex align-items-center gap-2">
+                            <ExportButtons tableRef={tableRef} fileName="Clientes" />
                             {!mostrarInput ? (
                                 <Button
                                     variant="outline-primary"
@@ -159,7 +162,7 @@ const ListarClientes = () => {
                 </div>
                 <div className="list-card-body p-0">
                     <div className="table-responsive">
-                        <Table hover className="mb-0">
+                        <Table hover className="mb-0" ref={tableRef}>
                             <thead className="table-light text-center">
                                 <tr>
                                     <th className="fw-semibold py-3">DNI</th>
