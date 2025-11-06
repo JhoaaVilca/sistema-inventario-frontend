@@ -81,7 +81,7 @@ function Login() {
             </div>
             <div className="d-flex justify-content-between align-items-center mb-4">
               <span></span>
-              <a className="small" href="#" onClick={(e)=>e.preventDefault()} style={{ color: 'rgba(255,255,255,.7)' }}>¿Olvidaste tu contraseña?</a>
+              <a className="small" href="#" onClick={(e) => e.preventDefault()} style={{ color: 'rgba(255,255,255,.7)' }}>¿Olvidaste tu contraseña?</a>
             </div>
             <div className="d-grid">
               <SubmitButton loading={loading}>Ingresar</SubmitButton>

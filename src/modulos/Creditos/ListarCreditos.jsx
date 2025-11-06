@@ -113,7 +113,7 @@ function ListarCreditos() {
             <Row className="g-3">
               <Col lg={4} md={6}>
                 <Form.Group>
-                  <Form.Label className="d-flex align-items-center"><User size={16} className="me-2"/>Cliente</Form.Label>
+                  <Form.Label className="d-flex align-items-center"><User size={16} className="me-2" />Cliente</Form.Label>
                   <Form.Control value={clienteQ} onChange={(e) => setClienteQ(e.target.value)} placeholder="Nombre del cliente" size="sm" />
                 </Form.Group>
               </Col>
@@ -130,13 +130,13 @@ function ListarCreditos() {
               </Col>
               <Col lg={2} md={6}>
                 <Form.Group>
-                  <Form.Label className="d-flex align-items-center"><Calendar size={16} className="me-2"/>Inicio</Form.Label>
+                  <Form.Label className="d-flex align-items-center"><Calendar size={16} className="me-2" />Inicio</Form.Label>
                   <Form.Control type="date" value={fechaIni} onChange={(e) => setFechaIni(e.target.value)} size="sm" />
                 </Form.Group>
               </Col>
               <Col lg={2} md={6}>
                 <Form.Group>
-                  <Form.Label className="d-flex align-items-center"><Calendar size={16} className="me-2"/>Fin</Form.Label>
+                  <Form.Label className="d-flex align-items-center"><Calendar size={16} className="me-2" />Fin</Form.Label>
                   <Form.Control type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} size="sm" />
                 </Form.Group>
               </Col>

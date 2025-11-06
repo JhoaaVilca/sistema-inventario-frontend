@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
 
-function FormularioCategoria({ 
-    show, 
-    handleClose, 
-    onCategoriaAdded, 
+function FormularioCategoria({
+    show,
+    handleClose,
+    onCategoriaAdded,
     onCategoriaUpdated,
-    inlineMode = false, 
+    inlineMode = false,
     categoriaEditar = null,
-    modoEdicion = false 
+    modoEdicion = false
 }) {
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
@@ -59,7 +59,7 @@ function FormularioCategoria({
             if (modoEdicion && categoriaEditar) {
                 // Modo edición
                 await apiClient.put(`/categorias/${categoriaEditar.idCategoria}`, datosCategoria);
-                
+
                 // Notificar al componente padre
                 if (onCategoriaUpdated) {
                     onCategoriaUpdated();
@@ -67,13 +67,13 @@ function FormularioCategoria({
             } else {
                 // Modo agregar
                 await apiClient.post("/categorias", datosCategoria);
-                
+
                 // Limpiar formulario
                 setNombre("");
                 setDescripcion("");
                 setActivo(true);
                 setValidated(false);
-                
+
                 if (!inlineMode) {
                     handleClose();
                 }

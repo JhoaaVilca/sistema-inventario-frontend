@@ -378,11 +378,11 @@ function ListarEntradas() {
                             <small className="text-muted">Gestiona las entradas de inventario</small>
                         </div>
                     </div>
-                    
+
                     <div className="row">
                         {entradas?.map((entrada) => (
                             <div key={entrada.idEntrada} className="col-12 mb-3">
-                                <DetalleEntrada 
+                                <DetalleEntrada
                                     entrada={entrada}
                                     isOpen={false}
                                     onToggle={() => toggleEntrada(entrada.idEntrada)}
@@ -393,7 +393,7 @@ function ListarEntradas() {
                             </div>
                         ))}
                     </div>
-                    
+
                     <div className="d-flex justify-content-center mt-4">
                         <Paginador page={page} totalPages={totalPages} onChange={setPage} disabled={cargando} />
                     </div>
@@ -475,7 +475,7 @@ function ListarEntradas() {
                             <DetalleEntrada
                                 entrada={entradaDetalle}
                                 isOpen={true}
-                                onToggle={() => {}}
+                                onToggle={() => { }}
                                 onVerFactura={handleVerFactura}
                                 onSubirFactura={handleSubirFactura}
                                 resolverFacturaUrl={resolverFacturaUrl}

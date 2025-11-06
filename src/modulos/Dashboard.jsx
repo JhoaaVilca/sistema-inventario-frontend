@@ -204,8 +204,8 @@ function Dashboard() {
                                         <YAxis tick={{ fill: '#9ca3af', fontSize: 12 }} axisLine={false} tickLine={false} width={40} />
                                         <Tooltip cursor={{ fill: 'rgba(59,130,246,0.08)' }} contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb' }} />
                                         <Legend verticalAlign="top" height={24} wrapperStyle={{ fontSize: 12 }} />
-                                        <Bar dataKey="ventas" fill="url(#barBlue)" radius={[6,6,0,0]} barSize={20} name="Ventas" />
-                                        <Bar dataKey="compras" fill="url(#barOrange)" radius={[6,6,0,0]} barSize={20} name="Compras" />
+                                        <Bar dataKey="ventas" fill="url(#barBlue)" radius={[6, 6, 0, 0]} barSize={20} name="Ventas" />
+                                        <Bar dataKey="compras" fill="url(#barOrange)" radius={[6, 6, 0, 0]} barSize={20} name="Compras" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -224,7 +224,7 @@ function Dashboard() {
                                             <tr key={idx}>
                                                 <td>{a.fecha}</td>
                                                 <td>{a.tipo}</td>
-                                                <td style={{maxWidth: 300}} className="text-truncate">{a.detalle}</td>
+                                                <td style={{ maxWidth: 300 }} className="text-truncate">{a.detalle}</td>
                                                 <td>{a.monto?.toFixed ? a.monto.toFixed(2) : a.monto}</td>
                                             </tr>
                                         ))}
@@ -316,7 +316,7 @@ function Dashboard() {
                                         <tbody>
                                             {deudores.map((d, i) => (
                                                 <tr key={i}>
-                                                    <td className="text-truncate" style={{maxWidth: 200}}>{d.nombreCompleto || 'Cliente'}</td>
+                                                    <td className="text-truncate" style={{ maxWidth: 200 }}>{d.nombreCompleto || 'Cliente'}</td>
                                                     <td className="text-end">S/ {Number(d.saldoPendiente || 0).toFixed(2)}</td>
                                                     <td className="text-end"><Badge bg="warning" text="dark">Pendiente</Badge></td>
                                                 </tr>

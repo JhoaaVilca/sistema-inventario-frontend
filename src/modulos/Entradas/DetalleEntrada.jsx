@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Card, Row, Col, Badge, Button, Collapse, Table } from "react-bootstrap";
-import { 
-    Package, 
-    Calendar, 
-    Building, 
-    Receipt, 
-    ChevronDown, 
+import {
+    Package,
+    Calendar,
+    Building,
+    Receipt,
+    ChevronDown,
     ChevronUp,
     FileText,
     Truck,
@@ -154,7 +154,7 @@ const DetalleEntrada = ({ entrada, isOpen, onToggle, onVerFactura, onSubirFactur
                         </Row>
                         {/* Productos */}
                         <Card className="border-0 bg-light">
-                            <Card.Header 
+                            <Card.Header
                                 className="bg-white border-bottom"
                             >
                                 <div className="d-flex justify-content-between align-items-center">
@@ -230,7 +230,7 @@ const DetalleEntrada = ({ entrada, isOpen, onToggle, onVerFactura, onSubirFactur
 
     return (
         <Card className="mb-3 border-0 shadow-sm">
-            <Card.Header 
+            <Card.Header
                 className="bg-white border-bottom"
                 onClick={onToggle}
                 style={{ cursor: 'pointer' }}
@@ -368,7 +368,7 @@ const DetalleEntrada = ({ entrada, isOpen, onToggle, onVerFactura, onSubirFactur
 
                         {/* Productos */}
                         <Card className="border-0 bg-light">
-                            <Card.Header 
+                            <Card.Header
                                 className="bg-white border-bottom cursor-pointer"
                                 onClick={() => setDetallesAbiertos(!detallesAbiertos)}
                                 style={{ cursor: 'pointer' }}

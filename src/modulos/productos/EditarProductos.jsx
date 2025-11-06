@@ -135,8 +135,8 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                    
-                    <Col md={6}>
+
+                        <Col md={6}>
                             <Form.Group controlId="formUnidadMedida" className="mb-3">
                                 <Form.Label>Unidad de Medida <span className="text-danger">*</span></Form.Label>
                                 <Form.Select
@@ -158,7 +158,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        </Row>
+                    </Row>
 
                     {/* Precios */}
                     <Row>
@@ -223,7 +223,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                                 />
                             </Form.Group>
                         </Col>
-                        
+
                     </Row>
 
 

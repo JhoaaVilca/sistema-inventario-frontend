@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Card, Row, Col, Badge, Button, Collapse, Table } from "react-bootstrap";
-import { 
-    Package, 
-    Calendar, 
-    User, 
-    Receipt, 
-    ChevronDown, 
+import {
+    Package,
+    Calendar,
+    User,
+    Receipt,
+    ChevronDown,
     ChevronUp,
     FileText,
     ShoppingCart,
@@ -214,7 +214,7 @@ const DetalleSalida = ({ salida, isOpen, onToggle, ocultarHeader = false }) => {
 
     return (
         <Card className="mb-3 border-0 shadow-sm">
-            <Card.Header 
+            <Card.Header
                 className="bg-white border-bottom"
                 onClick={onToggle}
                 style={{ cursor: 'pointer' }}
@@ -322,7 +322,7 @@ const DetalleSalida = ({ salida, isOpen, onToggle, ocultarHeader = false }) => {
 
                         {/* Productos */}
                         <Card className="border-0 bg-light">
-                            <Card.Header 
+                            <Card.Header
                                 className="bg-white border-bottom cursor-pointer"
                                 onClick={() => setDetallesAbiertos(!detallesAbiertos)}
                                 style={{ cursor: 'pointer' }}

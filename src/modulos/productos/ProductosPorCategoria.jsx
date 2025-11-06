@@ -53,7 +53,7 @@ const ProductosPorCategoria = () => {
         cargarDatos();
     }, [cargarDatos]);
 
-    
+
 
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este producto?")) {

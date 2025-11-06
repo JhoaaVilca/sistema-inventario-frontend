@@ -209,10 +209,10 @@ const Kardex = () => {
             console.log("[Kardex] POST /kardex/ajuste body=", datosAjuste);
             const response = await apiClient.post("/kardex/ajuste", datosAjuste);
             console.log("[Kardex] Ajuste creado exitosamente:", response.data);
-            
+
             // Mostrar mensaje de éxito
             setError(""); // Limpiar cualquier error previo
-            
+
             setShowAjusteModal(false);
             setAjusteData({
                 idProducto: '',
@@ -228,11 +228,11 @@ const Kardex = () => {
         } catch (err) {
             console.error("[Kardex] Error al guardar ajuste:", err?.response || err);
             let errorMessage = "Error al guardar el ajuste de Kardex.";
-            
+
             if (err.response && err.response.data) {
                 const backendErrors = err.response.data;
                 const newErrors = {};
-                
+
                 if (backendErrors.errors) { // Spring Boot @Valid errors
                     backendErrors.errors.forEach(e => {
                         newErrors[e.field] = e.defaultMessage;
@@ -240,10 +240,10 @@ const Kardex = () => {
                 } else if (backendErrors.error) { // Custom error message
                     errorMessage = backendErrors.error;
                 }
-                
+
                 setAjusteErrors(newErrors);
             }
-            
+
             setError(errorMessage);
             console.error("[Kardex] Detalles del error:", {
                 status: err.response?.status,
@@ -393,7 +393,7 @@ const Kardex = () => {
                         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv;charset=utf-8' }));
                         const link = document.createElement('a');
                         link.href = url;
-                        link.setAttribute('download', `kardex_${new Date().toISOString().slice(0,10)}.csv`);
+                        link.setAttribute('download', `kardex_${new Date().toISOString().slice(0, 10)}.csv`);
                         document.body.appendChild(link);
                         link.click();
                         link.remove();
@@ -457,9 +457,9 @@ const Kardex = () => {
                                             <td className="text-start">{mov.nombreProducto}</td>
                                             <td>
                                                 <Badge bg={
-                                                    mov.tipoMovimiento === 'ENTRADA' ? 'success' 
-                                                    : mov.tipoMovimiento === 'SALIDA' ? 'danger' 
-                                                    : 'info'
+                                                    mov.tipoMovimiento === 'ENTRADA' ? 'success'
+                                                        : mov.tipoMovimiento === 'SALIDA' ? 'danger'
+                                                            : 'info'
                                                 }>
                                                     {mov.tipoMovimiento}
                                                 </Badge>

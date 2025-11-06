@@ -180,7 +180,7 @@ const ListarProductos = () => {
         return `${d}/${m}/${y}`;
     };
 
-    
+
 
     const handleEliminar = async (id) => {
         if (window.confirm("¿Seguro que deseas eliminar este producto?")) {

@@ -182,11 +182,11 @@ function AgregarSalida({ show, handleClose, onSalidaAgregada }) {
                     showAgregarCliente={true}
                 />
 
-                <TablaProductosSalida 
+                <TablaProductosSalida
                     productosSalida={productosSalida}
                     setProductosSalida={setProductosSalida}
                 />
-                
+
                 {/* Resumen de totales (sin IGV) */}
                 {productosSalida.length > 0 && (
                     <div className="mt-3 p-3 bg-light rounded">

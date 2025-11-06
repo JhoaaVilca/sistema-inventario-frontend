@@ -137,7 +137,7 @@ function ListarCategorias() {
                         <div className="card-body">
                             <FormularioCategoria
                                 show={true}
-                                handleClose={() => {}}
+                                handleClose={() => { }}
                                 onCategoriaAdded={() => {
                                     obtenerCategorias();
                                     mostrarNotificacion("Categoría agregada exitosamente", "success");
@@ -153,9 +153,9 @@ function ListarCategorias() {
                             />
                             {modoEdicion && (
                                 <div className="mt-3">
-                                    <Button 
-                                        variant="outline-secondary" 
-                                        size="sm" 
+                                    <Button
+                                        variant="outline-secondary"
+                                        size="sm"
                                         onClick={cancelarEdicion}
                                     >
                                         Cancelar Edición
@@ -231,11 +231,11 @@ function ListarCategorias() {
                                 <Table striped hover responsive size="sm" className="mb-0 align-middle">
                                     <thead>
                                         <tr>
-                                            <th style={{width: '80px'}}>ID</th>
+                                            <th style={{ width: '80px' }}>ID</th>
                                             <th>Nombre</th>
                                             <th>Descripción</th>
-                                            <th style={{width: '110px'}}>Estado</th>
-                                            <th style={{width: '180px'}}>Acciones</th>
+                                            <th style={{ width: '110px' }}>Estado</th>
+                                            <th style={{ width: '180px' }}>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>

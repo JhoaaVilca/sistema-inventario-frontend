@@ -34,16 +34,16 @@ function DetalleCredito() {
       // Obtener la caja abierta actual
       const estadoCaja = await cajaService.obtenerEstado();
       const idCaja = estadoCaja.caja?.idCaja || estadoCaja.caja?.id;
-      
+
       if (!idCaja && medioPago === 'EFECTIVO') {
-        setMsg({ 
-          type: 'warning', 
-          text: 'No hay una caja abierta. El pago se registrará pero no se reflejará en caja.' 
+        setMsg({
+          type: 'warning',
+          text: 'No hay una caja abierta. El pago se registrará pero no se reflejará en caja.'
         });
       }
 
       await creditoService.registrarPago(
-        id, 
+        id,
         {
           fechaPago,
           monto: parseFloat(monto),
@@ -52,13 +52,13 @@ function DetalleCredito() {
         },
         idCaja // Pasar el ID de la caja al servicio
       );
-      
-      setMsg({ 
-        type: 'success', 
-        text: 'Pago registrado' + (idCaja ? ' y registrado en caja' : '') 
+
+      setMsg({
+        type: 'success',
+        text: 'Pago registrado' + (idCaja ? ' y registrado en caja' : '')
       });
-      
-      setMonto(''); 
+
+      setMonto('');
       setObservacion('');
       setFechaPago(hoyISO());
       await cargar();
@@ -109,7 +109,7 @@ function DetalleCredito() {
               </div>
               <div className="text-end">
                 <small className="text-muted d-block">Saldo</small>
-                <span className={`fw-bold ${Number(credito.saldoPendiente||0) === 0 ? 'text-success' : 'text-danger'}`}>{formatearMoneda(credito.saldoPendiente)}</span>
+                <span className={`fw-bold ${Number(credito.saldoPendiente || 0) === 0 ? 'text-success' : 'text-danger'}`}>{formatearMoneda(credito.saldoPendiente)}</span>
               </div>
               {badgeEstado(credito.estado)}
             </div>
@@ -123,7 +123,7 @@ function DetalleCredito() {
           <div className="d-flex align-items-center">
             <h6 className="mb-0">Pagos</h6>
             <div className="ms-auto">
-              {Number(credito.saldoPendiente||0) > 0 && (
+              {Number(credito.saldoPendiente || 0) > 0 && (
                 <a href="#form-pago" className="btn btn-sm btn-primary">Pagar</a>
               )}
             </div>
@@ -161,7 +161,7 @@ function DetalleCredito() {
         </Card.Body>
       </Card>
 
-      {Number(credito.saldoPendiente||0) > 0 && (
+      {Number(credito.saldoPendiente || 0) > 0 && (
         <Card className="border-0 shadow-sm" id="form-pago">
           <Card.Header className="bg-white border-bottom">
             <h6 className="mb-0">Pagar</h6>
