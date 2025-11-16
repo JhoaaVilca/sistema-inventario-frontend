@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Alert, Row, Col, Toast, ToastContainer } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
 import { useCategorias } from "./useCategorias";
 
@@ -17,6 +17,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
     const [descripcionCorta, setDescripcionCorta] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showToast, setShowToast] = useState(false);
     const { categorias } = useCategorias();
 
 
@@ -86,6 +87,9 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
             setDescripcionCorta("");
             setError("");
 
+            // Mostrar mensaje de éxito
+            setShowToast(true);
+            
             handleClose();
             onProductoAdded(response.data); // notificar al padre
         } catch (error) {
@@ -329,6 +333,24 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                     </div>
                 </Form>
             </Modal.Body>
+            
+            {/* Toast de notificaciones */}
+            <ToastContainer position="top-center" className="p-3" style={{ zIndex: 9999 }}>
+                <Toast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    delay={3000}
+                    autohide
+                    bg="success"
+                >
+                    <Toast.Header closeButton className="bg-success text-white border-0">
+                        <strong className="me-auto">✅ Éxito</strong>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">
+                        Producto agregado exitosamente
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Modal>
     );
 }

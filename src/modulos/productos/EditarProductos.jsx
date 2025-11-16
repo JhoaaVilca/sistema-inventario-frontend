@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Button, Form, Spinner, Alert, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Spinner, Alert, Row, Col, Toast, ToastContainer } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
 import { useCategorias } from "./useCategorias";
 
@@ -18,6 +18,7 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showToast, setShowToast] = useState(false);
     const { categorias } = useCategorias();
 
 
@@ -76,6 +77,9 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
             );
 
             if (response.status === 200) {
+                // Mostrar mensaje de éxito
+                setShowToast(true);
+                
                 onProductoUpdated();
                 handleClose();
             }
@@ -307,6 +311,24 @@ const EditarProducto = ({ show, handleClose, producto, onProductoUpdated }) => {
                     </div>
                 </Form>
             </Modal.Body>
+            
+            {/* Toast de notificaciones */}
+            <ToastContainer position="top-center" className="p-3" style={{ zIndex: 9999 }}>
+                <Toast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    delay={3000}
+                    autohide
+                    bg="success"
+                >
+                    <Toast.Header closeButton className="bg-success text-white border-0">
+                        <strong className="me-auto">✅ Éxito</strong>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">
+                        Producto actualizado exitosamente
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Modal>
     );
 };

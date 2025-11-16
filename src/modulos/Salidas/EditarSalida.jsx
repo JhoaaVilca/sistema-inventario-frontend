@@ -1,4 +1,4 @@
-import { Modal, Button, Form, Alert, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Alert, Row, Col, Toast, ToastContainer } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import apiClient from "../../servicios/apiClient";
 import TablaProductosSalida from "./TablaProductosSalida";
@@ -13,6 +13,7 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada, inlineMode =
     const [totalSalida, setTotalSalida] = useState(0);
     const [errorMsg, setErrorMsg] = useState("");
     const [editedTotal, setEditedTotal] = useState(false);
+    const [showToast, setShowToast] = useState(false);
 
     useEffect(() => {
         if ((show || inlineMode) && salida) {
@@ -121,6 +122,10 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada, inlineMode =
                     precioUnitario: d.precioUnitario
                 }))
             });
+            
+            // Mostrar mensaje de éxito
+            setShowToast(true);
+            
             onSalidaEditada();
             handleClose();
         } catch (error) {
@@ -232,6 +237,24 @@ function EditarSalida({ show, handleClose, salida, onSalidaEditada, inlineMode =
                 <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
                 <Button variant="primary" onClick={handleGuardar}>Guardar Cambios</Button>
             </Modal.Footer>
+            
+            {/* Toast de notificaciones */}
+            <ToastContainer position="top-center" className="p-3" style={{ zIndex: 9999 }}>
+                <Toast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    delay={3000}
+                    autohide
+                    bg="success"
+                >
+                    <Toast.Header closeButton className="bg-success text-white border-0">
+                        <strong className="me-auto">✅ Éxito</strong>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">
+                        Salida actualizada exitosamente
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Modal>
     );
 }

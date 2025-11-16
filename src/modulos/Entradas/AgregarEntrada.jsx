@@ -75,6 +75,16 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                 await subirFactura(data.idEntrada);
             }
 
+            // Mostrar mensaje de éxito
+            setToastMessage("Entrada guardada exitosamente");
+            setToastType("success");
+            setShowToast(true);
+            
+            // Cerrar el toast después de 3 segundos
+            setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
+
             onEntradaAgregada();
             handleClose();
         } catch (error) {
@@ -443,7 +453,7 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
 
             {/* Toast de notificaciones */}
             {showToast && (
-                <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 9999 }}>
+                <div className="position-fixed top-0 start-50 translate-middle-x p-3" style={{ zIndex: 9999 }}>
                     <div className={`toast show ${toastType === 'success' ? 'bg-success' : 'bg-danger'} text-white`} role="alert">
                         <div className="toast-header bg-transparent text-white border-0">
                             <strong className="me-auto">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Lock } from 'lucide-react';
+import { Toast, ToastContainer } from 'react-bootstrap';
 import apiClient from '../../servicios/apiClient';
 import AuthLayout from '../ui/AuthLayout.jsx';
 import InputIcon from '../ui/InputIcon.jsx';
@@ -11,13 +12,19 @@ function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [showExpiredToast, setShowExpiredToast] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const expired = localStorage.getItem('sessionExpired');
     if (expired === '1') {
-      setError('Tu sesión expiró. Vuelve a iniciar sesión.');
+      setShowExpiredToast(true);
       localStorage.removeItem('sessionExpired');
+      // Ocultar el toast después de 5 segundos
+      setTimeout(() => {
+        setShowExpiredToast(false);
+      }, 5000);
     }
   }, []);
 
@@ -31,13 +38,23 @@ function Login() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username || username);
         localStorage.setItem('role', data.role || 'ADMIN');
-        navigate('/', { replace: true });
+        
+        // Mostrar mensaje de éxito
+        setShowSuccessToast(true);
+        setLoading(false);
+        
+        // Redirigir después de mostrar el mensaje (aumentado a 2 segundos para mejor visibilidad)
+        setTimeout(() => {
+          navigate('/', { replace: true });
+        }, 2000);
       } else {
         setError('Respuesta inválida del servidor');
+        setLoading(false);
       }
     } catch (err) {
       setError(err?.response?.data?.error || 'Credenciales inválidas');
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,6 +104,40 @@ function Login() {
               <SubmitButton loading={loading}>Ingresar</SubmitButton>
             </div>
           </form>
+          
+          {/* Toast de éxito */}
+          <ToastContainer position="top-center" className="p-3" style={{ zIndex: 9999 }}>
+            <Toast
+              show={showSuccessToast}
+              onClose={() => setShowSuccessToast(false)}
+              delay={3000}
+              autohide
+              bg="success"
+            >
+              <Toast.Header closeButton className="bg-success text-white border-0">
+                <strong className="me-auto">✅ Inicio de sesión exitoso</strong>
+              </Toast.Header>
+              <Toast.Body className="text-white">
+                Bienvenido, {username}. Redirigiendo al dashboard...
+              </Toast.Body>
+            </Toast>
+            
+            {/* Toast de sesión expirada */}
+            <Toast
+              show={showExpiredToast}
+              onClose={() => setShowExpiredToast(false)}
+              delay={5000}
+              autohide
+              bg="warning"
+            >
+              <Toast.Header closeButton className="bg-warning text-dark border-0">
+                <strong className="me-auto">⚠️ Sesión Expirada</strong>
+              </Toast.Header>
+              <Toast.Body className="text-dark">
+                Tu sesión ha expirado. Por favor, inicia sesión nuevamente.
+              </Toast.Body>
+            </Toast>
+          </ToastContainer>
         </div>
       </div>
     </AuthLayout>

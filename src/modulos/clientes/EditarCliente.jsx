@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Modal, Button, Form, Alert, Spinner } from "react-bootstrap";
+import { Modal, Button, Form, Alert, Spinner, Toast, ToastContainer } from "react-bootstrap";
 import { User, Edit } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 
@@ -15,6 +15,7 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showToast, setShowToast] = useState(false);
 
     useEffect(() => {
         if (cliente) {
@@ -50,6 +51,10 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
 
         try {
             await apiClient.put(`/clientes/${cliente.idCliente}`, formData);
+            
+            // Mostrar mensaje de éxito
+            setShowToast(true);
+            
             onClienteEditado();
         } catch (err) {
             console.error("Error al actualizar cliente:", err);
@@ -199,6 +204,24 @@ const EditarCliente = ({ show, onHide, cliente, onClienteEditado }) => {
                     </Button>
                 </Modal.Footer>
             </Form>
+            
+            {/* Toast de notificaciones */}
+            <ToastContainer position="top-center" className="p-3" style={{ zIndex: 9999 }}>
+                <Toast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    delay={3000}
+                    autohide
+                    bg="success"
+                >
+                    <Toast.Header closeButton className="bg-success text-white border-0">
+                        <strong className="me-auto">✅ Éxito</strong>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">
+                        Cliente actualizado exitosamente
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Modal>
     );
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Toast, ToastContainer } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
 
 function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
@@ -13,6 +13,7 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
         email: "",
         estado: "",
     });
+    const [showToast, setShowToast] = useState(false);
 
     useEffect(() => {
         if (proveedor) {
@@ -59,6 +60,10 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
         e.preventDefault();
         try {
             const { data } = await apiClient.put(`/proveedores/${formulario.idProveedor}`, formulario);
+            
+            // Mostrar mensaje de éxito
+            setShowToast(true);
+            
             onProveedorUpdated(data);
             handleClose();
         } catch (error) {
@@ -170,6 +175,24 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
                     </div>
                 </Form>
             </Modal.Body>
+            
+            {/* Toast de notificaciones */}
+            <ToastContainer position="top-center" className="p-3" style={{ zIndex: 9999 }}>
+                <Toast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    delay={3000}
+                    autohide
+                    bg="success"
+                >
+                    <Toast.Header closeButton className="bg-success text-white border-0">
+                        <strong className="me-auto">✅ Éxito</strong>
+                    </Toast.Header>
+                    <Toast.Body className="text-white">
+                        Proveedor actualizado exitosamente
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
         </Modal>
     );
 }
