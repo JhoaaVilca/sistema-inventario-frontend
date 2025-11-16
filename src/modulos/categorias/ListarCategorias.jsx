@@ -14,6 +14,7 @@ import {
 } from "react-bootstrap";
 import apiClient from "../../servicios/apiClient";
 import Paginador from "../common/Paginador";
+import ExportButtons from "../common/ExportButtons";
 
 function ListarCategorias() {
     const navigate = useNavigate();
@@ -33,6 +34,7 @@ function ListarCategorias() {
     const [totalPages, setTotalPages] = useState(0);
 
     const inputRef = useRef(null);
+    const tableRef = useRef(null);
 
     const obtenerCategorias = useCallback(async () => {
         setLoading(true);
@@ -179,6 +181,7 @@ function ListarCategorias() {
                                     )}
                                 </h5>
                                 <div className="d-flex align-items-center gap-2">
+                                    <ExportButtons tableRef={tableRef} fileName="Categorias" />
                                     {!mostrarInput ? (
                                         <Button
                                             variant="outline-secondary"
@@ -228,7 +231,7 @@ function ListarCategorias() {
                                     {filtro ? "No se encontraron categorías" : "No hay categorías registradas"}
                                 </div>
                             ) : (
-                                <Table striped hover responsive size="sm" className="mb-0 align-middle">
+                                <Table striped hover responsive size="sm" className="mb-0 align-middle" ref={tableRef}>
                                     <thead>
                                         <tr>
                                             <th style={{ width: '80px' }}>ID</th>

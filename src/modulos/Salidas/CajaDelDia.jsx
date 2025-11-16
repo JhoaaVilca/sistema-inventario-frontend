@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Table, Badge, Alert, Modal, Form, Row, Col, Spinner, Toast, ToastContainer } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 import {
     Banknote,
     Plus,
@@ -11,12 +12,14 @@ import {
     CheckCircle,
     XCircle,
     TrendingUp,
-    TrendingDown
+    TrendingDown,
+    ShoppingCart
 } from 'lucide-react';
 import apiClient from '../../servicios/apiClient';
 import cajaService from '../../servicios/cajaService';
 
 const CajaDelDia = () => {
+    const navigate = useNavigate();
     const [caja, setCaja] = useState(null);
     const [movimientos, setMovimientos] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -426,6 +429,13 @@ const CajaDelDia = () => {
                                         <Download size={16} className="me-2" />
                                         Generar Reporte
                                     </Button>
+                                    <Button
+                                        variant="outline-success"
+                                        onClick={() => navigate('/salidas')}
+                                    >
+                                        <ShoppingCart size={16} className="me-2" />
+                                        Ir a Salidas
+                                    </Button>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -696,5 +706,8 @@ const CajaDelDia = () => {
 };
 
 export default CajaDelDia;
+
+
+
 
 

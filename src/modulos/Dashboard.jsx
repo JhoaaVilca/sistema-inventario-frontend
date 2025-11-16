@@ -128,11 +128,11 @@ function Dashboard() {
                 <p className="text-muted mb-0 small small-md">
                     Panel de control y estadísticas generales — Actualizado al: {fechaActual}
                 </p>
-                <div className="mt-2">
+                {/* <div className="mt-2">
                     <Button size="sm" variant="outline-primary" onClick={cargarTodo}>
                         🔄 Actualizar datos
                     </Button>
-                </div>
+                </div> */}
             </div>
 
             {/* Tarjetas de estadísticas */}
