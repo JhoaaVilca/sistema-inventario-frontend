@@ -44,11 +44,14 @@ function ListarEntradas() {
             setErrorListado("");
             setCargando(true);
             const { data } = await apiClient.get("/entradas", { params: { page, size } });
-            setEntradas(data?.content || []);
+            const lista = data?.content || [];
+            setEntradas(lista);
             setTotalPages(data?.totalPages || 0);
+            return lista;
         } catch (error) {
             console.error("Error al obtener entradas:", error);
             setErrorListado("No se pudo cargar el listado de entradas.");
+            return [];
         } finally {
             setCargando(false);
         }
@@ -176,7 +179,12 @@ function ListarEntradas() {
             );
 
             alert('Factura subida exitosamente');
-            obtenerEntradas();
+            const nuevas = await obtenerEntradas();
+            // Si el modal de detalle está abierto y corresponde a la entrada actual, refrescar su estado
+            if (showDetalleModal && entradaDetalle && entradaDetalle.idEntrada === entradaFactura.idEntrada) {
+                const actualizada = (nuevas || []).find(e => e.idEntrada === entradaFactura.idEntrada);
+                if (actualizada) setEntradaDetalle(actualizada);
+            }
             setSubiendoFactura(false);
             setEntradaFactura(null);
         } catch (error) {
@@ -185,12 +193,29 @@ function ListarEntradas() {
         }
     };
 
-    const handleVerFactura = (entrada) => {
-        if (entrada.facturaUrl) {
-            const url = resolverFacturaUrl(entrada);
-            window.open(url, '_blank');
-        } else {
+    const handleVerFactura = async (entrada) => {
+        if (!entrada.facturaUrl) {
             alert('Esta entrada no tiene factura asociada');
+            return;
+        }
+        try {
+            // Usar URL absoluta para evitar duplicar /api en baseURL + path
+            const absoluteUrl = resolverFacturaUrl(entrada);
+            // Descargar usando apiClient (envía Authorization/cookies si aplica)
+            const response = await apiClient.get(absoluteUrl, { responseType: 'blob' });
+            const contentType = response.headers['content-type'] || 'application/octet-stream';
+            const blob = new Blob([response.data], { type: contentType });
+            const blobUrl = URL.createObjectURL(blob);
+            window.open(blobUrl, '_blank');
+            // Limpieza opcional del objeto URL se puede hacer luego con setTimeout si se desea
+        } catch (error) {
+            console.error('Error al abrir factura:', error);
+            // Fallback: intentar abrir directamente la URL absoluta (podría requerir sesión/cookies del navegador)
+            try {
+                const absoluteUrl = resolverFacturaUrl(entrada);
+                window.open(absoluteUrl, '_blank');
+            } catch (_) {}
+            alert('No se pudo abrir la factura. Verifique su sesión e intente nuevamente.');
         }
     };
 
