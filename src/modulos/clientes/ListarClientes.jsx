@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Table, Button, InputGroup, FormControl, Alert, Toast, ToastContainer, Badge } from "react-bootstrap";
-import { Edit, Trash2, Search, X, User, Plus } from "lucide-react";
+import { Edit, Power, PowerOff, Search, X, User, Plus } from "lucide-react";
 import AgregarCliente from "./AgregarCliente";
 import EditarCliente from "./EditarCliente";
 import apiClient from "../../servicios/apiClient";
@@ -45,16 +45,41 @@ const ListarClientes = () => {
         cargarClientes();
     }, [cargarClientes]);
 
-    const handleEliminar = async (id) => {
-        if (window.confirm("¿Seguro que deseas eliminar este cliente?")) {
+    // Desactivar cliente (igual que en Proveedores)
+    const desactivarCliente = async (id) => {
+        if (window.confirm("¿Seguro que deseas desactivar este cliente?")) {
             try {
-                await apiClient.delete(`/clientes/${id}`);
-                mostrarNotificacion("Cliente eliminado exitosamente", "success");
+                await apiClient.put(`/clientes/${id}/inactivar`);
+                mostrarNotificacion("Cliente desactivado exitosamente", "success");
                 cargarClientes();
             } catch (err) {
-                console.error("Error al eliminar cliente:", err);
-                mostrarNotificacion("Error al eliminar el cliente", "danger");
+                console.error("Error al desactivar cliente:", err);
+                manejarErrorAuth(err, "desactivar");
             }
+        }
+    };
+
+    // Activar cliente (igual que en Proveedores)
+    const activarCliente = async (id) => {
+        try {
+            await apiClient.put(`/clientes/${id}/activar`);
+            mostrarNotificacion("Cliente activado exitosamente", "success");
+            cargarClientes();
+        } catch (err) {
+            console.error("Error al activar cliente:", err);
+            manejarErrorAuth(err, "activar");
+        }
+    };
+
+    const manejarErrorAuth = (err, accion) => {
+        const status = err?.response?.status;
+        if (status === 401) {
+            mostrarNotificacion("Sesión expirada. Por favor inicie sesión nuevamente.", "danger");
+            setTimeout(() => { window.location.href = "/login"; }, 800);
+        } else if (status === 403) {
+            mostrarNotificacion("No tiene permisos para " + accion + " clientes.", "danger");
+        } else {
+            mostrarNotificacion(`Error al ${accion} el cliente`, "danger");
         }
     };
 
@@ -226,17 +251,31 @@ const ListarClientes = () => {
                                                         <Edit size={12} />
                                                         <span className="d-none d-xl-inline ms-1">Editar</span>
                                                     </Button>
-                                                    <Button
-                                                        variant="outline-danger"
-                                                        size="sm"
-                                                        onClick={() => handleEliminar(cliente.idCliente)}
-                                                        className="btn-sm shadow-sm"
-                                                        style={{ minWidth: '32px' }}
-                                                        title="Eliminar cliente"
-                                                    >
-                                                        <Trash2 size={12} />
-                                                        <span className="d-none d-xl-inline ms-1">Eliminar</span>
-                                                    </Button>
+                                                    {cliente.activo ? (
+                                                        <Button
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            onClick={() => desactivarCliente(cliente.idCliente)}
+                                                            className="btn-sm shadow-sm"
+                                                            style={{ minWidth: '32px' }}
+                                                            title="Desactivar cliente"
+                                                        >
+                                                            <PowerOff size={12} />
+                                                            <span className="d-none d-xl-inline ms-1">Desactivar</span>
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            variant="outline-success"
+                                                            size="sm"
+                                                            onClick={() => activarCliente(cliente.idCliente)}
+                                                            className="btn-sm shadow-sm"
+                                                            style={{ minWidth: '32px' }}
+                                                            title="Activar cliente"
+                                                        >
+                                                            <Power size={12} />
+                                                            <span className="d-none d-xl-inline ms-1">Activar</span>
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
