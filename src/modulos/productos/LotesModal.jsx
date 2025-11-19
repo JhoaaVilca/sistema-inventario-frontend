@@ -34,7 +34,7 @@ function LotesModal({ show, onHide, producto, lotes, onChanged }) {
     return new Date(now.getFullYear(), now.getMonth(), now.getDate());
   }, []);
 
-  const umbralDiasProximo = 15; // ventana para considerar "próximo a vencer"
+  const umbralDiasProximo = 30; // ventana para considerar "próximo a vencer" (alineado con backend)
 
   const esVencido = useCallback((lote) => {
     if (lote?.estaVencido === true) return true; // respetar flag si viene del backend

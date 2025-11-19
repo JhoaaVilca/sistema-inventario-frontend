@@ -228,6 +228,7 @@ const DetalleSalida = ({ salida, isOpen, onToggle, ocultarHeader = false }) => {
                                 <h6 className="mb-0">{nombreCliente || 'Venta'}</h6>
                                 <span className="text-muted">•</span>
                                 <small className="text-muted">Salida #{salida.idSalida}</small>
+                                <Badge bg="info" className="ms-1">Ticket</Badge>
                                 <span className="text-muted">•</span>
                                 {getTipoVentaBadge(salida.tipoVenta)}
                             </div>

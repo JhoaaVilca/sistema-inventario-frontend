@@ -329,9 +329,11 @@ const Kardex = () => {
                             <Button variant="primary" onClick={handleFiltrar} className="w-100">
                                 <Search size={16} /> Buscar
                             </Button>
-                            <Button variant="outline-secondary" onClick={handleLimpiarFiltros} className="w-100">
-                                <X size={16} /> Limpiar
-                            </Button>
+                            {(productoSeleccionado || fechaInicio || fechaFin || tipoMovimiento) && (
+                                <Button variant="outline-secondary" onClick={handleLimpiarFiltros} className="w-100">
+                                    <X size={16} /> Limpiar
+                                </Button>
+                            )}
                         </Col>
                     </Form>
                 </Card.Body>

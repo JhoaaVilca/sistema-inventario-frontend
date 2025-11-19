@@ -242,7 +242,13 @@ const DetalleEntrada = ({ entrada, isOpen, onToggle, onVerFactura, onSubirFactur
                         <div>
                             <div className="d-flex align-items-center gap-2">
                                 <h6 className="mb-0">{entrada?.proveedor?.nombre || 'Sin proveedor'}</h6>
-                                <small className="text-muted">Factura {entrada.numeroFactura || '-'}</small>
+                                {entrada?.numeroFactura || entrada?.facturaUrl ? (
+                                    <Badge bg="success" className="ms-1">
+                                        {entrada?.numeroFactura ? `Factura ${entrada.numeroFactura}` : 'Factura adjunta'}
+                                    </Badge>
+                                ) : (
+                                    <Badge bg="secondary" className="ms-1">Sin factura</Badge>
+                                )}
                             </div>
                             <small className="text-muted">
                                 {formatearFecha(entrada.fechaEntrada)}
