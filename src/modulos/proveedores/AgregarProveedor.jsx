@@ -24,7 +24,15 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
     };
 
     const handleChange = (e) => {
-        setProveedor({ ...proveedor, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        // Sanitizar numeroDocumento para permitir solo dígitos y respetar longitud según tipo
+        if (name === "numeroDocumento") {
+            const maxLen = proveedor.tipoDocumento === "RUC" ? 11 : 8;
+            const soloDigitos = (value || "").replace(/\D/g, "").slice(0, maxLen);
+            setProveedor({ ...proveedor, numeroDocumento: soloDigitos });
+            return;
+        }
+        setProveedor({ ...proveedor, [name]: value });
     };
 
     const buscarDocumento = async () => {
@@ -118,8 +126,28 @@ const AgregarProveedor = ({ show, handleClose, onProveedorAdded }) => {
                                     onChange={handleChange}
                                     placeholder="Ingrese el número de documento"
                                     required
+                                    inputMode="numeric"
+                                    pattern={proveedor.tipoDocumento === "RUC" ? "\\d{11}" : proveedor.tipoDocumento === "DNI" ? "\\d{8}" : "\\d+"}
+                                    maxLength={proveedor.tipoDocumento === "RUC" ? 11 : 8}
+                                    title={
+                                        proveedor.tipoDocumento === "RUC"
+                                            ? "RUC debe tener 11 dígitos"
+                                            : proveedor.tipoDocumento === "DNI"
+                                            ? "DNI debe tener 8 dígitos"
+                                            : "Solo números"
+                                    }
                                 />
-                                <Button variant="secondary" onClick={buscarDocumento}>
+                                <Button
+                                    variant="secondary"
+                                    onClick={buscarDocumento}
+                                    disabled={
+                                        proveedor.tipoDocumento === "RUC"
+                                            ? proveedor.numeroDocumento.length !== 11
+                                            : proveedor.tipoDocumento === "DNI"
+                                            ? proveedor.numeroDocumento.length !== 8
+                                            : !proveedor.numeroDocumento
+                                    }
+                                >
                                     Buscar
                                 </Button>
                             </InputGroup>

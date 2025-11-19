@@ -19,6 +19,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
     const [error, setError] = useState("");
     const [showToast, setShowToast] = useState(false);
     const { categorias } = useCategorias();
+    const hoy = new Date().toISOString().split('T')[0];
 
 
     // Resetear formulario cada vez que se abre el modal
@@ -50,6 +51,17 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
         if (!unidadMedida) {
             setError("Por favor ingresa la unidad de medida");
             return;
+        }
+
+        if (esPerecible && parseInt(stock || 0, 10) > 0) {
+            if (!fechaVencimientoInicial) {
+                setError("Para productos perecibles con stock inicial, la fecha de vencimiento es obligatoria.");
+                return;
+            }
+            if (fechaVencimientoInicial < hoy) {
+                setError("La fecha de vencimiento no puede ser anterior a hoy.");
+                return;
+            }
         }
 
 
@@ -297,6 +309,7 @@ function AgregarProductos({ show, handleClose, onProductoAdded }) {
                                     onChange={(e) => setFechaVencimientoInicial(e.target.value)}
                                     required={esPerecible && parseInt(stock || 0, 10) > 0}
                                     disabled={!esPerecible || parseInt(stock || 0, 10) <= 0}
+                                    min={hoy}
                                 />
                                 <Form.Text muted>
                                     Obligatorio si el producto es perecible y el stock inicial es mayor a 0.

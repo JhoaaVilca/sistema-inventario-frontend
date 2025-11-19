@@ -97,9 +97,13 @@ const AgregarCliente = ({ show, onHide = () => {}, onClienteAgregado = () => {},
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        let nuevoValor = value;
+        if (name === 'dni') {
+            nuevoValor = (value || '').replace(/\D/g, '').slice(0, 8);
+        }
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: nuevoValor
         }));
     };
 
@@ -187,6 +191,9 @@ const AgregarCliente = ({ show, onHide = () => {}, onClienteAgregado = () => {},
                                     onChange={handleInputChange}
                                     placeholder="12345678"
                                     maxLength="8"
+                                    inputMode="numeric"
+                                    pattern="\\d{8}"
+                                    title="El DNI debe tener 8 dígitos numéricos"
                                     isInvalid={dniValidation === 'invalid'}
                                     isValid={dniValidation === 'valid' || dniValidation === 'found'}
                                 />

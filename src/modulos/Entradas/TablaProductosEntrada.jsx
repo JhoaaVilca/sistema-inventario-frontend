@@ -15,6 +15,7 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
     const [errorInline, setErrorInline] = useState("");
     const [limpiarBuscador, setLimpiarBuscador] = useState(false);
     const [productoRecienAgregado, setProductoRecienAgregado] = useState(null);
+    const hoy = new Date().toISOString().split('T')[0];
 
     const formatearFechaLocalDate = (str) => {
         if (!str) return 'Sin fecha';
@@ -65,6 +66,10 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
         }
         if (requiereVencimiento && !fechaVencimiento) {
             setErrorInline("Seleccione la fecha de vencimiento.");
+            return;
+        }
+        if (requiereVencimiento && fechaVencimiento < hoy) {
+            setErrorInline("La fecha de vencimiento no puede ser anterior a hoy.");
             return;
         }
         const subtotal = cantidadNum * precioNum;
@@ -175,6 +180,7 @@ function TablaProductosEntrada({ productosEntrada, setProductosEntrada, onProduc
                             onChange={(e) => setFechaVencimiento(e.target.value)}
                             title="Fecha de vencimiento del lote"
                             required
+                            min={hoy}
                         />
                     </Col>
                 )}

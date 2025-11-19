@@ -27,7 +27,14 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        const actualizado = { ...formulario, [name]: value };
+        let actualizado;
+        if (name === "numeroDocumento") {
+            const maxLen = (formulario.tipoDocumento === "RUC") ? 11 : 8;
+            const soloDigitos = (value || "").replace(/\D/g, "").slice(0, maxLen);
+            actualizado = { ...formulario, numeroDocumento: soloDigitos };
+        } else {
+            actualizado = { ...formulario, [name]: value };
+        }
         setFormulario(actualizado);
 
         if (
@@ -116,6 +123,16 @@ function EditarProveedor({ show, handleClose, proveedor, onProveedorUpdated }) {
                             onChange={handleChange}
                             placeholder="Ingrese número de documento"
                             required
+                            inputMode="numeric"
+                            pattern={formulario.tipoDocumento === "RUC" ? "\\d{11}" : formulario.tipoDocumento === "DNI" ? "\\d{8}" : "\\d+"}
+                            maxLength={formulario.tipoDocumento === "RUC" ? 11 : 8}
+                            title={
+                                formulario.tipoDocumento === "RUC"
+                                    ? "RUC debe tener 11 dígitos"
+                                    : formulario.tipoDocumento === "DNI"
+                                    ? "DNI debe tener 8 dígitos"
+                                    : "Solo números"
+                            }
                         />
                     </Form.Group>
 
