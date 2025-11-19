@@ -93,6 +93,21 @@ const CajaDelDia = () => {
         cargarEstadoCaja();
     }, [cargarEstadoCaja]);
 
+    // Abrir modal de apertura con Enter cuando no hay caja
+    useEffect(() => {
+        const handler = (e) => {
+            if (e.key === 'Enter') {
+                // Si no hay caja abierta ni modal ya abierto, abrir modal
+                if (!caja && !showAbrirModal) {
+                    e.preventDefault();
+                    setShowAbrirModal(true);
+                }
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, [caja, showAbrirModal]);
+
     const cargarMovimientos = async (idCaja) => {
         if (!idCaja) {
             console.warn('No se proporcionó un ID de caja para cargar movimientos');
@@ -521,7 +536,7 @@ const CajaDelDia = () => {
                     <Modal.Title>Abrir Caja del Día</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form>
+                    <Form onSubmit={(e) => { e.preventDefault(); abrirCaja(); }}>
                         <Form.Group className="mb-3">
                             <Form.Label>Monto de Apertura *</Form.Label>
                             <Form.Control
@@ -549,7 +564,7 @@ const CajaDelDia = () => {
                     <Button variant="secondary" onClick={() => setShowAbrirModal(false)}>
                         Cancelar
                     </Button>
-                    <Button variant="success" onClick={abrirCaja} disabled={loading}>
+                    <Button variant="success" onClick={abrirCaja} disabled={loading} type="submit">
                         {loading ? <Spinner size="sm" /> : 'Abrir Caja'}
                     </Button>
                 </Modal.Footer>
