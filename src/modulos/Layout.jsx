@@ -28,6 +28,7 @@ function Layout({ children }) {
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
     const handleLogout = () => {
+        localStorage.setItem('logoutSuccess', '1');
         localStorage.removeItem('token');
         localStorage.removeItem('username');
         localStorage.removeItem('role');

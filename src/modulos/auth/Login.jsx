@@ -14,6 +14,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [showExpiredToast, setShowExpiredToast] = useState(false);
+  const [showLogoutToast, setShowLogoutToast] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +26,17 @@ function Login() {
       setTimeout(() => {
         setShowExpiredToast(false);
       }, 5000);
+    }
+  }, []);
+
+  useEffect(() => {
+    const logout = localStorage.getItem('logoutSuccess');
+    if (logout === '1') {
+      setShowLogoutToast(true);
+      localStorage.removeItem('logoutSuccess');
+      setTimeout(() => {
+        setShowLogoutToast(false);
+      }, 3000);
     }
   }, []);
 
@@ -119,6 +131,22 @@ function Login() {
               </Toast.Header>
               <Toast.Body className="text-white">
                 Bienvenido, {username}. Redirigiendo al dashboard...
+              </Toast.Body>
+            </Toast>
+
+            {/* Toast de sesión cerrada */}
+            <Toast
+              show={showLogoutToast}
+              onClose={() => setShowLogoutToast(false)}
+              delay={3000}
+              autohide
+              bg="danger"
+            >
+              <Toast.Header closeButton className="bg-danger text-white border-0">
+                <strong className="me-auto">ℹ️ Sesión cerrada</strong>
+              </Toast.Header>
+              <Toast.Body className="text-white">
+                Has cerrado sesión correctamente.
               </Toast.Body>
             </Toast>
             
