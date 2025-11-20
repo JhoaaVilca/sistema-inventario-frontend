@@ -7,14 +7,21 @@ import {
     Receipt,
     ChevronDown,
     ChevronUp,
-    FileText,
     Truck,
     Hash,
     Eye,
     Upload
 } from "lucide-react";
 
-const DetalleEntrada = ({ entrada, isOpen, onToggle, onVerFactura, onSubirFactura, resolverFacturaUrl, ocultarHeader = false }) => {
+const DetalleEntrada = ({
+    entrada,
+    isOpen,
+    onToggle,
+    onVerFactura,
+    onSubirFactura,
+    resolverFacturaUrl,
+    ocultarHeader = false
+}) => {
     const [detallesAbiertos, setDetallesAbiertos] = useState(false);
 
     const calcularTotal = () => {

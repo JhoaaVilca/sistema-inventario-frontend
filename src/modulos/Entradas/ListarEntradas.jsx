@@ -3,7 +3,7 @@ import { Table, Button, Form, Card, Badge, Collapse, Alert, Spinner, Modal } fro
 import AgregarEntrada from "./AgregarEntrada";
 import EditarEntrada from "./EditarEntrada";
 import DetalleEntrada from "./DetalleEntrada";
-import { Plus, Search, X, Filter, Calendar, Building, ChevronDown, ChevronUp, Edit, Trash2, Upload, FileText, Eye } from "lucide-react";
+import { Plus, Search, X, Filter, Calendar, Building, ChevronDown, ChevronUp,  FileText } from "lucide-react";
 import apiClient from "../../servicios/apiClient";
 import Paginador from "../common/Paginador";
 
@@ -15,14 +15,12 @@ function ListarEntradas() {
     const [fechaFin, setFechaFin] = useState("");
     const [numeroFactura, setNumeroFactura] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
-    // Eliminado modal de edición clásico; ahora editamos inline en el detalle
     const [filtrosActivos, setFiltrosActivos] = useState(false);
     const [filtrosAbiertos, setFiltrosAbiertos] = useState(false);
     const [cargando, setCargando] = useState(false);
     const [errorListado, setErrorListado] = useState("");
     const [subiendoFactura, setSubiendoFactura] = useState(false);
     const [entradaFactura, setEntradaFactura] = useState(null);
-    // Eliminado: entradaExpandida ya no se usa
     const [showDetalleModal, setShowDetalleModal] = useState(false);
     const [entradaDetalle, setEntradaDetalle] = useState(null);
     const [editMode, setEditMode] = useState(false);
@@ -168,7 +166,8 @@ function ListarEntradas() {
         formData.append('file', file);
 
         try {
-            await apiClient.post(
+            const metodo = entradaFactura?.facturaUrl ? 'put' : 'post';
+            await apiClient[metodo](
                 `/entradas/${entradaFactura.idEntrada}/factura`,
                 formData,
                 {
@@ -214,7 +213,9 @@ function ListarEntradas() {
             try {
                 const absoluteUrl = resolverFacturaUrl(entrada);
                 window.open(absoluteUrl, '_blank');
-            } catch (_) {}
+            } catch (fallbackError) {
+                console.error('Error al abrir la factura directamente:', fallbackError);
+            }
             alert('No se pudo abrir la factura. Verifique su sesión e intente nuevamente.');
         }
     };
@@ -462,6 +463,11 @@ function ListarEntradas() {
                     <hr />
                     <Form.Group>
                         <Form.Label>Seleccionar archivo (PDF o imagen)</Form.Label>
+                        {entradaFactura?.facturaUrl && (
+                            <Form.Text className="text-warning d-block mb-2">
+                                Subir un nuevo archivo reemplazará la factura actual.
+                            </Form.Text>
+                        )}
                         <Form.Control
                             type="file"
                             accept=".pdf,.jpg,.jpeg,.png"

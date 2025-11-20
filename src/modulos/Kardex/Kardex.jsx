@@ -401,6 +401,7 @@ const Kardex = () => {
                         link.remove();
                         window.URL.revokeObjectURL(url);
                     } catch (e) {
+                        console.error('Error al exportar Excel del Kardex:', e);
                         setError("Error al exportar Excel del Kardex.");
                     }
                 }}>

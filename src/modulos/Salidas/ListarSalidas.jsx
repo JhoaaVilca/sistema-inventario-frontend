@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Table, Button, Form, Card, Badge, Collapse, Alert, Modal, Spinner } from "react-bootstrap";
 import AgregarSalida from "./AgregarSalida";
 import EditarSalida from "./EditarSalida";
@@ -32,27 +32,46 @@ function ListarSalidas() {
     const [estadoCaja, setEstadoCaja] = useState(null);
     // eliminado cargandoCaja sin uso
     const [mensajeCaja, setMensajeCaja] = useState("");
+    const ticketUrlRef = useRef(null);
 
     useEffect(() => {
+        if (!showTicketModal || !ticketSalidaId) {
+            if (ticketUrlRef.current) {
+                URL.revokeObjectURL(ticketUrlRef.current);
+                ticketUrlRef.current = null;
+            }
+            setTicketPdfUrl("");
+            return;
+        }
+
+        let isActive = true;
         const loadPdf = async () => {
-            if (!showTicketModal || !ticketSalidaId) return;
             setCargandoTicket(true);
             try {
                 const resp = await apiClient.get(`/salidas/${ticketSalidaId}/ticket-pdf`, { responseType: 'blob' });
                 const blob = new Blob([resp.data], { type: 'application/pdf' });
                 const url = URL.createObjectURL(blob);
-                setTicketPdfUrl(url);
+                if (ticketUrlRef.current) {
+                    URL.revokeObjectURL(ticketUrlRef.current);
+                }
+                ticketUrlRef.current = url;
+                if (isActive) {
+                    setTicketPdfUrl(url);
+                }
             } catch (e) {
                 console.error('No se pudo cargar el ticket PDF', e);
             } finally {
-                setCargandoTicket(false);
+                if (isActive) {
+                    setCargandoTicket(false);
+                }
             }
         };
         loadPdf();
         return () => {
-            if (ticketPdfUrl) {
-                URL.revokeObjectURL(ticketPdfUrl);
-                setTicketPdfUrl("");
+            isActive = false;
+            if (ticketUrlRef.current) {
+                URL.revokeObjectURL(ticketUrlRef.current);
+                ticketUrlRef.current = null;
             }
         };
     }, [showTicketModal, ticketSalidaId]);
