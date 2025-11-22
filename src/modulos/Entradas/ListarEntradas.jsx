@@ -198,24 +198,32 @@ function ListarEntradas() {
             return;
         }
         try {
-            // Usar URL absoluta para evitar duplicar /api en baseURL + path
             const absoluteUrl = resolverFacturaUrl(entrada);
-            // Descargar usando apiClient (envía Authorization/cookies si aplica)
+            // Usamos XHR para enviar credenciales/headers y evitar 401
             const response = await apiClient.get(absoluteUrl, { responseType: 'blob' });
-            const contentType = response.headers['content-type'] || 'application/octet-stream';
-            const blob = new Blob([response.data], { type: contentType });
-            const blobUrl = URL.createObjectURL(blob);
-            window.open(blobUrl, '_blank');
-            // Limpieza opcional del objeto URL se puede hacer luego con setTimeout si se desea
+            const disposition = response.headers['content-disposition'] || '';
+            let filename = 'factura';
+            const match = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i.exec(disposition);
+            if (match) {
+                filename = decodeURIComponent(match[1] || match[2] || filename);
+            }
+            const blob = new Blob([response.data], { type: response.headers['content-type'] || 'application/octet-stream' });
+            const url = URL.createObjectURL(blob);
+            // Intentar abrir inline en nueva pestaña
+            const win = window.open(url, '_blank');
+            if (!win) {
+                // Si el navegador bloquea popups, forzar descarga con nombre correcto
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            }
+            // Liberar URL más tarde
+            setTimeout(() => URL.revokeObjectURL(url), 60_000);
         } catch (error) {
             console.error('Error al abrir factura:', error);
-            // Fallback: intentar abrir directamente la URL absoluta (podría requerir sesión/cookies del navegador)
-            try {
-                const absoluteUrl = resolverFacturaUrl(entrada);
-                window.open(absoluteUrl, '_blank');
-            } catch (fallbackError) {
-                console.error('Error al abrir la factura directamente:', fallbackError);
-            }
             alert('No se pudo abrir la factura. Verifique su sesión e intente nuevamente.');
         }
     };
@@ -224,7 +232,11 @@ function ListarEntradas() {
     const resolverFacturaUrl = (entrada) => {
         const apiBase = apiClient.defaults.baseURL || '';
         const backendRoot = apiBase.replace(/\/api\/?$/, '');
-        // Si ya es absoluta, devolver tal cual
+        // Si la URL almacenada es de Azure (pública), usar SIEMPRE el proxy del backend
+        if (entrada?.facturaUrl && /\.blob\.core\.windows\.net/i.test(entrada.facturaUrl)) {
+            return `${backendRoot}/api/entradas/${entrada.idEntrada}/factura`;
+        }
+        // Si ya es absoluta y no es Azure, devolver tal cual
         if (/^https?:\/\//i.test(entrada.facturaUrl)) return entrada.facturaUrl;
         return `${backendRoot}${entrada.facturaUrl}`;
     };

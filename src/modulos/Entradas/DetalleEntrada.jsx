@@ -274,16 +274,17 @@ const DetalleEntrada = ({
                         {isOpen ? <ChevronUp size={20} className="ms-1" /> : <ChevronDown size={20} className="ms-1" />}
                     </div>
                 </div>
-                {/* Miniatura si la factura es imagen */}
-                {entrada?.facturaUrl && /\.(jpg|jpeg|png)$/i.test(entrada.facturaUrl) && (
-                    <div className="mt-3">
-                        <img
-                            src={resolverFacturaUrl ? resolverFacturaUrl(entrada) : entrada.facturaUrl}
-                            alt="Factura adjunta"
-                            style={{ maxHeight: 80, borderRadius: 6 }}
-                            className="border"
+                {/* Acceso rápido a la factura con mejor diseño */}
+                {entrada?.facturaUrl && (
+                    <div className="mt-2">
+                        <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            className="d-inline-flex align-items-center py-0 px-2"
                             onClick={(e) => { e.stopPropagation(); onVerFactura && onVerFactura(entrada); }}
-                        />
+                        >
+                            <Eye size={14} className="me-1" /> Ver factura
+                        </Button>
                     </div>
                 )}
             </Card.Header>
