@@ -33,6 +33,9 @@ const ListarProductos = () => {
     const [mostrarFiltros, setMostrarFiltros] = useState(false); // Mostrar/ocultar filtros
     const [alertas, setAlertas] = useState({}); // Almacenar alertas por producto
     const [stockMap, setStockMap] = useState({}); // Stock calculado desde lotes activos por producto
+    // Filtro por categoría (server-side)
+    const [categorias, setCategorias] = useState([]);
+    const [categoriaId, setCategoriaId] = useState("");
 
     const inputRef = useRef(null);
     const tableRef = useRef(null);
@@ -131,7 +134,9 @@ const ListarProductos = () => {
     const cargarProductos = useCallback(async () => {
         setLoading(true);
         try {
-            const { data } = await apiClient.get(`/productos`, { params: { page, size } });
+            const params = { page, size };
+            if (categoriaId) params.categoriaId = categoriaId;
+            const { data } = await apiClient.get(`/productos`, { params });
             setProductos(data?.content || []);
             setTotalPages(data?.totalPages || 0);
             setError("");
@@ -159,12 +164,26 @@ const ListarProductos = () => {
         } finally {
             setLoading(false);
         }
-    }, [page, size]);
+    }, [page, size, categoriaId]);
 
     useEffect(() => {
         cargarProductos();
         cargarAlertas();
     }, [cargarProductos, cargarAlertas]);
+
+    // Cargar categorías activas para el filtro (una vez)
+    useEffect(() => {
+        const cargarCategorias = async () => {
+            try {
+                const { data } = await apiClient.get(`/categorias/activas`);
+                setCategorias(Array.isArray(data) ? data : []);
+            } catch (e) {
+                console.error("Error al cargar categorías:", e);
+                setCategorias([]);
+            }
+        };
+        cargarCategorias();
+    }, []);
 
     // Utilidades para manejar fechas 'YYYY-MM-DD' sin desfases de zona horaria
     const parseLocalDate = (str) => {
@@ -246,6 +265,7 @@ const ListarProductos = () => {
     const limpiarFiltros = () => {
         setFiltro("");
         setFiltroAlerta("");
+        setCategoriaId("");
         setMostrarInput(false);
         inputRef.current?.blur();
     };
@@ -302,7 +322,7 @@ const ListarProductos = () => {
                         <Filter size={16} className="me-1" />
                         Filtros
                     </Button>
-                    {(filtro || filtroAlerta) && (
+                    {(filtro || filtroAlerta || categoriaId) && (
                         <Button
                             variant="outline-secondary"
                             onClick={limpiarFiltros}
@@ -326,6 +346,22 @@ const ListarProductos = () => {
                     </div>
                     <div className="card-body">
                         <div className="row g-3">
+                            <div className="col-md-6">
+                                <label className="form-label">Filtrar por categoría:</label>
+                                <select
+                                    className="form-select"
+                                    value={categoriaId}
+                                    onChange={(e) => {
+                                        setCategoriaId(e.target.value);
+                                        setPage(0); // Reiniciar paginación al cambiar filtro
+                                    }}
+                                >
+                                    <option value="">Todas las categorías</option>
+                                    {categorias.map(c => (
+                                        <option key={c.idCategoria} value={c.idCategoria}>{c.nombre}</option>
+                                    ))}
+                                </select>
+                            </div>
                             <div className="col-md-6">
                                 <label className="form-label">Filtrar por tipo de alerta:</label>
                                 <select

@@ -303,15 +303,6 @@ function AgregarEntrada({ show, handleClose, onEntradaAgregada }) {
                         {archivoFactura && (
                             <div className="d-flex gap-2">
                                 <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    onClick={verFactura}
-                                    disabled={!previewFactura}
-                                >
-                                    <Eye size={16} className="me-1" />
-                                    Ver Preview
-                                </Button>
-                                <Button
                                     variant="outline-danger"
                                     size="sm"
                                     onClick={() => {

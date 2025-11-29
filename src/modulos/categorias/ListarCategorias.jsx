@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import FormularioCategoria from "./FormularioCategoria";
-import { Edit, Trash2, Search, X, Grid3X3, Eye, Plus } from "lucide-react";
+import { Edit, Power, PowerOff, Search, X, Grid3X3, Eye, Plus } from "lucide-react";
 import {
     Table,
     Button,
@@ -55,16 +55,29 @@ function ListarCategorias() {
         obtenerCategorias();
     }, [obtenerCategorias]);
 
-    const eliminarCategoria = async (id) => {
-        if (window.confirm("¿Estás seguro de que deseas eliminar esta categoría?")) {
+    // Inactivar categoría
+    const inactivarCategoria = async (id) => {
+        if (window.confirm("¿Seguro que deseas inactivar esta categoría?")) {
             try {
-                await apiClient.delete(`/categorias/${id}`);
-                mostrarNotificacion("Categoría eliminada exitosamente", "success");
+                await apiClient.put(`/categorias/${id}/inactivar`);
+                mostrarNotificacion("Categoría inactivada exitosamente", "success");
                 obtenerCategorias();
             } catch (error) {
-                console.error("Error al eliminar categoría:", error);
-                mostrarNotificacion("Error al eliminar la categoría", "danger");
+                console.error("Error al inactivar categoría:", error);
+                mostrarNotificacion("Error al inactivar la categoría", "danger");
             }
+        }
+    };
+
+    // Activar categoría
+    const activarCategoria = async (id) => {
+        try {
+            await apiClient.put(`/categorias/${id}/activar`);
+            mostrarNotificacion("Categoría activada exitosamente", "success");
+            obtenerCategorias();
+        } catch (error) {
+            console.error("Error al activar categoría:", error);
+            mostrarNotificacion("Error al activar la categoría", "danger");
         }
     };
 
@@ -274,15 +287,27 @@ function ListarCategorias() {
                                                             <Edit size={14} />
                                                             <span className="d-none d-md-inline ms-1">Editar</span>
                                                         </Button>
-                                                        <Button
-                                                            variant="outline-danger"
-                                                            size="sm"
-                                                            onClick={() => eliminarCategoria(categoria.idCategoria)}
-                                                            title="Eliminar categoría"
-                                                        >
-                                                            <Trash2 size={14} />
-                                                            <span className="d-none d-md-inline ms-1">Eliminar</span>
-                                                        </Button>
+                                                        {categoria.activo ? (
+                                                            <Button
+                                                                variant="outline-danger"
+                                                                size="sm"
+                                                                onClick={() => inactivarCategoria(categoria.idCategoria)}
+                                                                title="Inactivar categoría"
+                                                            >
+                                                                <PowerOff size={14} />
+                                                                <span className="d-none d-md-inline ms-1">Inactivar</span>
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                variant="outline-success"
+                                                                size="sm"
+                                                                onClick={() => activarCategoria(categoria.idCategoria)}
+                                                                title="Activar categoría"
+                                                            >
+                                                                <Power size={14} />
+                                                                <span className="d-none d-md-inline ms-1">Activar</span>
+                                                            </Button>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>
