@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Button, Form, Row, Col, Card, Badge, Collapse, Alert, Spinner, ProgressBar } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { Filter, Calendar, User, Wallet, DollarSign, AlertCircle, CheckCircle, Clock, TrendingUp, Eye, CreditCard, ArrowLeft, ArrowRight, X } from 'lucide-react';
+import { Filter, Calendar, User, Wallet, AlertCircle, CheckCircle, Clock, TrendingUp, Eye, CreditCard, ArrowLeft, ArrowRight, X } from 'lucide-react';
 import creditoService from '../../servicios/creditoService';
 
 function ListarCreditos() {
@@ -98,8 +98,11 @@ function ListarCreditos() {
     const est = (c.estado || '').toUpperCase();
     
     acc.totalCreditos += 1;
-    acc.totalMonto += total;
-    acc.totalSaldo += saldo;
+    // Excluir cancelados de totales
+    if (est !== 'CANCELADO') {
+      acc.totalMonto += total;
+      acc.totalSaldo += saldo;
+    }
     
     if (saldo > 0 && est !== 'CANCELADO' && est !== 'PAGADO') {
       acc.vigentes += 1;
@@ -197,7 +200,7 @@ function ListarCreditos() {
                     <small className="opacity-75">Saldo Pendiente</small>
                     <h4 className="mb-0 fw-bold">{formatearMoneda(estadisticas.totalSaldo)}</h4>
                   </div>
-                  <DollarSign size={32} className="opacity-50" />
+                  <Wallet size={32} className="opacity-50" />
                 </div>
               </Card.Body>
             </Card>
@@ -360,8 +363,9 @@ function ListarCreditos() {
         <div className="row g-3">
           {clientesAgrupados.map((clienteGrupo) => {
             // Calcular totales del cliente
-            const totalMonto = clienteGrupo.creditos.reduce((sum, c) => sum + (Number(c.montoTotal) || 0), 0);
-            const totalSaldo = clienteGrupo.creditos.reduce((sum, c) => sum + (Number(c.saldoPendiente) || 0), 0);
+            const creditosActivos = clienteGrupo.creditos.filter(c => (c.estado || '').toUpperCase() !== 'CANCELADO');
+            const totalMonto = creditosActivos.reduce((sum, c) => sum + (Number(c.montoTotal) || 0), 0);
+            const totalSaldo = creditosActivos.reduce((sum, c) => sum + (Number(c.saldoPendiente) || 0), 0);
             const tieneVencidos = clienteGrupo.creditos.some(c => esVencido(c.fechaVencimiento) && Number(c.saldoPendiente || 0) > 0);
             const tienePendientes = clienteGrupo.creditos.some(c => Number(c.saldoPendiente || 0) > 0);
             

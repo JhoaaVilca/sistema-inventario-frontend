@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Table, Button, Form, Row, Col, Alert, Card, Badge, ProgressBar, Toast, ToastContainer } from 'react-bootstrap';
-import { ArrowLeft, User, Wallet, Calendar, DollarSign, CreditCard, CheckCircle, AlertCircle, Clock, TrendingUp, FileText } from 'lucide-react';
+import { ArrowLeft, User, Wallet, Calendar, CreditCard, CheckCircle, AlertCircle, Clock, TrendingUp, FileText } from 'lucide-react';
 import creditoService from '../../servicios/creditoService';
 import cajaService from '../../servicios/cajaService';
 
@@ -22,7 +22,15 @@ function DetalleCredito() {
   const cargar = useCallback(async () => {
     setLoading(true);
     try {
-      const resp = await creditoService.obtener(id);
+      let resp = await creditoService.obtener(id);
+      // Ordenar pagos por fecha (más recientes primero)
+      if (resp && Array.isArray(resp.pagos)) {
+        resp = { ...resp, pagos: [...resp.pagos].sort((a, b) => {
+          const da = new Date(a?.fechaPago || 0);
+          const db = new Date(b?.fechaPago || 0);
+          return db - da; // descendente
+        }) };
+      }
       setCredito(resp);
       // Prefill: fecha = hoy, monto = saldo pendiente (si > 0)
       setFechaPago(hoyISO());
@@ -217,7 +225,7 @@ function DetalleCredito() {
                       <small className="opacity-75">Monto Total</small>
                       <h4 className="mb-0 fw-bold">{formatearMoneda(credito.montoTotal)}</h4>
                     </div>
-                    <DollarSign size={32} className="opacity-50" />
+                    <Wallet size={32} className="opacity-50" />
                   </div>
                 </Card.Body>
               </Card>
@@ -281,19 +289,6 @@ function DetalleCredito() {
                 <Badge bg="primary" className="ms-2">{credito.pagos.length}</Badge>
               )}
             </div>
-            {saldoPendiente > 0 && (
-              <Button 
-                variant="primary" 
-                size="sm"
-                onClick={() => {
-                  document.getElementById('form-pago')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="d-flex align-items-center"
-              >
-                <CreditCard size={16} className="me-1" />
-                Registrar Pago
-              </Button>
-            )}
           </div>
         </Card.Header>
         <Card.Body className="p-0">
@@ -376,7 +371,7 @@ function DetalleCredito() {
                 <Col md={3}>
                   <Form.Group>
                     <Form.Label className="fw-semibold d-flex align-items-center">
-                      <DollarSign size={16} className="me-2 text-primary" />
+                      <Wallet size={16} className="me-2 text-primary" />
                       Monto
                     </Form.Label>
                     <Form.Control 

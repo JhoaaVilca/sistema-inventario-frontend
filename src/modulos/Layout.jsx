@@ -59,7 +59,7 @@ function Layout({ children }) {
                         className="text-white fw-bold"
                         style={{ fontSize: '1.35rem', letterSpacing: '.3px' }}
                     >
-                        COMERCIAL YAMISA
+                        COMERCIAL YOLI
                     </div>
                 </div>
 
@@ -217,7 +217,7 @@ function Layout({ children }) {
                             >
                                 <Menu size={22} />
                             </button>
-                            <span className="navbar-brand mb-0 fw-bold">COMERCIAL YAMISA</span>
+                            <span className="navbar-brand mb-0 fw-bold">COMERCIAL YOLI</span>
                         </div>
                     </nav>
                 )}

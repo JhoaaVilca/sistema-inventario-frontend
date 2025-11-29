@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Form, Button, Row, Col, Alert, Spinner } from 'react-bootstrap';
-import { Building2, Save, RefreshCw } from 'lucide-react';
+import { Building2, Save } from 'lucide-react';
 import empresaService from '../../servicios/empresaService';
 
 const ConfiguracionEmpresa = () => {
@@ -86,11 +86,7 @@ const ConfiguracionEmpresa = () => {
         }
     };
 
-    const handleReset = () => {
-        cargarConfiguracion();
-        setError('');
-        setSuccess('');
-    };
+    
 
     return (
         <div className="mt-4">
@@ -140,7 +136,7 @@ const ConfiguracionEmpresa = () => {
                                             name="nombreEmpresa"
                                             value={empresa.nombreEmpresa}
                                             onChange={handleInputChange}
-                                            placeholder="Ej: COMERCIAL YAMISA"
+                                            placeholder="Ej: COMERCIAL YOLI"
                                             required
                                         />
                                     </Form.Group>
@@ -222,15 +218,6 @@ const ConfiguracionEmpresa = () => {
                                 >
                                     <Save size={16} className="me-2" />
                                     {saving ? 'Guardando...' : 'Guardar Configuración'}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline-secondary"
-                                    onClick={handleReset}
-                                    className="d-flex align-items-center"
-                                >
-                                    <RefreshCw size={16} className="me-2" />
-                                    Restablecer
                                 </Button>
                             </div>
                         </Form>

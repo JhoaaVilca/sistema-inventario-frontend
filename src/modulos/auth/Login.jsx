@@ -72,7 +72,7 @@ function Login() {
   return (
     <AuthLayout
       leftTitle="Bienvenido"
-      leftSubtitle="COMERCIAL YAMISA • Inventario"
+      leftSubtitle="COMERCIAL YOLI • Inventario"
       leftBg="var(--palette-blue-900)"
       rightBg="var(--palette-blue-600)"
       wedge={true}

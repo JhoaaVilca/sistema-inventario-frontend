@@ -123,7 +123,7 @@ function Dashboard() {
             {/* Header del Dashboard */}
             <div className="mb-4">
                 <h2 className="mb-2 fw-bold text-dark fs-4 fs-md-3">
-                    ¡Bienvenido al Sistema de Inventario COMERCIAL YAMISA!
+                    ¡Bienvenido al Sistema de Inventario COMERCIAL YOLI!
                 </h2>
                 <p className="text-muted mb-0 small small-md">
                     Panel de control y estadísticas generales — Actualizado al: {fechaActual}
