@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { User, Lock } from 'lucide-react';
 import { Toast, ToastContainer } from 'react-bootstrap';
 import apiClient from '../../servicios/apiClient';
+import { useEmpresa } from '../../shared/contexts/EmpresaContext.jsx';
 import AuthLayout from '../ui/AuthLayout.jsx';
 import InputIcon from '../ui/InputIcon.jsx';
 import SubmitButton from '../ui/SubmitButton.jsx';
 
 function Login() {
+  const { subtituloApp } = useEmpresa();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -49,7 +51,11 @@ function Login() {
       if (data?.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username || username);
-        localStorage.setItem('role', data.role || 'ADMIN');
+        if (data.role) {
+          localStorage.setItem('role', data.role);
+        } else {
+          localStorage.removeItem('role');
+        }
         
         // Mostrar mensaje de éxito
         setShowSuccessToast(true);
@@ -72,7 +78,7 @@ function Login() {
   return (
     <AuthLayout
       leftTitle="Bienvenido"
-      leftSubtitle="COMERCIAL YOLI • Inventario"
+      leftSubtitle={subtituloApp}
       leftBg="var(--palette-blue-900)"
       rightBg="var(--palette-blue-600)"
       wedge={true}

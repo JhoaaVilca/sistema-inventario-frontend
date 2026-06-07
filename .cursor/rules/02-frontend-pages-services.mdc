@@ -1,0 +1,19 @@
+---
+description: Pages delgadas y capa de servicios API
+globs: src/**/*.{js,jsx}
+alwaysApply: false
+---
+
+# Pages y servicios
+
+## Reglas
+- Pages/JSX: solo UI + llamadas a `servicios/` o `shared/api/`
+- Prohibido `apiClient` directo en componentes de página (usar services)
+- Máx ~250 LOC por componente sin refactor planificado
+
+## Manejo HTTP
+- 401 → logout (apiClient)
+- 403 → mensaje local, NO logout global
+
+## Referencia
+`docs/02-CONVENCIONES-DESARROLLO.md`, `09-identidad-permisos.mdc`

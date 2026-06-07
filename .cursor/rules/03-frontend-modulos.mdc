@@ -1,0 +1,46 @@
+---
+
+description: Módulos frontend — estructura objetivo y EmpresaContext
+
+globs: src/**/*
+
+alwaysApply: false
+
+---
+
+
+
+# Módulos frontend
+
+
+
+Documento: `docs/01-ARQUITECTURA-SAAS.md` §6
+
+
+
+## Estructura objetivo
+
+`src/modules/{identity,settings,inventory,...}` + `src/shared/`
+
+
+
+## Legacy
+
+`src/modulos/` — migrar gradualmente; no crear features grandes solo ahí.
+
+
+
+## Contextos obligatorios (Fase 1+)
+
+- **EmpresaContext** — branding shell
+
+- **AuthContext** — Fase 2 (roles, permisos, empresaId)
+
+
+
+## Prohibido en código nuevo
+
+- Alias de contexto distintos de EmpresaContext para branding
+
+- Hardcodes de nombre comercial o colores de un cliente
+

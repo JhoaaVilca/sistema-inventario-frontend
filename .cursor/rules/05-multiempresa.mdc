@@ -1,0 +1,36 @@
+---
+
+description: Diseño multiempresa — EmpresaContext, empresa_id, white-label
+
+alwaysApply: true
+
+---
+
+
+
+# Multiempresa — Frontend
+
+
+
+Documento: `docs/03-MULTIEMPRESA.md`
+
+
+
+## Reglas
+
+- **EmpresaContext** tras login: nombre, logo, colores, CSS variables.
+
+- Sin hardcodes de negocio en Layout, Login, Dashboard, `index.html`.
+
+- `empresaService` para GET/PUT configuración y branding.
+
+- Ticket e informes usan datos de empresa vía API.
+
+
+
+## Prohibido
+
+- Branding fijo de un cliente en código
+
+- Ignorar `empresaId` del login (Fase 2+)
+

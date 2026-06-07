@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useEmpresa } from '../shared/contexts/EmpresaContext.jsx';
 import '../assets/bootstrap-olive.css';
 
 // Íconos Lucide
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 
 function Layout({ children }) {
+    const { nombreComercial, empresa } = useEmpresa();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [salidasSubmenuOpen, setSalidasSubmenuOpen] = useState(false);
@@ -59,7 +61,11 @@ function Layout({ children }) {
                         className="text-white fw-bold"
                         style={{ fontSize: '1.35rem', letterSpacing: '.3px' }}
                     >
-                        COMERCIAL YOLI
+                        {empresa?.logoUrl ? (
+                            <img src={empresa.logoUrl} alt={nombreComercial} style={{ maxHeight: 48, maxWidth: '100%' }} />
+                        ) : (
+                            nombreComercial
+                        )}
                     </div>
                 </div>
 
@@ -217,7 +223,7 @@ function Layout({ children }) {
                             >
                                 <Menu size={22} />
                             </button>
-                            <span className="navbar-brand mb-0 fw-bold">COMERCIAL YOLI</span>
+                            <span className="navbar-brand mb-0 fw-bold">{nombreComercial}</span>
                         </div>
                     </nav>
                 )}

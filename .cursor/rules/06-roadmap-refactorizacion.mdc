@@ -1,0 +1,44 @@
+---
+
+description: Roadmap frontend — PRs Fase 1 alineados a 07-ROADMAP §2
+
+alwaysApply: true
+
+---
+
+
+
+# Roadmap Frontend
+
+
+
+**Canónico:** `docs/07-ROADMAP-TECNICO.md` §2  
+
+**Validación docs:** `docs/INFORME-AUDITORIA-DOCUMENTACION.md`
+
+
+
+## Fase 1 FE (orden)
+
+- **1.4** Eliminar hardcodes (paralelo BE)
+
+- **1.7** EmpresaContext + branding UI — **depende BE 1.5**
+
+
+
+## Fase 2 FE
+
+AuthContext, RoleRoute, UsuariosPage, menú por permisos
+
+
+
+## Fase 4 FE
+
+`/admin/*` AdminLayout, gestión empresas
+
+
+
+## Regresión
+
+Checklist: `docs/07-ROADMAP-TECNICO.md` §8
+

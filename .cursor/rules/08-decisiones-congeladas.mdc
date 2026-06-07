@@ -1,0 +1,28 @@
+---
+
+description: Decisiones congeladas D01-D20 — v1.0.1
+
+alwaysApply: true
+
+---
+
+
+
+# Decisiones congeladas
+
+
+
+Documento: `docs/08-DECISIONES-CONGELADAS.md`
+
+
+
+No reabrir sin change control. Cambios requieren actualizar `docs/` + `.cursor/rules/` + skill + changelog en `ARQUITECTURA-MAESTRA.md`.
+
+
+
+## Recordatorio FE
+
+- D16: white-label desde empresa, no hardcodes
+
+- D19: backend autoriza; frontend solo oculta UI
+

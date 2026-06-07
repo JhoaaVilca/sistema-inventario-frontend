@@ -1,0 +1,31 @@
+---
+description: Convenciones oficiales de nombres y estructura — frontend
+globs: src/**/*.{js,jsx}
+alwaysApply: false
+---
+
+# Convenciones frontend
+
+Ver `docs/ARQUITECTURA-MAESTRA.md` secciones 4 y 11.8.
+
+## Estructura módulo
+```
+modules/{dominio}/pages/ | components/ | hooks/ | services/
+```
+
+## Nombres
+| Tipo | Patrón | Ejemplo |
+|------|--------|---------|
+| Página | {Nombre}Page.jsx | ProductosPage.jsx |
+| Hook | use{Nombre}.js | useProductos.js |
+| Service | {dominio}Service.js | productoService.js |
+| Context | {Nombre}Context.jsx | EmpresaContext.jsx |
+
+## Dominios (inglés)
+identity, settings, inventory, purchases, sales, customers, suppliers, reports, platform, billing
+
+## Prohibido
+- Hardcode nombre comercial / colores / logos
+- axios directo en pages (usar services/)
+- Componentes > 250 LOC sin refactor
+- console.log en producción

@@ -232,13 +232,12 @@ function ListarEntradas() {
     const resolverFacturaUrl = (entrada) => {
         const apiBase = apiClient.defaults.baseURL || '';
         const backendRoot = apiBase.replace(/\/api\/?$/, '');
-        // Si la URL almacenada es de Azure (pública), usar SIEMPRE el proxy del backend
-        if (entrada?.facturaUrl && /\.blob\.core\.windows\.net/i.test(entrada.facturaUrl)) {
+        // Facturas se sirven siempre por el API del backend (storage local)
+        if (entrada?.idEntrada) {
             return `${backendRoot}/api/entradas/${entrada.idEntrada}/factura`;
         }
-        // Si ya es absoluta y no es Azure, devolver tal cual
-        if (/^https?:\/\//i.test(entrada.facturaUrl)) return entrada.facturaUrl;
-        return `${backendRoot}${entrada.facturaUrl}`;
+        if (/^https?:\/\//i.test(entrada?.facturaUrl)) return entrada.facturaUrl;
+        return `${backendRoot}${entrada.facturaUrl || ''}`;
     };
 
     return (

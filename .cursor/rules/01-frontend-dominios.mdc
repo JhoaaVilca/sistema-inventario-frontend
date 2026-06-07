@@ -1,0 +1,20 @@
+---
+description: Estructura modular frontend por dominios
+globs: src/**/*
+alwaysApply: false
+---
+
+# Dominios frontend
+
+Objetivo: `src/modules/{identity,settings,inventory,purchases,sales,customers,suppliers,reports,platform}` + `src/shared/`.
+
+## Estado actual (legacy)
+- `src/modulos/` — permitido para mantenimiento
+- Código nuevo preferir `src/modules/` + `src/shared/`
+
+## Prohibido en código nuevo
+- Features nuevas solo en `modulos/` sin plan de migración
+- Hardcodes comerciales (nombres de cliente, branding fijo)
+
+## Referencia
+`docs/01-ARQUITECTURA-SAAS.md` §6

@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 
 function AuthLayout({
   leftTitle = 'Bienvenido',
-  leftSubtitle = 'COMERCIAL YOLI • Inventario',
+  leftSubtitle = 'Sistema de Inventario',
   leftBg = 'var(--palette-blue-900)',
   rightBg = 'var(--palette-blue-600)',
   wedge = true,

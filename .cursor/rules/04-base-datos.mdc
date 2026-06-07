@@ -1,0 +1,24 @@
+---
+
+description: Base de datos multiempresa — empresa_id, Flyway (referencia FE)
+
+alwaysApply: true
+
+---
+
+
+
+# Base de datos (referencia)
+
+
+
+Documento: `docs/05-BASE-DE-DATOS.md`
+
+
+
+- Aislamiento por **`empresa_id`** (Fase 3).
+
+- Cambios de schema vía Flyway en backend; el FE no altera BD.
+
+- Contratos API deben incluir contexto de empresa cuando aplique (Fase 2+: `empresaId` en JWT).
+

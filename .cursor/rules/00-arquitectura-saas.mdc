@@ -1,0 +1,51 @@
+---
+
+description: Documentación oficial v1.0.1 — Modular Monolith multiempresa
+
+alwaysApply: true
+
+---
+
+
+
+# Estado código vs objetivo
+
+**Estado actual:** Fase 1 en ejecución. Legacy `src/modulos/` coexiste con `src/shared/contexts/EmpresaContext`.
+No asumir RBAC de 5 roles ni `empresa_id` hasta completar Fases 2–3.
+
+# Fuente oficial
+
+
+
+**Índice:** `docs/ARQUITECTURA-MAESTRA.md`  
+
+**Suite:** `docs/01-` a `docs/08-`, informes de cumplimiento y auditoría  
+
+**Skill:** `.cursor/skills/saas-platform-architecture/SKILL.md`
+
+
+
+## Arquitectura
+
+- **Modular Monolith (B)** — dominios aislados, un deploy
+
+- **Empresa** = única unidad de aislamiento
+
+- **empresa_id** en tablas de negocio (Fase 3+)
+
+- **White-label** desde **EmpresaContext**
+
+
+
+## Fases
+
+1 Fundamentos → 2 Identidad → 3 Multiempresa → 4 Super Admin → 5 Sucursales → 6 Billing
+
+
+
+## Antes de cada PR
+
+Checklist en `docs/07-ROADMAP-TECNICO.md` §8.  
+
+Secuencia Fase 1 FE: PR-1.7 (tras BE 1.5) en `docs/07-ROADMAP-TECNICO.md` §2.
+

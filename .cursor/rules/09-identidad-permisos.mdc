@@ -1,0 +1,58 @@
+---
+
+description: Identidad, roles y permisos RBAC — diseño oficial frontend
+
+alwaysApply: true
+
+---
+
+
+
+# Identidad y autorización — Frontend
+
+
+
+Documento completo: `docs/04-IDENTIDAD-PERMISOS.md`
+
+
+
+## Contextos
+
+- `AuthContext`: token, roles, permisos, empresaId, superAdmin
+
+- `EmpresaContext`: branding (nombre, logo, colores)
+
+
+
+## Componentes
+
+- `PrivateRoute` — autenticado
+
+- `RoleRoute` / `PermisoRoute` — permiso específico
+
+- Menú Layout filtrado por permisos
+
+
+
+## Login response (Fase 2+)
+
+Incluir: token, empresaId, roles, permisos, nombreEmpresa
+
+
+
+## Reglas
+
+- 401 → logout; 403 permiso → mensaje, NO logout global
+
+- No default `role: 'ADMIN'` si backend no envía
+
+- SUPER_ADMIN → redirect `/admin`
+
+- Usuarios empresa → redirect `/`
+
+
+
+## Módulo identity
+
+`modules/identity/pages/UsuariosPage.jsx` — solo EMPRESA_ADMIN
+
